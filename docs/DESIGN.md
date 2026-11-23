@@ -16,8 +16,8 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
    file in `public/logos/`) on a light tile, or the icon when there's no logo.
 3. Featured: projects with `featured: true`. Each row opens a drawer.
 4. Writing: latest 2 published posts + "All writing".
-5. Connect: email (copies, toast), then LinkedIn and GitHub side by side in two columns. The resume
-   lives only at the top (header badge line and the "Reach me" sentence).
+5. Connect: two columns. Email (copies, toast) | Resume (when the PDF exists), then LinkedIn | GitHub.
+   On phones the email address wraps after the "@".
 6. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound
    toggle (home page only) and the light/dark theme toggle.
    The theme follows the system until toggled; the choice is saved in localStorage (`theme`).
