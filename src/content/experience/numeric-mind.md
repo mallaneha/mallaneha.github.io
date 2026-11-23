@@ -10,9 +10,9 @@ logo: /logos/numeric-mind.jpg
 order: 20
 ---
 
-## Overview
+## Overview <span class="when">Apr 2024 – Apr 2025</span>
 
-A year as Senior Data Analyst (April 2024 to April 2025), after two and a half years as a Data
+A year as Senior Data Analyst, after two and a half years as a Data
 Analyst at the same company. I led a team and owned the pipeline that turns raw trial data into FDA
 submission packages.
 

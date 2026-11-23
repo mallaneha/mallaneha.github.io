@@ -10,9 +10,9 @@ logo: /logos/numeric-mind.jpg
 order: 30
 ---
 
-## Overview
+## Overview <span class="when">Oct 2021 – Apr 2024</span>
 
-My first role in clinical data (October 2021 to April 2024): building the datasets and reports that
+My first role in clinical data: building the datasets and reports that
 go into FDA submissions, and making sure they were right.
 
 <div class="stats">

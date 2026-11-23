@@ -113,6 +113,9 @@ Modeled on ch.sh. Sections run top to bottom, separated automatically by `···
 
 Two or three sentences: what it is and why it matters.
 
+<!-- Experience and education: put the dates in the heading, not the sentence.
+     `## Overview <span class="when">Aug 2017 – Mar 2022</span>` shows them right of the dotted line. -->
+
 <div class="stats">
   <div><strong>59% → 3%</strong><span>attack success</span></div>
   <div><strong>1,063</strong><span>documents</span></div>
