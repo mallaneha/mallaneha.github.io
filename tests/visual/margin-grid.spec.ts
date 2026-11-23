@@ -138,3 +138,29 @@ test("hovering a cluster reveals the color of a few of its cells, and keeps the 
   await page.mouse.move(vw / 2, 300);
   await expect.poll(colored).toBe(0);
 });
+
+test("clusters stay small and never spawn near the text column", async ({
+  page,
+}) => {
+  const vw = page.viewportSize()!.width;
+  test.skip(vw < 1024, "only from 1024px up");
+  for (const seed of [3, 7, 11]) {
+    await page.goto(`/?seed=${seed}`);
+    await expect.poll(() => frames(page)).toBeGreaterThan(1);
+    const biggest = await grid(page).evaluate((c) =>
+      Number((c as HTMLCanvasElement).dataset.biggest),
+    );
+    expect(biggest).toBeLessThanOrEqual(12);
+    // Inner 40% of each margin (next to the column) stays empty.
+    const main = (await page.locator("main").boundingBox())!;
+    const vh = page.viewportSize()!.height;
+    const pad = 32; // the 2rem band
+    const leftBand = (main.x - pad) * 0.4;
+    const rightStart = main.x + main.width + pad;
+    const rightBand = (vw - rightStart) * 0.4;
+    expect(
+      await inked(page, main.x - pad - leftBand + 10, 0, leftBand - 10, vh),
+    ).toBe(0);
+    expect(await inked(page, rightStart, 0, rightBand - 10, vh)).toBe(0);
+  }
+});

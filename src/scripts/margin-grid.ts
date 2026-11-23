@@ -10,13 +10,17 @@ const TICK = 100; // ms per frame (~10fps, cells step like the oddgrid recording
 // Motion: boils in place like the oddgrid recording (no drift direction), but ~4.5x slower so it stays calm: a
 // cell stays lit ~5s, the field re-forms over ~10s. Much sparser than oddgrid on purpose: ~2% of cells lit, a few small islands.
 const SPEED = 0.01; // noise time per frame: slow and calm (oddgrid itself is ~0.045)
-const SCALE = 0.09; // noise lattice per cell
+const SCALE = 0.16; // noise lattice per cell: small islands
 // Noise above the threshold lights a cell. The threshold is LIT at the screen edge and rises by EDGE_BIAS toward
 // the text column, so islands sit out by the edges and almost never next to the text (oddgrid is 0.66 everywhere).
 // It also rises by TOP_BIAS toward the top of the window, so islands gather lower down.
 const LIT = 0.72;
 const EDGE_BIAS = 0.14;
 const TOP_BIAS = 0.08;
+// Never spawn in the inner share of each margin, next to the text column (0 = the column's band, 1 = screen edge).
+const KEEP_OUT = 0.4;
+// Clusters stay small: one that grows past this keeps only its strongest cells.
+const MAX_CLUSTER = 12;
 const STEP = 0.05; // each shade is this much further above LIT
 const DOT_SHARE = 0.55; // share of lit cells with a marker (oddgrid: 56%)
 const DOT_SIZE = 0.55; // marker size / cell (oddgrid's dots: ~24 of 44px)
@@ -197,6 +201,7 @@ function draw() {
 
   // 1. Which cells are lit, and their shade and hue (packed as shade * 5 + hue).
   const lit = new Map<number, number>();
+  const strength = new Map<number, number>(); // noise value per lit cell, for trimming clusters
   for (let cy = 0; cy < rows; cy++) {
     for (let cx = 0; cx < cols; cx++) {
       const x = cx * CELL;
@@ -207,7 +212,7 @@ function draw() {
           : x >= clearRight
             ? (x - clearRight) / rightWidth
             : -1;
-      if (p < 0) continue;
+      if (p < KEEP_OUT) continue;
       const threshold =
         LIT + (1 - p) * EDGE_BIAS + (1 - (cy * CELL) / height) * TOP_BIAS;
       const v = field(cx, cy, t, threshold);
@@ -218,10 +223,27 @@ function draw() {
       let hue = 0;
       while (hue < HUE_CUTS.length && h >= HUE_CUTS[hue]) hue++;
       lit.set(cy * cols + cx, shade * 5 + hue);
+      strength.set(cy * cols + cx, v);
     }
   }
 
-  // 2. Follow the hovered cluster as it boils; forget it once it's gone.
+  // 2. Trim big clusters to their MAX_CLUSTER strongest cells.
+  const sorted = new Set<number>();
+  let biggest = 0;
+  for (const i of [...lit.keys()]) {
+    if (sorted.has(i) || !lit.has(i)) continue;
+    const cells = component(lit, i, cols);
+    cells.forEach((c) => sorted.add(c));
+    if (cells.size > MAX_CLUSTER) {
+      [...cells]
+        .sort((a, b) => strength.get(b)! - strength.get(a)!)
+        .slice(MAX_CLUSTER)
+        .forEach((c) => lit.delete(c));
+    }
+    biggest = Math.max(biggest, Math.min(cells.size, MAX_CLUSTER));
+  }
+
+  // 3. Follow the hovered cluster as it boils; forget it once it's gone.
   if (cluster && clusterCols !== cols) cluster = null;
   if (cluster) {
     let seed = -1;
@@ -249,7 +271,7 @@ function draw() {
     }
   }
 
-  // 3. Group cells by fill style, so each style is set once.
+  // 4. Group cells by fill style, so each style is set once.
   const groups: number[][] = fills.map(() => []);
   const dots: number[][] = dotFills.map(() => []);
   for (const [i, code] of lit) {
@@ -261,6 +283,7 @@ function draw() {
       dots[l].push(cx, cy, Math.floor(hash(cx, cy, -2) * MARKERS));
   }
   const colored = reveal.size;
+  canvas.dataset.biggest = String(biggest); // largest cluster before trimming, capped (for tests)
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   // Cells touch (no gap, like oddgrid); edges come from rounding each side, so there are no seams.

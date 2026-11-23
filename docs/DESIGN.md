@@ -54,9 +54,9 @@ show ↗ on hover (always on touch screens).
 From 1024px up, a fixed canvas behind every page puts a sparse, slow noise texture in the left and right margins,
 after oddgrid: 10px square cells, touching, lit where a 3D value-noise field crosses a threshold. About half the lit
 cells carry a marker (dot, ring, plus, cross, small square or dash). At rest it's barely there: three
-near-background grays (`--grid-1`..`--grid-3`) and gray markers (`--grid-dot`). The threshold rises toward the text
-column and toward the top of the window, so the few islands sit out by the screen edges and lower down; none touch
-the 34rem column plus its 2rem band. It boils in place (no drift direction), slowly: a cell stays lit for several
+near-background grays (`--grid-1`..`--grid-3`) and gray markers (`--grid-dot`). Islands are small (at most 12 cells: a
+bigger one keeps only its strongest cells) and never spawn in the inner 40% of each margin; the threshold also rises
+toward the column and toward the top of the window, so the few specks sit out by the screen edges and lower down. It boils in place (no drift direction), slowly: a cell stays lit for several
 seconds.
 
 Hover reveals color, never adds cells: when the mouse is on a lit cell, the lit cells of one small pattern around it

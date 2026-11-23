@@ -106,3 +106,6 @@ What shipped differs from the plan above in these ways, all at Neha's request:
   neighbors, +, x or -) show it; the pattern is chosen once per hovered cluster and kept while that cluster lives.
   The reveal eases after the pointer (6% of the distance per frame).
 - Frame cost about 1–2ms at 1440–1920px.
+- **Small, outer clusters.** `SCALE 0.16` for small features, and a hard cap of 12 cells per cluster (a bigger one
+  keeps its 12 strongest cells). No cells in the inner 40% of each margin (`KEEP_OUT`); about 2.7× more ink in the
+  bottom half of the window than the top.
