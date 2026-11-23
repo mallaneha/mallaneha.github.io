@@ -45,8 +45,6 @@ I adapted the PoisonedRAG black-box attack to the SOC corpus. With just 2 poison
 query, the attack succeeded 59% of the time, changing answers about CVE severity, ATT&CK tactics
 and targeted platforms.
 
-> Two documents out of more than a thousand were enough.
-
 ## Defense
 
 Each retrieved document passes four checks before it reaches the model.
@@ -70,5 +68,3 @@ open-domain questions.
 
 Measuring the attack first made the defense work concrete. Every layer had to earn its place
 against a number.
-
-> Defend retrieval, not just the prompt.

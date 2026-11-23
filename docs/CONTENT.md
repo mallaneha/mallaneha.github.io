@@ -120,14 +120,12 @@ What I built, with one number.
   <li>Step two</li>
 </ol>
 
-> A one-line footnote, shown under a dotted rule.
-
 ## Takeaways
 
 What changed, and what I learned.
 ```
 
-- `##` starts a section, `###` is a small label, `>` is the section's footnote.
+- `##` starts a section, `###` is a small label. No `>` footnotes in drawers (removed 2026-11-23).
 - `stats` (2–3 tiles) and `flow` (2–5 steps) are optional. Only use numbers from the resume or SPEC.
 
 ## Short copy

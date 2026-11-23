@@ -36,8 +36,6 @@ Storage, and Spark talks to a self-hosted PostgreSQL Docker container over JDBC.
 Live World Cup YouTube comments flow through Kafka with a custom producer and consumer, tracking
 mentions of top-rated players. Ambiguous names are filtered out to reduce false matches.
 
-> A player named like a common word will match everything unless you filter it.
-
 ## Models
 
 I trained and tuned rating prediction models in Spark MLlib and PyTorch. A Random Forest reached

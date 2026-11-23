@@ -41,8 +41,6 @@ Every dataset was checked with Pinnacle 21 and statistical modeling to find and 
 built a debugging tool that traces each Pinnacle 21 finding back to the patient records in the SDTM
 and ADaM datasets. It replaced manual lookups and cut issue resolution time by 75%.
 
-> A finding you can't trace to a record is a finding you can't fix.
-
 ## Leading
 
 As a senior analyst I led 12 analysts across concurrent clinical projects, working with
