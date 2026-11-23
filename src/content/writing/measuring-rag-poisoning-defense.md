@@ -4,7 +4,7 @@ description: "How I measured Vector Guard against poisoned documents, and why a 
 date: 2026-11-23
 type: post
 tags: [security, rag, evals]
-draft: true
+draft: false
 ---
 
 Vector Guard is a layered defense I built against poisoned documents in retrieval-augmented generation

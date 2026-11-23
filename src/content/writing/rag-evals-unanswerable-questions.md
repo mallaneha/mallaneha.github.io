@@ -4,7 +4,7 @@ description: "Without unanswerable questions, refusing always looks like a mista
 date: 2026-11-23
 type: post
 tags: [evals, rag, healthcare]
-draft: true
+draft: false
 ---
 
 When I added self-reflection to my [research agent](/writing/cutting-hallucinations-research-agent/),

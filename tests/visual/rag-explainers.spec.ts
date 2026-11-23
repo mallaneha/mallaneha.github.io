@@ -1,11 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 // The RAG post widgets (src/scripts/rag-explainers.ts). Each check pins a number the post's text quotes,
-// so the prose and the widget can't drift apart. These posts are drafts, so skip them on the live site.
-test.skip(
-  Boolean(process.env.BASE_URL),
-  "draft posts only exist on the dev server",
-);
+// so the prose and the widget can't drift apart.
 
 test("abstain lab: floor 0 and 0.60", async ({ page }) => {
   await page.goto("/writing/rag-evals-unanswerable-questions/");

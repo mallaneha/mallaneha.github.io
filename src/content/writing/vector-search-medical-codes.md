@@ -4,7 +4,7 @@ description: "E11.9 and E11.65 look alike to an embedding model. Keyword, vector
 date: 2026-11-23
 type: post
 tags: [rag, healthcare, evals]
-draft: true
+draft: false
 ---
 
 Claims, prior-authorization lists and coverage policies are full of codes: diagnosis codes like E11.9,

@@ -4,7 +4,7 @@ description: "Which features push a RAG assistant over patient data into untrust
 date: 2026-11-23
 type: post
 tags: [security, healthcare, rag, agents]
-draft: true
+draft: false
 ---
 
 With [Vector Guard](/#projects) I worked on keeping poisoned documents out of a RAG index. This post is
