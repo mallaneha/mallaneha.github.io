@@ -7,6 +7,7 @@ location: "Pittsburgh, PA"
 summary: "M.S. AI Engineering"
 icon: school
 logo: /logos/cmu.png
+logoSize: 30
 order: 10
 ---
 
