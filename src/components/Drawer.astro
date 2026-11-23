@@ -121,13 +121,9 @@ const linkAttrs = external
   .drawer:global(.is-visible) {
     transform: translateY(0);
   }
+  /* Same curve as the entrance, so the sheet moves the moment you close it (and a flick keeps its speed). */
   .drawer:global(.is-closing) {
     transition-duration: var(--drawer-out);
-    transition-timing-function: var(--ease-drawer-out);
-  }
-  /* A flicked sheet is already moving: keep its speed instead of easing in from rest. */
-  .drawer:global(.is-closing.is-flung) {
-    transition-timing-function: var(--ease-drawer);
   }
   .drawer:global(.is-dragging) {
     transition: none;
@@ -314,30 +310,45 @@ const linkAttrs = external
       animation: swap-out 6s infinite;
     }
   }
+  /* A short blur mid-swap blends the two texts into one change instead of two overlapping. */
   @keyframes swap-out {
     0%,
     42% {
       opacity: 1;
+      filter: blur(0);
+    }
+    46%,
+    96% {
+      filter: blur(2px);
     }
     50%,
     92% {
       opacity: 0;
+      filter: blur(0);
     }
     100% {
       opacity: 1;
+      filter: blur(0);
     }
   }
   @keyframes swap-in {
     0%,
     42% {
       opacity: 0;
+      filter: blur(0);
+    }
+    46%,
+    96% {
+      filter: blur(2px);
     }
     50%,
     92% {
       opacity: 1;
+      filter: blur(0);
     }
     100% {
       opacity: 0;
+      filter: blur(0);
     }
   }
 
@@ -487,10 +498,21 @@ const linkAttrs = external
     color: var(--color-faint);
   }
 
+  /* Reduced motion: no sliding, but the sheet and backdrop still fade so nothing pops. */
   @media (prefers-reduced-motion: reduce) {
     .drawer,
-    .drawer::backdrop {
-      transition: none;
+    .drawer:global(.is-visible) {
+      transform: none;
+      opacity: 0;
+      transition: opacity 150ms ease;
+    }
+    .drawer:global(.is-visible) {
+      opacity: 1;
+    }
+    .drawer::backdrop,
+    .drawer:global(.is-closing),
+    .drawer:global(.is-closing)::backdrop {
+      transition-duration: 150ms;
     }
     /* No swapping: the link stays visible (the description is on the row that opened the drawer). */
     .swap .desc {

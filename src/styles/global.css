@@ -125,13 +125,17 @@ html:has(dialog[open]) {
   transform: translate(-50%, var(--space-4));
   opacity: 0;
   pointer-events: none;
+  /* Leaving: quicker than arriving. */
   transition:
     opacity var(--transition),
-    transform 300ms var(--ease-drawer);
+    transform 200ms var(--ease-out);
 }
 .toast.is-visible {
   opacity: 1;
   transform: translate(-50%, 0);
+  transition:
+    opacity var(--transition),
+    transform 300ms var(--ease-drawer);
 }
 @media (prefers-reduced-motion: reduce) {
   .toast,

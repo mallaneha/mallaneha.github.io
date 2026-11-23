@@ -3,7 +3,6 @@
 // Every number shown is computed here from the formulas in the post; nothing is hard-coded output.
 
 import {
-  bar,
   bytes,
   checkbox,
   choice,

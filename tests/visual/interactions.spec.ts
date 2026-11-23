@@ -88,6 +88,98 @@ test("dragging the header down closes the drawer", async ({ page }) => {
   await expect(page.locator("dialog[open]")).toHaveCount(0);
 });
 
+test("a short flick closes the drawer; a short drag that stops springs back", async ({
+  page,
+}) => {
+  test.skip(
+    !!test.info().project.use.hasTouch,
+    "mouse drag only on pointer devices",
+  );
+  // The gestures are dispatched inside the page in one task, with exact gaps between events, so the
+  // speeds below don't depend on how busy the test machine is.
+  const gesture = (
+    moves: number[],
+    gap: number,
+    holdBefore: number,
+    holdAfter: number,
+  ) =>
+    openDrawer(page)
+      .locator("[data-drawer-handle]")
+      .evaluate(
+        (el, { moves, gap, holdBefore, holdAfter }) => {
+          const wait = (ms: number) => {
+            const end = performance.now() + ms;
+            while (performance.now() < end);
+          };
+          const r = el.getBoundingClientRect();
+          const x = r.left + 40;
+          const y = r.top + r.height / 2;
+          const fire = (type: string, dy: number) =>
+            el.dispatchEvent(
+              new PointerEvent(type, {
+                bubbles: true,
+                pointerId: 1,
+                pointerType: "mouse",
+                isPrimary: true,
+                clientX: x,
+                clientY: y + dy,
+              }),
+            );
+          fire("pointerdown", 0);
+          wait(holdBefore);
+          for (const dy of moves) {
+            fire("pointermove", dy);
+            wait(gap);
+          }
+          wait(holdAfter);
+          fire("pointerup", moves[moves.length - 1]!);
+        },
+        { moves, gap, holdBefore, holdAfter },
+      );
+  const trigger = page.locator("[data-drawer-open]").first();
+  const openIt = async () => {
+    await trigger.click();
+    await expect(openDrawer(page)).toHaveClass(/is-visible/);
+    await page.waitForTimeout(550);
+  };
+
+  // Hold still 400ms, then flick 60px in 80ms (under a quarter of the sheet). The speed at release
+  // (~0.75 px/ms) counts, not the average since pointerdown (60px / 480ms = 0.125 px/ms, which the old
+  // 0.4 px/ms cut-off let spring back).
+  await openIt();
+  await gesture([12, 24, 36, 48, 60], 16, 400, 0);
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+
+  // Drag 30px, stop for 300ms, let go: stays open and returns to its resting place.
+  await openIt();
+  const dialog = openDrawer(page);
+  await gesture([6, 12, 18, 24, 30], 16, 0, 300);
+  await page.waitForTimeout(600);
+  await expect(dialog).toHaveClass(/is-visible/);
+  await expect
+    .poll(() => dialog.evaluate((el) => getComputedStyle(el).transform))
+    .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+});
+
+test("reduced motion: the drawer fades instead of sliding, and still closes", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.locator("[data-drawer-open]").first().click();
+  const dialog = openDrawer(page);
+  await expect(dialog).toHaveClass(/is-visible/);
+  await expect
+    .poll(() =>
+      dialog.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return `${s.transform} ${s.opacity}`;
+      }),
+    )
+    .toBe("none 1");
+  await page.keyboard.press("Escape");
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+});
+
 test("deep link opens a drawer on load", async ({ page }) => {
   const id = await page
     .locator("[data-drawer-open]")

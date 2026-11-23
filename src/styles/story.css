@@ -118,6 +118,7 @@
   gap: var(--space-1);
 }
 .story-doc {
+  position: relative;
   flex: 1;
   height: 1.5rem;
   border: 1px solid var(--color-border);
@@ -135,6 +136,15 @@
     linear-gradient(var(--chart-4), var(--chart-4)) 4px 7px / 55% 2px no-repeat,
     linear-gradient(var(--chart-4), var(--chart-4)) 4px 13px / 35% 2px no-repeat,
     color-mix(in srgb, var(--chart-4) 12%, var(--color-bg));
+}
+/* The ring is a pseudo-element so the pulse animates opacity, not box-shadow (no repaint per frame). */
+.story-doc.is-bad::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--chart-4) 30%, transparent);
+  opacity: 0;
   animation: story-pulse 1.6s ease-in-out infinite;
 }
 .story-doc.is-gone {
@@ -143,7 +153,7 @@
 }
 @keyframes story-pulse {
   50% {
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--chart-4) 30%, transparent);
+    opacity: 1;
   }
 }
 
@@ -321,13 +331,23 @@
   margin: 0 -4px;
   border-radius: 3px;
 }
+/* The tint is a pseudo-element so the blink animates opacity, not background. */
 .story-line.is-flag {
+  position: relative;
+  isolation: isolate;
+}
+.story-line.is-flag::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   background: color-mix(in srgb, var(--chart-4) 14%, transparent);
   animation: story-flag 1.4s ease-in-out infinite;
 }
 @keyframes story-flag {
   50% {
-    background: color-mix(in srgb, var(--chart-4) 4%, transparent);
+    opacity: 0.3;
   }
 }
 .story-loop {
@@ -433,7 +453,7 @@
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   color: var(--color-text);
-  transform-origin: left center;
+  /* Revealed with clip-path, not scaleX, so the label isn't squashed. */
   animation: story-grow 6s var(--ease-out) infinite;
 }
 .story-bar.is-good {
@@ -441,11 +461,11 @@
 }
 @keyframes story-grow {
   0% {
-    transform: scaleX(0);
+    clip-path: inset(0 100% 0 0);
   }
   20%,
   100% {
-    transform: scaleX(1);
+    clip-path: inset(0);
   }
 }
 
@@ -456,7 +476,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .story * {
+  .story *,
+  .story *::after {
     animation: none !important;
   }
   .story-drop,
