@@ -4,6 +4,7 @@ description: "Count GPT-2 small's parameters matrix by matrix, and see why a thi
 date: 2026-11-22
 type: post
 tags: [llm-systems]
+draft: false
 ---
 
 This is part 2 of my "Build it" series. [Part 1](/writing/build-attention/) built one attention head by
