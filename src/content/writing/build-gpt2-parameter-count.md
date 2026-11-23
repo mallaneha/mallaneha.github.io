@@ -4,15 +4,7 @@ description: "Count GPT-2 small's parameters matrix by matrix, and see why a thi
 date: 2026-11-22
 type: post
 tags: [llm-systems]
-draft: true
 ---
-
-<!--
-TODO(Neha) before publishing. Part 2 of 3 in the "Build it" series. The voice pass is done: first person,
-written to an engineer a year or two behind you. Fill in every [PERSONAL EXAMPLE: ...] with something
-real or delete it, then delete the marker. The counts are computed from GPT-2's published shapes and
-match its published sizes (124M, 355M, 774M, 1.5B).
--->
 
 This is part 2 of my "Build it" series. [Part 1](/writing/build-attention/) built one attention head by
 hand. This part counts every parameter in GPT-2 small, matrix by matrix, until you reach 124,439,808. It
