@@ -18,7 +18,7 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
    file in `public/logos/`) in its own colors on a light tile,
    or the icon when there's no logo.
 3. Projects: projects with `featured: true`, three in one line (stacked on phones), no icon tile, an open-link arrow on each. Each row opens a drawer.
-4. Writing: latest 3 published posts, then an "All writing · N posts →" pill button.
+4. Writing: latest 3 published posts, then a quiet "All writing · N posts →" link styled like a row (no fill until hover).
 5. Connect: one column: Email (copies, toast), LinkedIn, GitHub, and Resume when `site.resume` is set.
    LinkedIn and GitHub also appear as icon links next to the name in the header.
 6. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound

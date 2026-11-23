@@ -34,10 +34,6 @@ const latest = [
   ...writing.filter((w) => w.data.featured),
   ...writing.filter((w) => !w.data.featured),
 ].slice(0, 3);
-// The "LLMs by hand" series gets its own button next to "All writing", pointing at part 1.
-const llmsByHand = writing
-  .filter((w) => w.data.series === "llms-by-hand")
-  .sort((a, b) => (a.data.part ?? 0) - (b.data.part ?? 0));
 
 const featuredDrawers = await Promise.all(
   featured.map(async (p) => ({
@@ -192,16 +188,6 @@ const educationDrawers = await Promise.all(
             <span class="count">{writing.length} posts</span>
             <Icon name="arrowRight" size={14} class="go" />
           </a>
-          {llmsByHand.length > 0 && (
-            <a
-              class="all-writing secondary"
-              href={`/writing/${llmsByHand[0]!.id}/`}
-            >
-              <span>LLMs by hand</span>
-              <span class="count">{llmsByHand.length} parts</span>
-              <Icon name="arrowRight" size={14} class="go" />
-            </a>
-          )}
         </div>
       </>
     ) : (
@@ -460,20 +446,19 @@ const educationDrawers = await Promise.all(
   .small {
     font-size: var(--text-sm);
   }
+  /* "All writing" link under the Writing rows. Same language as a row: no fill or border at rest,
+     the row hover background, and a bleed of --space-3 so the label lines up with the column edge
+     like the section title and tiles. The count and arrow stay muted. */
   .writing-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: var(--space-4);
+    margin: var(--space-3) calc(-1 * var(--space-3)) 0;
   }
   .all-writing {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    background: var(--color-surface);
+    min-height: 2rem;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-row);
     color: var(--color-text);
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
@@ -484,16 +469,10 @@ const educationDrawers = await Promise.all(
       transform var(--transition-press);
     -webkit-tap-highlight-color: transparent;
   }
-  .all-writing:hover {
-    background: var(--color-surface-hover);
-  }
-  /* Secondary: same pill, no fill or border until hover (border stays transparent to keep the size). */
-  .all-writing.secondary {
-    border-color: transparent;
-    background: transparent;
-  }
-  .all-writing.secondary:hover {
-    background: var(--color-surface);
+  @media (hover: hover) and (pointer: fine) {
+    .all-writing:hover {
+      background: var(--color-hover);
+    }
   }
   .all-writing:active {
     transform: scale(0.98);

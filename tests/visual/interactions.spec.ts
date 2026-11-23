@@ -379,9 +379,4 @@ test("home Writing section shows the featured posts", async ({ page }) => {
     "/writing/rag-evals-unanswerable-questions/",
     "/writing/clinical-data-validation-ai-evals/",
   ]);
-  // A secondary button next to "All writing" opens part 1 of the LLMs by hand series.
-  const series = page.locator("section:has(#writing) a.secondary");
-  await expect(series).toContainText("LLMs by hand");
-  await expect(series).toContainText("3 parts");
-  await expect(series).toHaveAttribute("href", "/writing/build-attention/");
 });
