@@ -367,11 +367,18 @@ for (const el of document.querySelectorAll<HTMLElement>("[data-local-time]")) {
   el.hidden = false;
 }
 
-// Interactive explainers for the "LLMs by hand" posts. Loaded only on pages that use one.
+// Interactive explainers for the "LLMs by hand" posts and the RAG posts. Loaded only on pages that use one.
 if (
   document.querySelector("attention-lab, scale-lab, gpt-shape, serving-budget")
 ) {
   import("./explainers");
+}
+if (
+  document.querySelector(
+    "abstain-lab, code-search, rule-of-two, poison-layers, attack-gap",
+  )
+) {
+  import("./rag-explainers");
 }
 
 export {};

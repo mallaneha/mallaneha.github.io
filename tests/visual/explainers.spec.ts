@@ -101,6 +101,8 @@ test("writing list keeps the LLMs by hand parts together and in order", async ({
       .map((n) => n.match(/LLMs by hand, part (\d)/)?.[1])
       .filter(Boolean)
       .map(Number);
+    // The home page shows only the 3 latest posts, and in dev newer drafts can push the series off it.
+    if (path === "/" && parts.length === 0) continue;
     expect(parts.length, `${path} lists series parts`).toBeGreaterThan(0);
     expect(parts, `${path} order`).toEqual([...parts].sort());
     expect(parts[0], `${path} starts at part 1`).toBe(1);

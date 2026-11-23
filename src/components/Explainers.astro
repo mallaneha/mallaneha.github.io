@@ -1,7 +1,8 @@
 ---
-// Interactive widgets for the "LLMs by hand" posts. Posts place <attention-lab>, <scale-lab>, <gpt-shape> or
-// <serving-budget> in Markdown with static fallback content inside. src/scripts/effects.ts loads the
-// logic only on pages that use one, and the fallback stays when JS is off. Logic: src/scripts/explainers.ts.
+// Interactive widgets for posts. "LLMs by hand": <attention-lab>, <scale-lab>, <gpt-shape>, <serving-budget>
+// (logic in src/scripts/explainers.ts). RAG posts: <abstain-lab>, <code-search>, <rule-of-two>, <poison-layers>,
+// <attack-gap> (src/scripts/rag-explainers.ts). Posts place them in Markdown with static fallback content inside;
+// src/scripts/effects.ts loads the logic only on pages that use one, and the fallback stays when JS is off.
 ---
 
 <style is:global>
@@ -10,7 +11,12 @@
   attention-lab,
   scale-lab,
   gpt-shape,
-  serving-budget {
+  serving-budget,
+  abstain-lab,
+  code-search,
+  rule-of-two,
+  poison-layers,
+  attack-gap {
     display: block;
     margin: var(--space-6) 0;
   }
@@ -642,6 +648,229 @@
     stroke: var(--chart-4);
   }
 
+  /* RAG widgets (src/scripts/rag-explainers.ts) */
+  .xp-left {
+    text-align: left;
+  }
+  .xp-strip {
+    max-width: 30rem;
+    cursor: default;
+  }
+  .xp-refuse {
+    fill: color-mix(in srgb, var(--color-text) 6%, transparent);
+  }
+  .xp-q {
+    stroke: var(--color-bg);
+    stroke-width: 1;
+    transition: opacity var(--transition);
+  }
+  .xp-q.is-hit {
+    fill: var(--chart-3);
+  }
+  .xp-q.is-miss {
+    fill: var(--chart-4);
+  }
+  .xp-q.is-none {
+    fill: var(--chart-2);
+  }
+  .xp-q.is-refused {
+    opacity: 0.35;
+  }
+  .xp-q.is-hidden {
+    display: none;
+  }
+  .xp-legend li[hidden] {
+    display: none;
+  }
+
+  .xp-ranks td.is-target {
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+    background: color-mix(in srgb, var(--chart-3) 14%, transparent);
+  }
+  .xp-chunks {
+    display: grid;
+    gap: var(--space-1);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--color-body);
+    font-size: var(--text-xs);
+  }
+  .xp-chunks li {
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+  }
+  .xp-chunks li.is-target {
+    background: color-mix(in srgb, var(--chart-3) 14%, transparent);
+    color: var(--color-text);
+  }
+  .xp-chunk-id {
+    font-family: var(--font-mono);
+    color: var(--color-text);
+  }
+
+  .xp-features {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    gap: var(--space-2);
+  }
+  .xp-features legend {
+    margin-bottom: var(--space-2);
+    color: var(--color-muted);
+    font-size: var(--text-xs);
+  }
+  .xp-features .xp-check {
+    align-items: flex-start;
+  }
+  .xp-features .xp-check input:disabled + span {
+    color: var(--color-muted);
+  }
+  .xp-tag {
+    flex: none;
+    margin-left: auto;
+    padding: 0 0.4em;
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-bg);
+  }
+  .xp-tag.is-A,
+  .xp-venn.is-A {
+    --c: var(--chart-2);
+  }
+  .xp-tag.is-B,
+  .xp-venn.is-B {
+    --c: var(--chart-1);
+  }
+  .xp-tag.is-C,
+  .xp-venn.is-C {
+    --c: var(--chart-3);
+  }
+  .xp-tag {
+    background: var(--c);
+  }
+  .xp-venn-svg {
+    max-width: 22rem;
+    cursor: default;
+  }
+  .xp-venn {
+    fill: var(--c);
+    fill-opacity: 0.06;
+    stroke: var(--c);
+    stroke-width: 1.5;
+    stroke-dasharray: 4 3;
+    transition: fill-opacity var(--transition);
+  }
+  .xp-venn.is-on {
+    fill-opacity: 0.28;
+    stroke-dasharray: none;
+  }
+  .xp-venn-label {
+    font-size: 12px;
+  }
+  .xp-venn-core {
+    fill: var(--color-bg);
+    stroke: var(--color-subtle);
+    stroke-width: 1;
+  }
+  .xp-venn-core.is-on {
+    fill: var(--chart-4);
+    stroke: var(--chart-4);
+  }
+  .xp.is-danger .xp-verdict {
+    color: var(--chart-4);
+    font-weight: var(--weight-medium);
+  }
+
+  .xp-gates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    gap: var(--space-2);
+    margin: var(--space-3) 0;
+    padding: 0;
+    list-style: none;
+  }
+  .xp-gate {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-row);
+    background: var(--color-bg);
+    transition:
+      border-color var(--transition),
+      opacity var(--transition);
+  }
+  .xp-gate-n {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+  .xp-gate-name {
+    color: var(--color-text);
+  }
+  .xp-gate-state {
+    font-size: var(--text-xs);
+    color: var(--color-body);
+  }
+  .xp-gate[data-state="stop"] {
+    border-color: var(--chart-3);
+  }
+  .xp-gate[data-state="stop"] .xp-gate-state {
+    color: var(--chart-3);
+    font-weight: var(--weight-medium);
+  }
+  .xp-gate[data-state="maybe"] {
+    border-color: var(--chart-4);
+    border-style: dashed;
+  }
+  .xp-gate[data-state="maybe"] .xp-gate-state {
+    color: var(--chart-4);
+  }
+  .xp-gate[data-state="skip"] {
+    opacity: 0.45;
+  }
+
+  .xp-hbars {
+    display: grid;
+    gap: var(--space-1);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .xp-hbar {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr 3rem;
+    gap: var(--space-2);
+    align-items: center;
+    color: var(--color-body);
+    font-size: var(--text-xs);
+  }
+  .xp-hbar-track {
+    height: 10px;
+    border-radius: 2px;
+    background: var(--color-border);
+    overflow: hidden;
+  }
+  .xp-hbar-fill {
+    display: block;
+    height: 100%;
+    background: var(--chart-1);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .xp-hbar.is-high .xp-hbar-fill {
+    background: var(--chart-4);
+  }
+  .xp-hbar-val {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--color-text);
+  }
+
   /* Motion: only after discrete changes (.is-instant is set while dragging or typing). */
   @media (prefers-reduced-motion: no-preference) {
     .xp-bar-fill {
@@ -651,8 +880,12 @@
     .xp-seg {
       transition: width var(--duration-state) var(--ease-out);
     }
+    .xp-hbar-fill {
+      transition: transform var(--duration-state) var(--ease-out);
+    }
     .xp.is-instant .xp-bar-fill,
-    .xp.is-instant .xp-seg {
+    .xp.is-instant .xp-seg,
+    .xp.is-instant .xp-hbar-fill {
       transition: none;
     }
   }
