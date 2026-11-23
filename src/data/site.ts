@@ -6,7 +6,7 @@ export const site = {
   location: "Pittsburgh, PA",
   // IANA zone for the local time shown next to the location in the footer.
   timeZone: "America/New_York",
-  // Header paragraphs, in order. Plain text; {email} and {linkedin} become links.
+  // Header paragraphs, in order. Plain text.
   intro: [
     "Currently finishing an M.S. in AI Engineering (Information Security) at Carnegie Mellon. Previously at Autonomize AI, and 3.5 years at Numeric Mind shipping FDA clinical data submissions.",
     "I build applied AI systems where data is sensitive and mistakes are costly: PII redaction, retrieval that holds up under attack, and agents you can trace and measure.",
@@ -20,14 +20,14 @@ export const site = {
   writingBlurb: "Notes on evaluating and observing AI systems.",
   // Spelled out so scrapers looking for "@" don't harvest it. The page shows it like this, and clicking it
   // copies the real address (effects.ts decodes it). Never write the plain address anywhere in src/ or public/.
-  email: "nehamalla99 at gmail dot com",
+  email: "nehamalla99[at]gmail[dot]com",
   links: {
     linkedin: "https://www.linkedin.com/in/mallaneha",
     github: "https://github.com/mallaneha",
   },
   // Path under public/. The link appears only once that file exists (see resumeHref in src/lib/content.ts).
   // The PDF must not contain a phone number or street address; `npm run check` scans public/ for phone numbers.
-  // null hides every resume link (header, "Reach me" sentence, Connect, llms.txt). Hidden on 2026-11-23;
+  // null hides every resume link (header, Connect, llms.txt). Hidden on 2026-11-23;
   // set back to "/neha-malla-resume.pdf" to show it again.
   resume: null as string | null,
   // One-line footer motto. null hides it.

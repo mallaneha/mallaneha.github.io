@@ -241,15 +241,15 @@ function showToast(text: string) {
 const decodeEmail = (s: string) =>
   s
     .trim()
-    .replace(/\s+at\s+/i, "@")
-    .replace(/\s+dot\s+/gi, ".");
+    .replace(/\s*\[at\]\s*|\s+at\s+/i, "@")
+    .replace(/\s*\[dot\]\s*|\s+dot\s+/gi, ".");
 
 document.addEventListener("click", async (e) => {
   const btn = (e.target as HTMLElement).closest<HTMLElement>("[data-copy]");
   if (!btn) return;
   const { copyLabel = "Copied" } = btn.dataset;
   let { copy = "", copyFallback } = btn.dataset;
-  // A spelled-out email ("name at gmail dot com", kept that way in the HTML so scrapers miss it).
+  // A spelled-out email ("name[at]gmail[dot]com", kept that way in the HTML so scrapers miss it).
   if ("copyEmail" in btn.dataset) {
     copy = decodeEmail(copy);
     copyFallback = `mailto:${copy}`;

@@ -95,25 +95,6 @@ const educationDrawers = await Promise.all(
     {site.intro.map((line) => (
       <p>{line}</p>
     ))}
-    <p>
-      Reach me at{" "}
-      <button
-        type="button"
-        class="inline-copy"
-        data-copy={site.email}
-        data-copy-email
-        data-copy-label="Email copied"
-      >
-        {site.email}
-      </button>
-      {resumeHref ? ", " : " or "}on <a href={site.links.linkedin}>LinkedIn</a>
-      {resumeHref && (
-        <>
-          , or read my <a href={resumeHref}>resume</a>
-        </>
-      )}
-      .
-    </p>
   </header>
 
   <SectionColumns>
@@ -188,7 +169,7 @@ const educationDrawers = await Promise.all(
   <Section id="connect" title="Connect">
     <RowList>
       <Row
-        icon="mail"
+        icon="mailFill"
         name={site.email}
         desc="Email"
         copy={site.email}
@@ -337,24 +318,11 @@ const educationDrawers = await Promise.all(
       box-shadow: 0 0 0 5px transparent;
     }
   }
-  .inline-copy {
-    padding: 0;
-    border: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    text-decoration: underline;
-    text-decoration-color: var(--color-subtle);
-    text-decoration-style: dotted;
-    text-underline-offset: 4px;
-    cursor: pointer;
-  }
   header a {
     text-decoration-style: dotted;
     text-decoration-color: var(--color-subtle);
     text-underline-offset: 4px;
   }
-  .inline-copy:hover,
   header a:hover {
     color: var(--color-muted);
   }

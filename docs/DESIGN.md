@@ -10,10 +10,10 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
 ## Page structure (`src/pages/index.astro`)
 
 1. Header: name (h1), tagline (muted), availability badge (pill with a status dot, plus "Resume (PDF)"
-   when the file exists), 3 short paragraphs (now, what I build, which industries),
-   "Reach me at <email, click to copy>, on LinkedIn, or read my resume".
+   when the file exists, and LinkedIn and GitHub icons), 3 short paragraphs (now, what I build, which industries).
+   The email is only in Connect.
 2. Experience: each row opens a drawer. The tile shows the company's logo (`logo:` in frontmatter,
-   file in `public/logos/`) in grayscale (CSS filter, so the files keep their colors) on a light tile,
+   file in `public/logos/`) in its own colors on a light tile,
    or the icon when there's no logo.
 3. Projects: projects with `featured: true`, three in one line (stacked on phones), no icon tile, an open-link arrow on each. Each row opens a drawer.
 4. Writing: latest 3 published posts, then an "All writing · N posts →" pill button.
