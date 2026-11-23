@@ -43,6 +43,10 @@ const TEMPLATE = /* html */ `
     /* puts the ledge on the surrounding text's baseline */
     vertical-align: calc(var(--cat-size, 3em) * -0.38);
     cursor: pointer;
+    /* clicking or double-clicking the cat never selects text */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
     line-height: 0;
   }
@@ -201,6 +205,8 @@ class HeaderCat extends HTMLElement {
         },
       ],
       ["pointermove", (e) => this.bat(e)],
+      // A mousedown here would start a text selection (double-click selects the name beside it).
+      ["mousedown", (e) => e.preventDefault()],
       ["click", () => this.poke()],
       [
         "keydown",

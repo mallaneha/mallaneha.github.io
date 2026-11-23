@@ -196,3 +196,13 @@ test("theme toggle flips the theme and remembers it", async ({ page }) => {
     String(!wasDark),
   );
 });
+
+test("clicking or double-clicking the header cat selects no text", async ({
+  page,
+}) => {
+  const cat = page.locator("header-cat");
+  await cat.click();
+  await cat.dblclick();
+  await cat.click({ clickCount: 3 });
+  expect(await page.evaluate(() => getSelection()?.toString() ?? "")).toBe("");
+});
