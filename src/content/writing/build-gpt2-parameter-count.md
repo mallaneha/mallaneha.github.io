@@ -22,8 +22,9 @@ than it sounds.
 People repeat "124M parameters" about GPT-2 small without saying where the parameters are. I think it's
 worth counting once, because the answer explains how bigger models are built and what they cost to run.
 
-[PERSONAL EXAMPLE: a time model size mattered in your own work, e.g. picking a model that had to fit on
-one GPU]
+Most of the time, what I want from a parameter count is memory. At 2 bytes per parameter (16-bit
+weights), GPT-2 small is about 250 MB and a 7B model is about 14 GB. That's the first line of the
+budget in [part 3](/writing/build-a-serving-budget/).
 
 GPT-2 small has a vocabulary of 50,257 tokens, a context of 1,024 tokens, 768-dimensional embeddings
 (d_model, the width of every vector inside the model) and 12 layers, each with 12 attention heads.

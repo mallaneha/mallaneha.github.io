@@ -25,8 +25,10 @@ Two facts drive the whole budget. When a model generates text, each new token ne
 every weight is read from memory once per step. On top of that, every request in the batch reads its
 own KV cache, the keys and values saved from [part 1](/writing/build-attention/).
 
-[PERSONAL EXAMPLE: a serving or self-hosting decision you've faced, e.g. why patient data meant
-running the model yourself]
+At Autonomize AI I worked on PII redaction for healthcare data, keeping patient names out of what a
+model sees. For a healthcare client, whether a prompt can go to a hosted API is a compliance question
+before it's a technical one. If the answer is no, the team runs the model itself, and this budget is
+what that costs.
 
 The running example is LLaMA 2-13B on eight TPU v5e chips (Google's AI accelerators), the worked
 example in Google's _How To Scale Your Model_. You can switch setups and change any number in the
@@ -116,8 +118,9 @@ the gap was achieved bandwidth (about 90% of the spec) and intermediate activati
 also ignores communication between chips, the attention math itself, and prefill, the step that
 processes the prompt before generation starts. Prefill is compute-bound, a different budget.
 
-[PERSONAL EXAMPLE: if you've measured a real deployment, how far your arithmetic was from the measured
-number]
+I haven't measured a deployment myself yet. When I do, I'll start from kipply's result, which came in
+about 30% over the arithmetic. If my number is much further off than that, I'll look for a bug before
+I blame the hardware.
 
 ## Further reading
 
