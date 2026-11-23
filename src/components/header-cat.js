@@ -6,12 +6,12 @@
  *  - Idle: the tail ripples slowly in an S-shaped wave and the cat breathes.
  *  - Hover: the tail moves a little wider and quicker and an ear twitches.
  *    Brushing the cursor across the tail bats it in that direction.
- *  - Click again while its eyes are open: it sits up, awake, tail still
- *    hanging off the ledge, then lies back down a few seconds later.
- *  - Clicks sometimes meow, at random intervals (silent while the site's
- *    sound toggle is off).
- *  - Click / Enter / Space: the tail flicks, an ear twitches and the cat
- *    pops open two big round golden eyes for a moment.
+ *  - Starts asleep from 10pm to 6am Pittsburgh time; otherwise it starts
+ *    awake, sitting up with the tail still hanging off the ledge.
+ *  - Click / Enter / Space while asleep: the tail flicks, an ear twitches,
+ *    it opens its eyes for a moment and purrs softly. WAKE_CLICKS clicks in
+ *    a row (no pause longer than WAKE_PAUSE_MS) wake it up.
+ *  - Purring is silent while the site's sound toggle is off.
  *  - prefers-reduced-motion: no tail motion or breathing. Clicking still
  *    opens the eyes, without motion.
  *
@@ -20,7 +20,8 @@
  *   <h1>Neha Malla <header-cat></header-cat></h1>
  *
  * Attributes:  no-ledge  — hide the little shelf line under the cat
- *              label="…" — accessible name (default "Sleeping cat")
+ *              label="…" — accessible name (default: "Sleeping cat" / "Cat, awake")
+ *              state="asleep|awake" — force the starting state (default: by Pittsburgh time)
  * CSS custom properties (set on the element or any ancestor):
  *   --cat-size   height of the cat (default 3em)
  *   --cat-fur    coat and tail color
@@ -190,12 +191,26 @@ const TEMPLATE = /* html */ `
   </g>
 </svg>`;
 
-// How long the cat stays sitting up after the last click.
-const AWAKE_MS = 4000;
-// Meows: chance that a click meows, and the random quiet gap after a meow.
-const MEOW_CHANCE = 0.5;
-const MEOW_GAP_MS = [2500, 9000];
+// Asleep from SLEEP_HOUR to WAKE_HOUR in Pittsburgh (Neha's local time).
+const TIME_ZONE = "America/New_York";
+const SLEEP_HOUR = 22;
+const WAKE_HOUR = 6;
+// Clicks in a row it takes to wake the sleeping cat; a longer pause resets the count.
+const WAKE_CLICKS = 12;
+const WAKE_PAUSE_MS = 3000;
+// The site's sound toggle (src/scripts/effects.ts).
 const MUTE_KEY = "effects-muted";
+
+function asleepNow() {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: TIME_ZONE,
+      hour: "numeric",
+      hourCycle: "h23",
+    }).format(new Date()),
+  );
+  return hour >= SLEEP_HOUR || hour < WAKE_HOUR;
+}
 
 // Tail region in viewBox units, for "batting" the tail with the cursor.
 const TAIL_BOX = { x0: 90, x1: 114, y0: 46, y1: 84 };
@@ -233,10 +248,9 @@ class HeaderCat extends HTMLElement {
     }
     if (!this.hasAttribute("tabindex")) this.tabIndex = 0;
     this.setAttribute("role", "button");
-    this.setAttribute(
-      "aria-label",
-      this.getAttribute("label") || "Sleeping cat",
-    );
+    const state = this.getAttribute("state");
+    this.setAwake(state ? state === "awake" : !asleepNow());
+    this.clicks = 0;
 
     this.reduce = matchMedia("(prefers-reduced-motion: reduce)");
     // motion state (degrees, seconds)
@@ -385,36 +399,46 @@ class HeaderCat extends HTMLElement {
     this.restart("twitch", 500);
   }
 
+  setAwake(awake) {
+    this.classList.toggle("awake", awake);
+    this.setAttribute(
+      "aria-label",
+      this.getAttribute("label") || (awake ? "Cat, awake" : "Sleeping cat"),
+    );
+  }
+
   poke() {
     this.twitch();
-    if (this.classList.contains("peek") || this.classList.contains("awake")) {
-      // A click while it's already looking: it sits up, and stays up a while
-      // (each further click keeps it up longer).
-      clearTimeout(this._peek);
-      this.classList.remove("peek");
-      this.classList.add("awake");
-      clearTimeout(this._awake);
-      this._awake = setTimeout(() => this.classList.remove("awake"), AWAKE_MS);
-    } else {
-      this.restart("peek", 1400);
-    }
-    this.maybeMeow();
     if (!this.reduce.matches)
       this.kickV += (Math.random() < 0.5 ? -1 : 1) * 260;
+    if (!this.classList.contains("awake")) {
+      // Asleep: it stirs and purrs. Enough clicks in a row wake it up.
+      const now = performance.now();
+      this.clicks =
+        now - (this.lastClick ?? 0) > WAKE_PAUSE_MS ? 1 : this.clicks + 1;
+      this.lastClick = now;
+      if (this.clicks >= WAKE_CLICKS) {
+        this.clicks = 0;
+        clearTimeout(this._peek);
+        this.classList.remove("peek");
+        this.setAwake(true);
+      } else {
+        this.restart("peek", 1400);
+        purr();
+      }
+    }
     this.dispatchEvent(
       new CustomEvent("cat-poke", { bubbles: true, composed: true }),
     );
   }
 }
 
-// ---------- meow ----------
-// A click meows only sometimes, and after each meow there's a fresh random
-// quiet gap, so meows come at irregular intervals. Synthesized (no audio file):
-// a sawtooth gliding up then down through two vowel formants, "ee" → "aa" → "oo".
-// Silent while the site's sound toggle is off (localStorage "effects-muted").
+// ---------- purr ----------
+// Synthesized (no audio file): low-passed noise pulsing about 25 times a second,
+// quiet, with a slow swell. One purr at a time: clicks during a purr don't stack.
 
 let audioCtx = null;
-let nextMeowAt = 0;
+let purrEnds = 0;
 const rand = (a, b) => a + Math.random() * (b - a);
 
 function soundOff() {
@@ -428,59 +452,53 @@ function soundOff() {
   return matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-HeaderCat.prototype.maybeMeow = function () {
-  const now = performance.now();
-  if (now < nextMeowAt || Math.random() > MEOW_CHANCE || soundOff()) return;
-  nextMeowAt = now + rand(MEOW_GAP_MS[0], MEOW_GAP_MS[1]);
+function purr() {
+  if (soundOff()) return;
   const AC =
     window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
   if (!AC) return;
   audioCtx ??= new AC();
   if (audioCtx.state === "suspended") audioCtx.resume();
-  meow(audioCtx, audioCtx.currentTime + rand(0.06, 0.3));
-};
+  const ctx = audioCtx;
+  const t = ctx.currentTime + 0.02;
+  if (t < purrEnds) return;
+  const dur = rand(1.1, 1.6);
+  purrEnds = t + dur;
 
-function meow(ctx, t) {
-  const dur = rand(0.42, 0.75);
-  const f0 = rand(470, 720); // pitch varies from meow to meow
-  const end = t + dur;
-  const peak = t + dur * rand(0.28, 0.42);
+  const len = Math.ceil(ctx.sampleRate * dur);
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
 
-  const osc = ctx.createOscillator();
-  osc.type = "sawtooth";
-  osc.frequency.setValueAtTime(f0 * 0.82, t);
-  osc.frequency.linearRampToValueAtTime(f0 * 1.22, peak);
-  osc.frequency.exponentialRampToValueAtTime(f0 * 0.68, end);
+  const lowpass = ctx.createBiquadFilter();
+  lowpass.type = "lowpass";
+  lowpass.frequency.value = 320;
+  lowpass.Q.value = 0.8;
 
+  // the purr's flutter: gain pulsing between ~0 and 1 at 22-28 Hz
+  const flutter = ctx.createGain();
+  flutter.gain.value = 0.5;
+  const lfo = ctx.createOscillator();
+  lfo.frequency.value = rand(22, 28);
+  const depth = ctx.createGain();
+  depth.gain.value = 0.5;
+  lfo.connect(depth).connect(flutter.gain);
+
+  // soft volume, swelling in and fading out
   const out = ctx.createGain();
+  const peak = 0.09;
   out.gain.setValueAtTime(0.0001, t);
-  out.gain.exponentialRampToValueAtTime(0.16, t + 0.05);
-  out.gain.setValueAtTime(0.16, end - dur * 0.35);
-  out.gain.exponentialRampToValueAtTime(0.0001, end);
+  out.gain.exponentialRampToValueAtTime(peak, t + dur * 0.3);
+  out.gain.setValueAtTime(peak, t + dur * 0.6);
+  out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
 
-  const soften = ctx.createBiquadFilter();
-  soften.type = "lowpass";
-  soften.frequency.value = 3800;
-  soften.connect(ctx.destination);
-  out.connect(soften);
-
-  // formants [start, middle, end] in Hz, with their loudness
-  for (const [hz, q, level] of [
-    [[380, 900, 480], 5, 1],
-    [[2300, 1400, 900], 7, 0.55],
-  ]) {
-    const bp = ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.Q.value = q;
-    bp.frequency.setValueAtTime(hz[0], t);
-    bp.frequency.linearRampToValueAtTime(hz[1], peak);
-    bp.frequency.linearRampToValueAtTime(hz[2], end);
-    const g = ctx.createGain();
-    g.gain.value = level * 3;
-    osc.connect(bp).connect(g).connect(out);
-  }
-  osc.start(t);
-  osc.stop(end + 0.05);
+  noise.connect(lowpass).connect(flutter).connect(out).connect(ctx.destination);
+  noise.start(t);
+  lfo.start(t);
+  noise.stop(t + dur);
+  lfo.stop(t + dur);
 }
 
 if (!customElements.get("header-cat"))
