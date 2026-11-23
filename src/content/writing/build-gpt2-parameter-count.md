@@ -1,7 +1,7 @@
 ---
 title: "LLMs by hand, part 2: where GPT-2's 124M parameters live"
 description: "Count GPT-2 small's parameters matrix by matrix, and see why a third of them are a lookup table."
-date: 2026-11-22
+date: 2026-06-01
 type: post
 tags: [llm-systems]
 series: llms-by-hand

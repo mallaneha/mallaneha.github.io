@@ -1,7 +1,7 @@
 ---
 title: "What clinical data validation taught me about AI evals"
 description: "Applying FDA and Pinnacle 21 style checks to evaluating LLM output in regulated domains."
-date: 2026-11-22
+date: 2025-08-01
 type: post
 tags: [evals, healthcare, governance]
 draft: false
