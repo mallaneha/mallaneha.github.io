@@ -96,7 +96,7 @@ in place of `company` and `role`. The body (overview, relevant courses) is the d
 ```yaml
 ---
 school: "Carnegie Mellon University"
-degree: "M.S. in AI Engineering (Information Security)" # shown in the drawer header with the years
+degree: "M.S. in AI Engineering (Information Security)" # full degree name, used in /llms.txt (the drawer header shows only the school)
 start: 2025
 end: 2026
 location: "Pittsburgh, PA"
