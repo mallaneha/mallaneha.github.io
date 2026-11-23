@@ -38,7 +38,7 @@ Each should link to its GitHub repo, or later to a write-up post. Repo URLs are 
 An addition to the paco.me layout, since she's job-hunting.
 
 - **Autonomize AI, AI/ML Intern (2026):** HIPAA-grade PII redaction: the best of 3 tools caught 97.7% of personal details in text; RAG over 100+ Medicare PDFs, with the benefits chart extracted from up to 90% of them.
-- **Numeric Mind, Senior Data Analyst (Apr 2024–Apr 2025):** led 12 analysts, 15+ studies delivered submission-ready within 3 weeks of database lock, 60% fewer validation findings.
+- **Numeric Mind, Senior Data Analyst (Apr 2024–Apr 2025):** led 12 analysts, owned 15+ concurrent studies, all delivered on deadline (submission package within 3 weeks of database lock), 60% fewer validation findings.
 - **Numeric Mind, Data Analyst (Oct 2021–Apr 2024):** 800+ CDISC datasets and reports, 10+ pharma clients, Pinnacle 21 debugging tool (−75% resolution time).
 
 ### Writing
