@@ -16,9 +16,9 @@ I think attention is the one mechanism you should compute by hand at least once.
 a transformer a transformer, and it fits on a page. Once you've done it, the diagrams in every other
 explainer get much easier to read.
 
-I spent 3.5 years validating clinical datasets, where a number doesn't count until you can trace it
-back to a record. I wanted the same for attention: pick one token, follow its numbers through every
-step, and check the output by hand. This post is that trace.
+I spent 3.5 years validating clinical datasets, where we checked numbers by tracing them back to the
+source records. I wanted to do the same with attention: pick one token, follow its numbers through
+each step, and check the output by hand.
 
 ## Three vectors per token
 
@@ -74,10 +74,9 @@ attention to "down", a word it shouldn't know yet.
 ## Weighted sum of values
 
 The weights decide how much of each value vector to take. With the default settings "sat" outputs
-0.10 × value("The") + 0.68 × value("cat") + 0.22 × value("sat") = (0.32, 0.90). That output doesn't
-replace "sat"'s vector outright. In GPT-2 it goes through one more learned matrix, the output
-projection, and is then added to "sat"'s original vector. So "sat" keeps what it had and gains
-information borrowed mostly from "cat".
+0.10 × value("The") + 0.68 × value("cat") + 0.22 × value("sat") = (0.32, 0.90). In GPT-2 that output goes
+through one more learned matrix, the output projection, and is then added to "sat"'s original vector.
+"sat" keeps what it had and picks up information mostly from "cat".
 
 ## All tokens at once
 

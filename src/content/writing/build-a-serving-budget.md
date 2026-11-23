@@ -17,9 +17,9 @@ Two facts drive the whole budget. When a model generates text, each new token ne
 every weight is read from memory once per step. On top of that, every request in the batch reads its
 own KV cache, the keys and values saved from [part 1](/writing/build-attention/).
 
-Most of my work has been in healthcare, with data that has to stay private. For teams like that,
-whether a prompt can go to a hosted API is a compliance question before it's a technical one. If the
-answer is no, they run the model themselves, and this budget tells them what that costs.
+A lot of my work has been with clinical and healthcare data. In healthcare, sending a prompt with
+patient data to a hosted API often has to clear a compliance review first. When it can't, the team
+hosts the model itself, and this budget estimates what that costs.
 
 The running example is LLaMA 2-13B on eight TPU v5e chips (Google's AI accelerators), the worked
 example in Google's _How To Scale Your Model_. You can switch setups and change any number in the
@@ -109,9 +109,9 @@ the gap was achieved bandwidth (about 90% of the spec) and intermediate activati
 also ignores communication between chips, the attention math itself, and prefill, the step that
 processes the prompt before generation starts. Prefill is compute-bound, a different budget.
 
-I haven't measured a deployment myself yet. When I do, I'll start from kipply's result, which came in
-about 30% over the arithmetic. If my number is much further off than that, I'll look for a bug before
-I blame the hardware.
+I haven't measured a deployment myself yet. When I do, I'll compare it with kipply's result, where the
+measured time was about 30% above the arithmetic. If mine is much further off, I'll check my setup
+first.
 
 ## Further reading
 

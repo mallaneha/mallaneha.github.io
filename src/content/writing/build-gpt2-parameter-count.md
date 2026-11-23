@@ -15,7 +15,7 @@ than it sounds.
 People repeat "124M parameters" about GPT-2 small without saying where the parameters are. I think it's
 worth counting once, because the answer explains how bigger models are built and what they cost to run.
 
-Most of the time, what I want from a parameter count is memory. At 2 bytes per parameter (16-bit
+I mostly use a parameter count to estimate memory. At 2 bytes per parameter (16-bit
 weights), GPT-2 small is about 250 MB and a 7B model is about 14 GB. That's the first line of the
 budget in [part 3](/writing/build-a-serving-budget/).
 
