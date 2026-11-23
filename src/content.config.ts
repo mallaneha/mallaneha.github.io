@@ -51,6 +51,11 @@ const experience = defineCollection({
     location: z.string().optional(),
     summary: z.string().max(60),
     icon: z.enum(iconNames),
+    // Company logo under public/logos/. Shown instead of the icon when set.
+    logo: z
+      .string()
+      .regex(/^\/logos\/[\w-]+\.(png|svg|webp|jpg)$/)
+      .optional(),
     url: z.url().optional(),
     order: z.number().int().default(100),
   }),

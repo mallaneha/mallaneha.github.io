@@ -8,6 +8,7 @@ Final spec as of 2026-11-22. Everything decided so far, ready to build.
 - **Design reference:** https://paco.me. One page, one column, no nav menu, lots of white space, small clean sans-serif, gray secondary text, subtle link hovers. Fonts and colors weren't checked against paco.me's source, so treat them as "in the spirit of", not an exact copy.
 - **Entry format everywhere:** linked title, then one short line. No cards or images.
 - **Update 2026-11-22:** layout, rows, bottom-sheet drawers and click effects now follow https://ch.sh. Featured work and experience open as case-study drawers; the "Now" lines moved into the header. Details in `docs/DESIGN.md` and `docs/adr/0002-client-scripts-for-drawers-and-effects.md`.
+- **Update 2026-11-22 (later):** the Building section is gone; Experience comes before Featured, with company logos; Connect shows LinkedIn and GitHub in two columns and no resume row (the resume link stays in the header); the footer shows Pittsburgh's local time; click effects run on the home page only, outside drawers, and muting silences the sound but keeps the sparks.
 - **Target roles:** applied AI engineering, and data and AI governance, in healthcare, banking and insurance. Interests: evaluating AI output, and observability.
 
 ## 2. Page content, top to bottom

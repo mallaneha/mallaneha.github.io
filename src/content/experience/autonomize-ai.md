@@ -6,6 +6,7 @@ end: 2026
 location: "Austin, TX"
 summary: "AI/ML Intern · 2026"
 icon: pulse
+logo: /logos/autonomize-ai.png
 order: 10
 ---
 

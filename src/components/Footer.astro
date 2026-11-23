@@ -1,24 +1,35 @@
 ---
 import { site } from "../data/site";
 import Icon from "./Icon.astro";
+
+interface Props {
+  effects?: boolean; // show the click-sound toggle (pages with click effects only)
+}
+const { effects = false } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
 <footer>
   <span>
     {site.motto && <>{site.motto} · </>}© {year} · {site.location}
+    <span class="time" data-local-time={site.timeZone} hidden>
+      {" · "}
+      <time></time>
+    </span>
   </span>
   <span class="controls">
-    <button
-      type="button"
-      class="control sound"
-      data-effects-toggle
-      aria-pressed="true"
-      aria-label="Click sounds and effects"
-    >
-      <Icon name="soundOn" size={14} class="on" />
-      <Icon name="soundOff" size={14} class="off" />
-    </button>
+    {effects && (
+      <button
+        type="button"
+        class="control sound"
+        data-effects-toggle
+        aria-pressed="true"
+        aria-label="Click sounds"
+      >
+        <Icon name="soundOn" size={14} class="on" />
+        <Icon name="soundOff" size={14} class="off" />
+      </button>
+    )}
     <button
       type="button"
       class="control theme"
@@ -43,6 +54,9 @@ const year = new Date().getFullYear();
     gap: var(--space-2);
     color: var(--color-muted);
     font-size: var(--text-sm);
+  }
+  .time time {
+    font-variant-numeric: tabular-nums;
   }
   .controls {
     display: flex;
