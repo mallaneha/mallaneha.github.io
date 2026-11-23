@@ -133,17 +133,18 @@ const experienceDrawers = await Promise.all(
   </Section>
 
   <Section id="connect" title="Connect">
-    <RowList>
+    <RowList columns={2}>
       <Row
         icon="mail"
-        name={site.email}
+        name={site.email.replace("@", "@\u200b")}
         desc="Email"
         copy={site.email}
         copyLabel="Email copied"
         href={`mailto:${site.email}`}
       />
-    </RowList>
-    <RowList columns={2}>
+      {resumeHref && (
+        <Row icon="file" name="Resume" desc="PDF" href={resumeHref} />
+      )}
       <Row
         icon="link"
         name="mallaneha"
