@@ -1,0 +1,377 @@
+---
+// Interactive widgets for the "Build it" posts. Posts place <attention-lab>, <scale-lab>, <gpt-shape> or
+// <serving-budget> in Markdown with static fallback content inside. src/scripts/effects.ts loads the
+// logic only on pages that use one, and the fallback stays when JS is off. Logic: src/scripts/explainers.ts.
+---
+
+<style is:global>
+  attention-lab,
+  scale-lab,
+  gpt-shape,
+  serving-budget {
+    display: block;
+    margin: var(--space-6) 0;
+  }
+
+  .xp-fallback {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-row);
+    color: var(--color-body);
+    font-size: var(--text-sm);
+  }
+
+  .xp {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-row);
+    background: var(--color-surface);
+    font-size: var(--text-sm);
+  }
+
+  .xp-title {
+    margin: 0 0 var(--space-3);
+    font-weight: var(--weight-medium);
+    color: var(--color-text);
+  }
+
+  .xp-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .xp-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: end;
+  }
+  .xp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+
+  .xp-split {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 34rem) {
+    .xp-split {
+      grid-template-columns: 1fr 13rem;
+      align-items: start;
+    }
+  }
+
+  .xp-field {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-1) var(--space-2);
+    align-items: center;
+    min-width: 0;
+  }
+  .xp-field label {
+    color: var(--color-body);
+  }
+  .xp-field input[type="range"] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+  .xp-field output {
+    font-family: var(--font-mono);
+    color: var(--color-text);
+  }
+  .xp-field-number,
+  .xp-field-select {
+    grid-template-columns: 1fr;
+  }
+  .xp-field input[type="number"],
+  .xp-field select {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--color-subtle);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: inherit;
+    font-family: var(--font-mono);
+  }
+
+  .xp-radios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .xp-radios legend {
+    width: 100%;
+    margin-bottom: var(--space-1);
+    padding: 0;
+    color: var(--color-body);
+  }
+  .xp-radios label,
+  .xp-check {
+    display: inline-flex;
+    gap: var(--space-2);
+    align-items: center;
+    min-height: 44px;
+    color: var(--color-text);
+  }
+  .xp-radios input,
+  .xp-check input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+
+  .xp-button {
+    align-self: flex-start;
+    min-height: 44px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-subtle);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: inherit;
+    cursor: pointer;
+    transition: background var(--transition);
+  }
+  .xp-button:hover {
+    background: var(--color-surface-hover);
+  }
+
+  .xp-scroll {
+    overflow-x: auto;
+    margin: var(--space-4) 0;
+  }
+  .xp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  .xp-table caption {
+    margin-bottom: var(--space-2);
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--color-body);
+  }
+  .xp-table th,
+  .xp-table td {
+    padding: var(--space-1) var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .xp-table th {
+    font-weight: var(--weight-medium);
+    color: var(--color-text);
+  }
+  .xp-table th[scope="row"] {
+    text-align: left;
+  }
+  .xp-table td {
+    color: var(--color-body);
+  }
+  .xp-table tr.is-masked td,
+  .xp-table tr.is-masked th {
+    color: var(--color-faint);
+  }
+  .xp-table tr.is-selected th,
+  .xp-table tr.is-selected td {
+    background: var(--color-surface-hover);
+  }
+
+  .xp-weight {
+    min-width: 5rem;
+  }
+  .xp-weight > span:first-child {
+    display: block;
+  }
+  .xp-bar {
+    display: block;
+    height: 4px;
+    margin-top: 2px;
+    border-radius: 2px;
+    background: var(--color-border);
+    overflow: hidden;
+  }
+  .xp-bar-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--color-accent);
+  }
+
+  .xp-summary {
+    margin: var(--space-3) 0;
+    color: var(--color-text);
+  }
+  .xp-big {
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    color: var(--color-text);
+  }
+
+  .xp-stack {
+    display: flex;
+    height: 14px;
+    margin: var(--space-3) 0 var(--space-2);
+    border-radius: var(--radius);
+    background: var(--color-border);
+    overflow: hidden;
+  }
+  .xp-stack.is-over {
+    outline: 2px dashed var(--chart-4);
+    outline-offset: 2px;
+  }
+  .xp-seg,
+  .xp-swatch {
+    display: block;
+    background: var(--color-border);
+  }
+  .xp-swatch {
+    flex: none;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 2px;
+  }
+  .xp-seg.c1,
+  .xp-swatch.c1 {
+    background: var(--chart-1);
+  }
+  .xp-seg.c2,
+  .xp-swatch.c2 {
+    background: var(--chart-2);
+  }
+  .xp-seg.c3,
+  .xp-swatch.c3 {
+    background: var(--chart-3);
+  }
+  .xp-seg.c4,
+  .xp-swatch.c4 {
+    background: var(--chart-4);
+  }
+  .xp-seg.c5,
+  .xp-swatch.c5 {
+    background: var(--chart-5);
+  }
+  .xp-swatch.c0 {
+    border: 1px solid var(--color-subtle);
+  }
+
+  .xp-legend {
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    list-style: none;
+    color: var(--color-body);
+  }
+  .xp-legend li {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .xp-facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 var(--space-4);
+    margin: var(--space-3) 0;
+  }
+  .xp-facts dt {
+    color: var(--color-body);
+  }
+  .xp-facts dd {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+  }
+
+  .xp-plot,
+  .xp-chart {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+  .xp-plot {
+    max-width: 16rem;
+    margin: 0 auto;
+  }
+  .xp-axis {
+    stroke: var(--color-subtle);
+    stroke-width: 1;
+  }
+  .xp-guide {
+    stroke: var(--color-muted);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+  .xp-guide.is-limit {
+    stroke: var(--chart-4);
+  }
+  .xp-label {
+    fill: var(--color-body);
+    font-family: var(--font-sans);
+    font-size: 11px;
+  }
+  .xp-label.is-masked {
+    fill: var(--color-faint);
+  }
+  .xp-end {
+    text-anchor: end;
+  }
+  .xp-middle {
+    text-anchor: middle;
+  }
+  .xp-key {
+    fill: var(--chart-3);
+    fill-opacity: 0.85;
+  }
+  .xp-key.is-masked {
+    fill: var(--color-subtle);
+  }
+  .xp-query {
+    stroke: var(--color-accent);
+    stroke-width: 2;
+  }
+  .xp-query-head {
+    fill: var(--color-accent);
+  }
+  .xp-line {
+    fill: none;
+    stroke: var(--chart-1);
+    stroke-width: 2;
+  }
+  .xp-line.is-over {
+    stroke: var(--color-subtle);
+    stroke-dasharray: 4 3;
+  }
+  .xp-dot {
+    fill: var(--color-bg);
+    stroke: var(--chart-1);
+    stroke-width: 2;
+  }
+  .xp-dot.is-over {
+    stroke: var(--chart-4);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .xp-bar-fill,
+    .xp-seg {
+      transition: width var(--transition);
+    }
+  }
+</style>

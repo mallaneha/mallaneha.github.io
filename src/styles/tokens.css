@@ -61,6 +61,13 @@
   --color-toast-bg: #111111;
   --color-toast-text: #ffffff;
   --shadow-sheet: 0 -1px 2px rgb(0 0 0 / 0.03), 0 -8px 24px rgb(0 0 0 / 0.06);
+  /* Chart series for the explainer widgets on white / --color-surface: 6.7/6.2, 6.6/6.2, 5.1/4.7, 5.4/5.1, 5.0/4.7.
+     Dark values on --color-bg / --color-surface are all 6.5:1 or higher. */
+  --chart-1: #0b5cad;
+  --chart-2: #7048a8;
+  --chart-3: #1a7f37;
+  --chart-4: #a65300;
+  --chart-5: #6f6f6f;
 }
 
 /* Dark: follows the system unless the theme toggle chose light; or forced by the toggle. */
@@ -85,6 +92,11 @@
     --color-toast-bg: #ededed;
     --color-toast-text: #111111;
     --shadow-sheet: 0 -1px 0 rgb(255 255 255 / 0.06);
+    --chart-1: #8ab8ff;
+    --chart-2: #c4a5f5;
+    --chart-3: #3fb950;
+    --chart-4: #f0a35c;
+    --chart-5: #a0a0a0;
   }
 }
 
@@ -109,6 +121,11 @@
   --color-toast-bg: #ededed;
   --color-toast-text: #111111;
   --shadow-sheet: 0 -1px 0 rgb(255 255 255 / 0.06);
+  --chart-1: #8ab8ff;
+  --chart-2: #c4a5f5;
+  --chart-3: #3fb950;
+  --chart-4: #f0a35c;
+  --chart-5: #a0a0a0;
 }
 
 :root[data-theme="light"] {
