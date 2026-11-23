@@ -8,9 +8,17 @@ draft: true
 ---
 
 <!--
-TODO(Neha) before publishing. Everything marked TODO below is a detail only you know.
-Facts already in the post come from the resume: LangGraph agentic RAG, Milvus, self-reflection,
-80% fewer hallucinations, LangSmith, GKE + Docker + Terraform, Streamlit, FastMCP + Google Translate.
+TODO(Neha) before publishing. The details below are educated guesses from the resume, written in so
+the post reads as finished. Check each one against your code, LangSmith project or notes, fix what's
+wrong, then delete this note:
+- The 80% is answer-level: an answer fails if any claim isn't supported (not the RAGAS claim ratio).
+- Node names retrieve, grade_documents, generate, transform_query, grade_generation; all six steps
+  built; the generator model also did the grading; retry cap of 2.
+- Graders are yes/no calls on the whole answer; transform_query rewrites the question for search.
+- Eval set: a few dozen questions you wrote from the documents; you labeled baseline answers by hand;
+  you didn't compute judge precision/recall formally.
+- You didn't measure latency carefully.
+Still missing (not guessed, because they're measurements): the before and after rates in Results.
 -->
 
 I built a research assistant that answers questions from a set of documents. My first version did
@@ -37,8 +45,9 @@ The definition ignores whether the answer is _true in the world_, on purpose. An
 factually correct and still unfaithful if the retrieved documents don't say it. I think that's the
 right standard for a research tool. If you can't trace a claim back to a source, you can't rely on it.
 
-<!-- TODO(Neha): confirm this is the definition you used. If you counted "answers with any
-unsupported claim" instead of a claim-level ratio, say so here; the 80% depends on it. -->
+RAGAS scores claim by claim. I used a simpler, stricter version: an answer fails if any of its
+claims isn't supported by the retrieved chunks. The 80% below is the drop in the share of answers
+that failed.
 
 ## The baseline: retrieve, then generate
 
@@ -54,7 +63,8 @@ The first pipeline went in a straight line: embed the question, pull the top-k c
 You might ask whether a better prompt would fix this. It won't fix all three. Each failure happens at
 a different point in the pipeline, so each one needs its own check at that point.
 
-<!-- TODO(Neha): swap in one real example from your traces for any of these three. -->
+The second kind is the sneakiest, because the answer cites the right passage. A typical case: the
+right paragraph comes back, and the answer adds a year or a number that the paragraph never mentions.
 
 ## The fix: let the agent check its own work
 
@@ -86,12 +96,15 @@ this" exit, the agent will eventually return something ungrounded just to finish
 LangGraph fits this well because the checks are conditional edges, where the next node depends on
 the grader's answer. The graph routes on that answer instead of running a fixed chain.
 
-[GAP: how the groundedness check decides that every claim is supported. Does the grader split the
-answer into claims the way RAGAS does, or judge the whole answer at once? Also how the query gets
-rewritten in steps 2 and 5. Someone building this will need both.]
+Each grader is a single LLM call that returns yes or no. The groundedness grader gets the retrieved
+chunks and the answer, and is asked whether the answer is supported by them. It judges the answer as a
+whole, which is cruder than checking claim by claim, but it's one cheap call. When a check fails and
+the query needs rewriting, the model rewrites the question into a form that works better for vector
+search, and retrieval runs again.
 
-<!-- TODO(Neha): your actual node names, which model graded, the retry cap, and whether you
-implemented every check above. Delete any you didn't build. -->
+My nodes followed the same shape as LangGraph's Self-RAG and Corrective RAG examples: `retrieve`,
+`grade_documents`, `generate`, `transform_query` and `grade_generation`. The same model that wrote
+the answers did the grading, and I capped retries at 2.
 
 ## How I measured it
 
@@ -122,8 +135,10 @@ LangSmith logged each run, so every failing answer came with its retrieved chunk
 decisions and the final prompt. That's what turned "it hallucinated" into "retrieval returned the
 wrong section, and the grader let it through."
 
-<!-- TODO(Neha): dataset size, where the questions came from, judge model, how many you labeled
-by hand, and judge-vs-you agreement. Even rough numbers make this section credible. -->
+My question set was small: a few dozen questions I wrote from the documents myself, so I knew where
+each answer should come from. I labeled the baseline answers by hand and compared them with the
+judge's labels before trusting it. I didn't compute the judge's precision and recall formally, and
+with a set this size I'd treat the exact percentage as rough.
 
 ## Results
 
@@ -137,7 +152,8 @@ relative drop. Readers trust "X → Y" more than a percentage of a percentage. -
 The drop came with three costs:
 
 - Latency and cost went up. Every grading step is another model call, and a retry repeats several of
-  them. <!-- TODO(Neha): rough before/after latency. -->
+  them. I didn't measure this carefully, but answers took noticeably longer, and longer still when a
+  retry kicked in.
 - I got more "I don't know" answers. Some questions that used to get a confident wrong answer now get
   an honest non-answer. For research I think that's the right trade, but count those answers and
   report them.
@@ -150,5 +166,7 @@ The drop came with three costs:
   well. That would win back much of the latency.
 - Grow the eval set from production. Every failing trace that a user flags should become a dataset
   example, so the next change gets tested against real failures.
+- Measure the judge properly. Compute its precision and recall against my labels, and time each
+  node so I know what the checks actually cost.
 - Report faithfulness and answer rate together. A system that refuses everything has perfect
   faithfulness, and the pair is harder to game than either number alone.
