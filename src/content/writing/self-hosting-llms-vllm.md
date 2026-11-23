@@ -51,5 +51,7 @@ PagedAttention (readings include the vLLM and ORCA papers) and a recitation on S
 
 ## Further reading
 
+- [Build it: a serving budget for an LLM](/writing/build-a-serving-budget/), which works out how much
+  the KV cache limits a self-hosted model, with a calculator.
 - Rohit Ghumare, [Inside the vLLM Engine](https://rohitghumare.com/guides/inside-vllm/): a
   detailed tour of vLLM's block pool, scheduler, process loop, speculative decoding and structured output.

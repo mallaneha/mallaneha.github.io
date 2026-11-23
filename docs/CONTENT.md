@@ -18,6 +18,26 @@ draft: true # new writing starts as a draft; drafts only show in `npm run dev`
 
 Existing tags: `evals`, `rag`, `agents`, `healthcare`, `governance`, `security`, `llm-systems`.
 
+### Interactive widgets in posts
+
+The "Build it" posts embed widgets as raw HTML in the Markdown: `<attention-lab>`, `<scale-lab>`, `<gpt-shape>` and
+`<serving-budget>`. Always put a static fallback inside, on one line with no blank lines, so the post still reads with
+JS off:
+
+```html
+<gpt-shape>
+  <div class="xp-fallback">
+    <p>
+      With JavaScript on, this is a parameter counter. For GPT-2 small it comes
+      to 124,439,808.
+    </p>
+  </div>
+</gpt-shape>
+```
+
+Any number the text quotes must match what the widget computes; `tests/visual/explainers.spec.ts` checks the main ones.
+Widget logic lives in `src/scripts/explainers.ts`, styles in `src/components/Explainers.astro`.
+
 ## Project: `src/content/projects/<slug>.md`
 
 ```yaml

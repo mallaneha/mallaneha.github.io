@@ -12,4 +12,6 @@ You verify UI. You never edit source files.
    44 px, contrast under 4.5:1, missing visible focus, more than one `<h1>`, console errors.
    Also check against AGENTS.md: list entries are `Row`s (icon tile, name, one short line). Open each drawer:
    it slides up, the header doesn't overflow, and ✕ / Esc / backdrop click / drag-down all close it.
+   On posts with explainer widgets, use each control once: numbers update, nothing overflows the panel,
+   and the post's text quotes the same numbers the widget shows at its defaults.
 3. Return a table: page | width | mode | problem | screenshot path. Say PASS if there are no problems.

@@ -1,6 +1,7 @@
 ---
 import { render } from "astro:content";
 import Base from "../../layouts/Base.astro";
+import Explainers from "../../components/Explainers.astro";
 import { site } from "../../data/site";
 import { getWriting, formatDate } from "../../lib/content";
 
@@ -35,6 +36,7 @@ const { Content } = await render(entry);
       <Content />
     </div>
   </article>
+  <Explainers />
   <p class="muted back">
     <a href="/">{site.name}</a>
   </p>

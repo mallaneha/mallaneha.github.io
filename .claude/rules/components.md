@@ -13,9 +13,12 @@ paths:
 - One component per file, PascalCase filename, scoped `<style>` in the component.
 - Client JS lives only in `src/scripts/drawer.ts` and `src/scripts/effects.ts` (plain TS, no framework, no `client:*`).
   Extend those rather than adding new scripts; ask before adding a dependency.
+  The exception is `src/scripts/explainers.ts` (post widgets): `effects.ts` imports it lazily, only on pages that use a widget,
+  so it never loads elsewhere. Its styles are `is:global` in `src/components/Explainers.astro`, since Markdown can't use scoped styles.
   The one exception is the tiny inline script in `Base.astro`'s `<head>` that applies the saved theme before paint.
 - New dark colors go in both dark blocks of `tokens.css` (the media query and `:root[data-theme="dark"]`).
 - Reuse `Section`, `RowList`, `Row` for any list, and `Drawer` for details. Icons come from `src/data/icons.ts`.
 - Respect `prefers-reduced-motion`; keep keyboard support (Esc, ←/→, focus return) when touching drawers.
-- `tests/visual/interactions.spec.ts` covers drawers and effects; update it with behavior changes.
+- `tests/visual/interactions.spec.ts` covers drawers and effects, and `tests/visual/explainers.spec.ts` pins the widgets'
+  numbers to the posts' text; update them with behavior changes.
 - Keep one `<h1>` per page.

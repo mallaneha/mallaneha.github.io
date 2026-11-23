@@ -45,12 +45,21 @@ color), a soft synthesized two-tick sound, and an 8ms vibration on phones. The f
 all three and is remembered in `localStorage`. No sparks for keyboard clicks or with
 `prefers-reduced-motion`.
 
+## Explainer widgets (`src/components/Explainers.astro`, `src/scripts/explainers.ts`)
+
+Interactive figures inside posts: a bordered `--color-surface` panel at `--text-sm`, controls stacked on
+phones, 44px tap targets, numbers in the mono font. Tables scroll inside the panel instead of the page.
+Charts and bars use `--chart-1` to `--chart-5`; weights are bars next to the number, never colored cell
+backgrounds, so text contrast doesn't depend on the data. Bar transitions only run without
+`prefers-reduced-motion`.
+
 ## Tokens (`src/styles/tokens.css`)
 
 - Fonts: system sans and mono stacks. No web fonts.
 - Sizes: rows and drawers at `--text-sm` (14px); post bodies at `--text-base`.
 - Colors: text, body, muted, faint, subtle (dotted rules), border, surface, hover, overlay. Each has
   a dark-mode value; contrast ratios are noted in the file.
+- Chart series: `--chart-1` to `--chart-5`, for the explainer widgets.
 - Motion: `--ease-drawer`, `--drawer-in`, `--drawer-out`, `--transition`.
 
 ## Voice

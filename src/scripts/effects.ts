@@ -241,4 +241,11 @@ document.addEventListener("click", async (e) => {
   }
 });
 
+// Interactive explainers for the "Build it" posts. Loaded only on pages that use one.
+if (
+  document.querySelector("attention-lab, scale-lab, gpt-shape, serving-budget")
+) {
+  import("./explainers");
+}
+
 export {};

@@ -2,7 +2,7 @@
 
 One-page personal site (intro, featured work, experience, writing, connect) plus a small blog.
 Full product spec: `docs/SPEC.md`. Design reference: ch.sh (layout, rows, drawers, click effects); see `docs/DESIGN.md`.
-Stack: Astro 7, TypeScript, Markdown content collections, plain CSS with design tokens, two small vanilla TS scripts.
+Stack: Astro 7, TypeScript, Markdown content collections, plain CSS with design tokens, small vanilla TS scripts (no framework).
 Hosted on GitHub Pages at https://mallaneha.github.io; `.github/workflows/deploy.yml` deploys on push to `main`.
 
 **Every change happens in its own git worktree, then merges into local `main`.** Never edit the main checkout:
@@ -17,8 +17,8 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 - `npm run check`: type-check + Prettier check + build + internal link check + phone-number scan of `public/`. **Run before saying a task is done.**
 - `npm run format`: Prettier
 - `node scripts/check-links.mjs dist --external`: also check external URLs (slow, needs network)
-- `npm run test:visual`: Playwright smoke + interaction tests (own server on port 4329) of every page at 375/768/1280/1920 px, light and dark.
-  Fails on sideways scroll, JS errors or ≠ 1 `<h1>`. Screenshots: `test-results/shots/`
+- `npm run test:visual`: Playwright smoke, interaction and explainer-widget tests (own server on port 4329) of every page
+  at 375/768/1280/1920 px, light and dark. Fails on sideways scroll, JS errors or ≠ 1 `<h1>`. Screenshots: `test-results/shots/`
 - `npm run test:visual:live`: the same against https://mallaneha.github.io (published pages only)
 
 ## Where things live
@@ -31,9 +31,11 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 - Experience: `src/content/experience/<slug>.md`, body is the drawer's case study. Example: `autonomize-ai.md`
 - Frontmatter schema: `docs/CONTENT.md`, enforced in `src/content.config.ts`. Keep both in sync.
 - Colors, fonts, spacing: `src/styles/tokens.css` only. Global element styles: `src/styles/global.css`.
-- Home page: `src/pages/index.astro`. Components: `Row`, `RowList`, `Drawer`, `Section`, `Icon`, `Footer`.
+- Home page: `src/pages/index.astro`. Components: `Row`, `RowList`, `Drawer`, `Section`, `Icon`, `Footer`,
+  `Explainers` (styles for the interactive widgets in posts).
 - Client scripts: `src/scripts/drawer.ts` (bottom-sheet drawers) and `src/scripts/effects.ts` (click spark, sound,
-  vibration, mute toggle, theme toggle, copy-email toast). Icons: `src/data/icons.ts` (generic glyphs, no brand logos).
+  vibration, mute toggle, theme toggle, copy-email toast). `effects.ts` also lazy-loads `src/scripts/explainers.ts`,
+  the interactive widgets for the "Build it" posts, only on pages that use one. Icons: `src/data/icons.ts` (generic glyphs, no brand logos).
 - `/llms.txt` is generated from the same content by `src/pages/llms.txt.ts`.
 - Background research and the source resume: `docs/research/`, `docs/reference/` (not published).
 
