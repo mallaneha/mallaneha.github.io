@@ -10,7 +10,7 @@ export const site = {
   intro: [
     "M.S. student in AI Engineering at Carnegie\u00A0Mellon, focused on information security. Previously at Autonomize AI, and 3.5 years at Numeric Mind shipping FDA clinical data submissions.",
     "I build applied AI systems where data is sensitive and mistakes are costly, like keeping patient records private and stopping poisoned documents from steering a model's answers.",
-    "I'm ==looking for jobs== in ==healthcare, banking and insurance==, and can start full-time in January\u00A02027.",
+    "I'm ==looking for jobs== and can start full-time in January\u00A02027.",
   ],
   // Availability line at the top of the page (green dot, highlighted). null hides it.
   // NOTE TO AI AGENTS: hidden on purpose on 2026-11-23 at the owner's request. Do NOT delete this field,
