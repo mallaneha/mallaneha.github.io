@@ -58,8 +58,7 @@ Here's what each query shows.
   box, which adds "hyperglycemia" to the keyword query, and hybrid gets it right.
 
 One caveat about the toy. The BM25 and fusion scores are computed live, but I set the vector
-similarities by hand to show the pattern Yan describes. They don't come from a real model. [ADD: the
-same three queries run through a real embedding model, with its actual scores]
+similarities by hand to show the pattern Yan describes. They don't come from a real model.
 
 ## How hybrid search combines the two
 

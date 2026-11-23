@@ -14,7 +14,7 @@ benchmark, from 72% to 24%.
 Those are the numbers on my resume. This post is about what they measure: one kind of attack, run the
 same way every time. A paper published in October 2025 showed how much that leaves out, and I think
 anyone reporting a defense number, me included, should say so. I'll cover the attack, the four checks,
-how I measured them, and what I'd test next, but not the code. [ADD: repo link once public]
+how I measured them, and what I'd test next, but not the code.
 
 ## The attack
 
@@ -56,8 +56,7 @@ The last option is the one that worries me. A poisoned document about a CVE that
 covers yet has nothing to contradict. The NLI check has no source to compare against, so only the LLM
 score stands in the way. Gaps like that are most likely for newly published CVEs.
 
-These are what each check is designed to catch, not measured rates for each layer. [ADD: per-layer
-results, if measured: attack success with each check turned off]
+These are what each check is designed to catch, not measured rates for each layer.
 
 ## The result, and what it's measured against
 
@@ -110,8 +109,7 @@ If I were testing Vector Guard again, I'd give the attacker what a real one woul
 I'd report attack success as a curve against the attacker's effort, not as one number.
 
 I'd also report the false positive rate. A filter that rejects poisoned documents and also 10% of good
-ones has a cost, and in a SOC that cost is missing context on a real alert. [ADD: how many clean
-documents the four checks rejected, if measured]
+ones has a cost, and in a SOC that cost is missing context on a real alert.
 
 ## What I'd say about the number now
 

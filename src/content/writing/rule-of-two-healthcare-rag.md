@@ -114,7 +114,6 @@ their coverage. B and C together can still leak data through a bug, with no atta
 
 The rule tells you where to put a person or a hard boundary. It doesn't replace the rest of the work:
 permissions on what gets retrieved, redaction of what gets logged, and evals on what gets answered.
-[GAP: link to a post on permission-aware retrieval, if written]
 
 If you're building one of these, list your features the way the widget does and mark each one A, B or C.
 Look hardest at the [C] features you didn't think of as actions.
