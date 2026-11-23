@@ -4,6 +4,7 @@ description: "Work out how many users a model can serve from four numbers: weigh
 date: 2026-11-22
 type: post
 tags: [llm-systems]
+draft: false
 ---
 
 This is the last part of my "Build it" series. Here you turn a model and some hardware into a budget:

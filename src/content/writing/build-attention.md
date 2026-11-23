@@ -4,6 +4,7 @@ description: "Build one attention head by hand with four tokens and two-dimensio
 date: 2026-11-22
 type: post
 tags: [llm-systems]
+draft: false
 ---
 
 This is part 1 of a three-part series where I build the pieces of a transformer small enough to check
