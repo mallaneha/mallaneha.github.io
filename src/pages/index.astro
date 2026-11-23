@@ -24,7 +24,7 @@ const [projects, experience, writing] = await Promise.all([
 ]);
 const published = new Set(writing.map((w) => w.id));
 const featured = projects.filter((p) => p.data.featured);
-const latest = writing.slice(0, 2);
+const latest = writing.slice(0, 3);
 
 const featuredDrawers = await Promise.all(
   featured.map(async (p) => ({
@@ -102,7 +102,7 @@ const experienceDrawers = await Promise.all(
   </Section>
 
   <Section id="projects" title="Projects">
-    <RowList columns={2}>
+    <RowList columns={3}>
       {featuredDrawers.map(({ entry, id }) => (
         <Row
           name={entry.data.title}
@@ -116,17 +116,23 @@ const experienceDrawers = await Promise.all(
 
   <Section id="writing" title="Writing" blurb={site.writingBlurb}>
     {latest.length > 0 ? (
-      <RowList>
-        {latest.map((w) => (
-          <Row
-            icon="pen"
-            name={w.data.draft ? `[draft] ${w.data.title}` : w.data.title}
-            desc={formatDate(w.data.date)}
-            href={`/writing/${w.id}/`}
-          />
-        ))}
-        <Row icon="file" name="All writing" href="/writing/" />
-      </RowList>
+      <>
+        <RowList>
+          {latest.map((w) => (
+            <Row
+              icon="pen"
+              name={w.data.draft ? `[draft] ${w.data.title}` : w.data.title}
+              desc={formatDate(w.data.date)}
+              href={`/writing/${w.id}/`}
+            />
+          ))}
+        </RowList>
+        <a class="all-writing" href="/writing/">
+          <span>All writing</span>
+          <span class="count">{writing.length} posts</span>
+          <Icon name="arrowRight" size={14} class="go" />
+        </a>
+      </>
     ) : (
       <p class="muted small">First posts coming soon.</p>
     )}
@@ -269,5 +275,41 @@ const experienceDrawers = await Promise.all(
   }
   .small {
     font-size: var(--text-sm);
+  }
+  .all-writing {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    line-height: 1.25rem;
+    text-decoration: none;
+    transition:
+      background-color var(--transition),
+      transform var(--transition);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .all-writing:hover {
+    background: var(--color-surface-hover);
+  }
+  .all-writing:active {
+    transform: scale(0.98);
+  }
+  .all-writing .count {
+    color: var(--color-muted);
+    font-weight: var(--weight-normal);
+  }
+  .all-writing :global(.go) {
+    color: var(--color-muted);
+    transition: transform var(--transition);
+  }
+  .all-writing:hover :global(.go) {
+    transform: translateX(2px);
   }
 </style>
