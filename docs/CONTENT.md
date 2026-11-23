@@ -21,6 +21,9 @@ part: 1 # required with series, never without it
 
 Existing tags: `evals`, `rag`, `agents`, `healthcare`, `governance`, `security`, `llm-systems`.
 
+The icon on a post's row comes from its `series`, else its first tag, else a document icon. The table is
+`writingIcons` in `src/lib/content.ts`; reorder a post's tags to change its icon.
+
 ### Placeholders in drafts
 
 Drafts can mark what only Neha can supply: `[PERSONAL EXAMPLE: …]` for a first-person story, `[GAP: …]` for a step

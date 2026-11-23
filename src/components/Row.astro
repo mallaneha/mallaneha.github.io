@@ -12,7 +12,6 @@ interface Props {
   logoAlt?: string; // debug only: alternative logo the ?debug panel can swap in (see scripts/debug.ts)
   logoAltSize?: number; // px of logoAlt inside the tile, default 24
   logoAltFull?: boolean; // logoAlt is a filled square: it covers the whole tile
-  glyph?: string; // a letter (e.g. Nepali क) shown in the tile instead of the icon
   name: string;
   desc?: string;
   meta?: string;
@@ -32,7 +31,6 @@ const {
   logoAlt,
   logoAltSize = 24,
   logoAltFull = false,
-  glyph,
   name,
   desc,
   meta,
@@ -76,11 +74,11 @@ if (drawer) {
   <Tag
     class:list={[
       "row",
-      { static: Tag === "div", "has-tile": Boolean(logo || glyph || icon) },
+      { static: Tag === "div", "has-tile": Boolean(logo || icon) },
     ]}
     {...attrs}
   >
-    {(logo || glyph || icon) && (
+    {(logo || icon) && (
       <span class:list={["tile", { logo, full: logo && logoFull }]}>
         {logo ? (
           <img
@@ -93,10 +91,6 @@ if (drawer) {
             data-logo-alt-size={logoAlt && (logoAltFull ? 40 : logoAltSize)}
             data-logo-alt-full={logoAlt && logoAltFull}
           />
-        ) : glyph ? (
-          <span class="glyph" lang="ne" aria-hidden="true">
-            {glyph}
-          </span>
         ) : (
           icon && <Icon name={icon} />
         )}
@@ -178,8 +172,7 @@ if (drawer) {
       background: var(--color-logo-tile);
     }
     .row:not(.static):hover .tile :global(svg),
-    .row:not(.static):hover .tile img,
-    .row:not(.static):hover .tile .glyph {
+    .row:not(.static):hover .tile img {
       transform: scale(1.05);
     }
   }
@@ -218,15 +211,8 @@ if (drawer) {
     /* Multiply drops a JPEG's white box into the tile. */
     mix-blend-mode: multiply;
   }
-  .glyph {
-    font-family: var(--font-devanagari);
-    font-size: var(--text-sm); /* about the size of the 16px icons */
-    line-height: 1;
-    font-weight: var(--weight-medium);
-  }
   .tile :global(svg),
-  .tile img,
-  .tile .glyph {
+  .tile img {
     transition: transform var(--transition);
   }
   .text {
@@ -273,7 +259,6 @@ if (drawer) {
     .row:not(.static):active,
     .row:not(.static):hover .tile :global(svg),
     .row:not(.static):hover .tile img,
-    .row:not(.static):hover .tile .glyph,
     .row:hover :global(.arrow.open) {
       transform: none;
     }
