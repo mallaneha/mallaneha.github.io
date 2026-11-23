@@ -67,11 +67,8 @@ defend. CVE entries have a fixed shape, so there's a trusted source to contradic
 don't.
 
 Here's what those numbers held fixed. The attack was PoisonedRAG as published, adapted to my corpus,
-with the same number of poisoned documents per query. It wasn't written with the four checks in mind,
-and it didn't get another try after a document was rejected.
-
-[GAP: confirm the attack wasn't tuned to the checks, and whether any test varied it, for example more
-poisoned documents per query or documents written to pass a specific check]
+with two poisoned documents per query. It wasn't written with the four checks in mind, and it didn't get
+another try after a document was rejected.
 
 ## When the attacker moves second
 

@@ -7,9 +7,9 @@ tags: [rag, healthcare, evals]
 draft: true
 ---
 
-Health plan documents are full of identifiers: diagnosis codes like E11.9, procedure codes like 99213,
-plan IDs, drug codes. When a member or a claims reviewer types one into a search box, they want the
-paragraph with that exact code. A paragraph about a similar code is a wrong answer.
+Claims, prior-authorization lists and coverage policies are full of codes: diagnosis codes like E11.9,
+procedure codes like 99213, drug codes. When a claims reviewer or a member types one into a search box,
+they want the paragraph with that exact code. A paragraph about a similar code is a wrong answer.
 
 Vector search, the default retriever in most RAG tutorials, is built to find similar things. For codes,
 similar is the problem. This post shows the failure on a small example you can click through, then what
@@ -73,21 +73,18 @@ similarities are on different scales, and with RRF you never have to convert one
 also why the "high blood sugar" query fails. A strong keyword hit on the wrong chunk counts as much as a
 strong vector hit on the right one, and hybrid only gets it right once the keyword side does too.
 
-## What I'd do on real plan documents
+## What I'd do on real documents
 
-In my Medicare Evidence of Coverage work, the identifiers that mattered most weren't diagnosis codes.
-They were plan identifiers. More than 100 PDFs from different plans cover the same ground in nearly the
-same words, so a chunk about one plan's copay looks almost identical to the same chunk from another
-plan. [ADD: what happened when plans got mixed, for example a copay answered from the wrong plan] That's
-the code problem again, with a plan ID in place of E11.65. <!-- TODO(Neha): confirm plan IDs were the
-identifiers that mattered, and how chunks were tied to their plan -->
+In my Medicare Evidence of Coverage work, the documents mostly didn't contain codes. An Evidence of
+Coverage is written for members, so its benefits charts name services in plain language, like "primary
+care physician services". A question with a code in it would have had nothing exact to match. The hard
+part of that project was somewhere else: every plan lays its document out differently, and I used each
+document's table of contents to find the benefits charts before anything was indexed.
 
-It's also worth checking whether your documents contain codes at all. [ADD: whether the Evidence of
-Coverage benefits charts list CPT or HCPCS codes, or only plain-language service names like "primary
-care visit"] If they don't, a code in the query has nothing exact to match, and a mapping from codes to
-service names will do more than any search setting.
+So the first thing I'd check is whether your documents contain codes at all. If they don't, a mapping
+from codes to service names will do more than any search setting.
 
-If I were building retrieval over plan documents again, I'd do four things.
+If they do, I'd do four things.
 
 1. **Run keyword and vector search together from the start.** It means two indexes instead of one, and
    many search engines and vector databases support both.
@@ -96,7 +93,8 @@ If I were building retrieval over plan documents again, I'd do four things.
    and hyphens.
 3. **Route exact identifiers to an exact lookup.** If the query matches a code pattern, filter on a
    metadata field before you rank anything. Jason Liu describes this as extracting structure into
-   metadata so queries can filter on it ([Liu,
+   metadata so queries can filter on it. The same goes for plan IDs when one index holds many plans: tag
+   each chunk with its plan and filter on that first ([Liu,
    2025](https://jxnl.co/writing/2025/01/24/systematically-improving-rag-applications/)).
 4. **Keep a synonym list for the plain-language side.** Members say "high blood sugar"; documents say
    "hyperglycemia". A short list of clinical terms and their everyday versions fixes many keyword
@@ -112,8 +110,8 @@ miss becomes a wrong coverage answer.
 
 So I'd split the eval set into at least three groups (code lookups, plain-language coverage questions,
 and questions that need more than one chunk) and report recall for each kind of search on each group. If
-vector search wins on one group and loses on another, that's your case for hybrid, with numbers. It's
-also an experiment worth running on public Medicare documents. [GAP: whether and when to run it]
+vector search wins on one group and loses on another, that's your case for hybrid, with numbers. It's a
+cheap experiment to run on public coverage policies that list codes.
 
 Keyword matching has a side benefit if you work somewhere regulated. When someone asks why the system
 returned a paragraph, "the query contained E11.65 and so did this chunk" is an answer an auditor can
