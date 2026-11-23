@@ -417,6 +417,15 @@ const linkAttrs = external
   .case :global(blockquote p) {
     margin: 0;
   }
+  /* Animated explainer (public/canvas/*.svg) under a project's Overview. Dark in both themes. */
+  .case :global(.canvas) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: var(--space-6) 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-tile);
+  }
   .case :global(.stats) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
