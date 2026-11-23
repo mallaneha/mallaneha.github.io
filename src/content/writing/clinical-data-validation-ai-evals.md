@@ -7,13 +7,6 @@ tags: [evals, healthcare, governance]
 draft: true
 ---
 
-<!--
-TODO(Neha) before publishing. Facts from the resume: 3.5 years at Numeric Mind, 800+ CDISC
-datasets and reports in SAS and R, 10+ pharma clients, 15+ FDA submission packages, Pinnacle 21,
-a debugging tool tracing P21 findings to patient records (-75% resolution time), led 12 analysts.
-Add one or two real (anonymized) stories where marked; they'll make this post.
--->
-
 Before I worked on AI systems, I spent three and a half years preparing clinical trial data for FDA
 submissions. I built more than 800 standardized datasets and reports, and every one of them was
 validated before it left the building.
@@ -53,8 +46,10 @@ terms, consistent dates. It says nothing about whether the analysis is right. A 
 every structural rule and still carry a wrong derivation, meaning a value computed from other values
 with the wrong logic.
 
-[PERSONAL EXAMPLE: a dataset that passed Pinnacle 21 cleanly but had a wrong derivation, and how it
-was caught]
+The simplest one I remember was an age group. The spec said 65 and over, and the code used greater
+than 65, so every 65-year-old landed in the younger group. Every variable had the right type and the
+right label, and Pinnacle 21 had nothing to say about it. We found it when the group counts in the
+demographics table didn't match the listing.
 
 LLM evals have the same trap. A response can be valid JSON, use the right format, cite a source and
 pass every assertion, and still be wrong.
@@ -77,7 +72,9 @@ that a rule failed, but it doesn't hand you the patient records behind it. Analy
 those up by hand. My tool traced each finding back to the exact records in the SDTM and ADaM
 datasets, and it cut our issue resolution time by 75%.
 
-<!-- TODO(Neha): one sentence on what a typical finding looked like before and after the tool. -->
+The slowest ones were ADaM values that didn't match their SDTM source. Before, an analyst rebuilt the
+derivation by hand to find where they split. After, the tool showed the ADaM record and the SDTM
+records it came from side by side.
 
 ADaM builds this idea into the standard: an analysis result should be traceable to the data it came
 from.
@@ -92,21 +89,25 @@ In clinical programming, important outputs are commonly checked by a second prog
 them independently. If two people derive the same number separately, you can trust it more than if
 one person checks their own work.
 
-<!-- TODO(Neha): describe how QC worked on your team, e.g. whether you double-programmed key
-datasets and TLFs, and what happened when outputs didn't match. -->
+On my team, key ADaM datasets and the main tables were double-programmed. A second analyst wrote
+their own code from the same spec, and we compared the outputs with PROC COMPARE. When they didn't
+match, the cause was usually a spec that two people could read two ways, and we fixed the spec before
+touching either program.
 
 An LLM judge is a second programmer you haven't vetted yet. Before you trust it, check its work
 against yours: label a sample by hand and measure how often the judge agrees. Hamel recommends
 precision and recall for this rather than raw agreement, because when failures are rare, a judge
-that says "fine" every time looks accurate. That judge would never catch a failure.
+that says "fine" every time looks accurate. That judge would never catch a failure. And when the judge disagrees with you, check whether your
+rubric can be read two ways before you blame the judge.
 
 ## 4. Decide what blocks a release before you see the results
 
 Not every validator finding blocks a submission. Some must be fixed. Others are acceptable if you
 explain them. Teams decide which is which, write it down, and justify it to the reviewer.
 
-[PERSONAL EXAMPLE: a finding your team chose to explain in the reviewer's guide instead of fixing,
-and why]
+Pinnacle 21 once flagged duplicate vital signs records at the same visit. They were real: the
+protocol asked for repeated blood pressure readings a few minutes apart. Deleting them would have
+given us a clean report and wrong data, so we kept them and explained why in the reviewer's guide.
 
 AI evals need the same explicit triage. In Hamel's words, your pass rate is "a product decision." A
 formatting slip in an internal summary and a leaked patient identifier aren't the same failure, and
