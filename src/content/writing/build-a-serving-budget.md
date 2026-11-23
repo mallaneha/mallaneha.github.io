@@ -1,13 +1,15 @@
 ---
-title: "Build it, part 3: a serving budget for an LLM"
+title: "LLMs by hand, part 3: a serving budget"
 description: "Work out how many users a model can serve from four numbers: weights, KV cache, memory and bandwidth."
 date: 2026-11-22
 type: post
 tags: [llm-systems]
+series: llms-by-hand
+part: 3
 draft: false
 ---
 
-This is the last part of my "Build it" series. Here you turn a model and some hardware into a budget:
+This is the last part of my "LLMs by hand" series. Here you turn a model and some hardware into a budget:
 how many requests fit in memory, how long each generation step takes, and how many tokens per second
 you get. It covers decoding, the phase where the model generates one token at a time. It doesn't cover
 prefill, communication between chips, or real measurements. Everything here is arithmetic, and the last

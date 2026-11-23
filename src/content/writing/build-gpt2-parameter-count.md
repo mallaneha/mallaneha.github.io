@@ -1,13 +1,15 @@
 ---
-title: "Build it, part 2: where GPT-2's 124M parameters live"
+title: "LLMs by hand, part 2: where GPT-2's 124M parameters live"
 description: "Count GPT-2 small's parameters matrix by matrix, and see why a third of them are a lookup table."
 date: 2026-11-22
 type: post
 tags: [llm-systems]
+series: llms-by-hand
+part: 2
 draft: false
 ---
 
-This is part 2 of my "Build it" series. [Part 1](/writing/build-attention/) built one attention head by
+This is part 2 of my "LLMs by hand" series. [Part 1](/writing/build-attention/) built one attention head by
 hand. This part counts every parameter in GPT-2 small, matrix by matrix, until you reach 124,439,808. It
 doesn't cover training or what the parameters end up learning. It's bookkeeping, which is more useful
 than it sounds.

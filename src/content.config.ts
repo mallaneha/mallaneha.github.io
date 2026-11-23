@@ -10,14 +10,21 @@ const md = (dir: string) =>
 
 const writing = defineCollection({
   loader: md("writing"),
-  schema: z.object({
-    title: z.string().max(70),
-    description: z.string().max(160),
-    date: z.coerce.date(),
-    type: z.enum(["post", "note"]).default("post"),
-    tags: z.array(z.string().regex(slug)).default([]),
-    draft: z.boolean().default(true),
-  }),
+  schema: z
+    .object({
+      title: z.string().max(70),
+      description: z.string().max(160),
+      date: z.coerce.date(),
+      type: z.enum(["post", "note"]).default("post"),
+      tags: z.array(z.string().regex(slug)).default([]),
+      draft: z.boolean().default(true),
+      // Optional series: posts with the same `series` are listed together, in `part` order.
+      series: z.string().regex(slug).optional(),
+      part: z.number().int().positive().optional(),
+    })
+    .refine((d) => (d.series === undefined) === (d.part === undefined), {
+      message: "series and part go together: set both or neither",
+    }),
 });
 
 const projects = defineCollection({

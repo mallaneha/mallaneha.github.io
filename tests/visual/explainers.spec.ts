@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-// The "Build it" widgets (src/scripts/explainers.ts). Each check pins a number the post's text quotes,
+// The "LLMs by hand" widgets (src/scripts/explainers.ts). Each check pins a number the post's text quotes,
 // so the prose and the widget can't drift apart.
 
 test("attention lab: default query for 'sat'", async ({ page }) => {
@@ -87,4 +87,34 @@ test("serving budget: LLaMA 2-13B on 8× TPU v5e", async ({ page }) => {
   await w.locator("select").first().selectOption({ index: 2 });
   await expect(facts).toContainText("Largest batch that fits13");
   await expect(facts).toContainText("Critical batch208");
+});
+
+test("writing list keeps the LLMs by hand parts together and in order", async ({
+  page,
+}) => {
+  for (const path of ["/writing/", "/"]) {
+    await page.goto(path);
+    const names = await page
+      .locator("a[href^='/writing/build-']")
+      .allTextContents();
+    const parts = names
+      .map((n) => n.match(/LLMs by hand, part (\d)/)?.[1])
+      .filter(Boolean)
+      .map(Number);
+    expect(parts.length, `${path} lists series parts`).toBeGreaterThan(0);
+    expect(parts, `${path} order`).toEqual([...parts].sort());
+    expect(parts[0], `${path} starts at part 1`).toBe(1);
+  }
+  // On the writing page all three parts are adjacent.
+  await page.goto("/writing/");
+  const hrefs = await page
+    .locator("main a[href^='/writing/']")
+    .evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+  const idx = [
+    "build-attention",
+    "build-gpt2-parameter-count",
+    "build-a-serving-budget",
+  ].map((s) => hrefs.indexOf(`/writing/${s}/`));
+  expect(idx[1]).toBe(idx[0] + 1);
+  expect(idx[2]).toBe(idx[1] + 1);
 });

@@ -13,6 +13,8 @@ date: 2026-11-22 # required, YYYY-MM-DD
 type: post # post (full article) or note (3–5 sentence finding)
 tags: [evals, rag] # optional, lowercase-kebab, reuse existing tags first
 draft: true # new writing starts as a draft; drafts only show in `npm run dev`
+series: llms-by-hand # optional; posts in a series are listed together, in part order
+part: 1 # required with series, never without it
 ---
 ```
 
@@ -27,7 +29,7 @@ with `draft: false`, projects, experience or `src/data/`. Fill them in or delete
 
 ### Interactive widgets in posts
 
-The "Build it" posts embed widgets as raw HTML in the Markdown: `<attention-lab>`, `<scale-lab>`, `<gpt-shape>` and
+The "LLMs by hand" posts embed widgets as raw HTML in the Markdown: `<attention-lab>`, `<scale-lab>`, `<gpt-shape>` and
 `<serving-budget>`. Always put a static fallback inside, on one line with no blank lines, so the post still reads with
 JS off:
 
