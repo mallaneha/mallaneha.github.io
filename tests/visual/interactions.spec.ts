@@ -207,13 +207,59 @@ test("clicking or double-clicking the header cat selects no text", async ({
   expect(await page.evaluate(() => getSelection()?.toString() ?? "")).toBe("");
 });
 
-test("header cat: first click opens its eyes, a second click sits it up", async ({
+// Fakes only Date (page.clock also fakes performance, which breaks Astro's dev toolbar),
+// then reloads. Pittsburgh is UTC-5 in November.
+async function atUtc(page: Page, utc: string) {
+  await page.addInitScript(
+    (t) => {
+      const Real = Date;
+      class Fixed extends Real {
+        constructor(...a: []) {
+          if (a.length) super(...a);
+          else super(t);
+        }
+        static now() {
+          return t;
+        }
+      }
+      window.Date = Fixed as DateConstructor;
+    },
+    Date.parse(`2026-11-24T${utc}:00Z`),
+  );
+  await page.reload();
+}
+
+for (const [utc, local, awake] of [
+  ["03:30", "10:30pm", false],
+  ["08:00", "3am", false],
+  ["10:59", "5:59am", false],
+  ["11:00", "6am", true],
+  ["17:00", "noon", true],
+  ["02:59", "9:59pm", true],
+] as const) {
+  test(`header cat starts ${awake ? "awake" : "asleep"} at ${local} Pittsburgh time`, async ({
+    page,
+  }) => {
+    await atUtc(page, utc);
+    const cat = page.locator("header-cat");
+    await expect(cat).toHaveAttribute(
+      "aria-label",
+      awake ? "Cat, awake" : "Sleeping cat",
+    );
+    if (awake) await expect(cat).toHaveClass(/awake/);
+    else await expect(cat).not.toHaveClass(/awake/);
+  });
+}
+
+test("sleeping header cat stirs on each click and wakes after 12 in a row", async ({
   page,
 }) => {
+  await atUtc(page, "08:00");
   const cat = page.locator("header-cat");
-  await cat.click();
+  for (let i = 0; i < 11; i++) await cat.click();
   await expect(cat).toHaveClass(/peek/);
+  await expect(cat).not.toHaveClass(/awake/);
   await cat.click();
   await expect(cat).toHaveClass(/awake/);
-  await expect(cat).not.toHaveClass(/awake/, { timeout: 6000 });
+  await expect(cat).toHaveAttribute("aria-label", "Cat, awake");
 });

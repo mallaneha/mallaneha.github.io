@@ -6,7 +6,8 @@ interface Props {
   noLedge?: boolean;
   size?: string;
 }
-const { label = "Sleeping cat", noLedge = false, size } = Astro.props;
+// label: leave unset so the name follows the state ("Sleeping cat" / "Cat, awake").
+const { label, noLedge = false, size } = Astro.props;
 ---
 
 <header-cat
