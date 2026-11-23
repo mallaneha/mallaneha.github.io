@@ -1,7 +1,7 @@
 ---
 title: "Evaluating RAG refusals with unanswerable questions"
 description: "Without unanswerable questions, refusing always looks like a mistake. How I score hallucinations, wrong refusals and right refusals."
-date: 2026-11-23
+date: 2026-04-01
 type: post
 tags: [evals, rag, healthcare]
 draft: false

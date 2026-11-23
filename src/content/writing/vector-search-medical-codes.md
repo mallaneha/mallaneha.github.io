@@ -1,7 +1,7 @@
 ---
 title: "Why vector search misses medical codes"
 description: "E11.9 and E11.65 look alike to an embedding model. Keyword, vector and hybrid search on a toy health plan document."
-date: 2026-11-23
+date: 2026-08-01
 type: post
 tags: [rag, healthcare, evals]
 draft: false
