@@ -87,8 +87,10 @@ const educationDrawers = await Promise.all(
     <p class="tagline">{site.tagline}</p>
     {site.availability && (
       <p class="availability">
-        <span class="dot" aria-hidden="true" />
-        <mark>{site.availability}.</mark>
+        <mark>
+          <span class="dot" aria-hidden="true" />
+          {site.availability}.
+        </mark>
         <a href="#connect">Get in touch →</a>
       </p>
     )}
@@ -249,15 +251,14 @@ const educationDrawers = await Promise.all(
   }
   .top {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
   }
-  .top h1 {
-    margin: 0;
-  }
+  /* Negative margins so the icon buttons don't make the name row taller. */
   .top .social {
-    margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) 0 0;
+    margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2))
+      calc(-1 * var(--space-2)) 0;
   }
   .availability {
     display: flex;
@@ -267,8 +268,11 @@ const educationDrawers = await Promise.all(
     color: var(--color-text);
   }
   .availability mark {
-    padding: 0.1em 0.35em;
-    margin-left: -0.35em;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    margin-left: calc(-1 * var(--space-3));
     border-radius: var(--radius);
     background: linear-gradient(var(--color-highlight), var(--color-highlight))
       no-repeat 0 0 / 100% 100%;
@@ -279,6 +283,7 @@ const educationDrawers = await Promise.all(
   }
   .availability .dot {
     flex: none;
+    margin-left: 1px;
   }
   @media (prefers-reduced-motion: no-preference) {
     .availability mark {

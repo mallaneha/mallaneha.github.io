@@ -154,7 +154,7 @@ What changed, and what I learned.
 
 ## Short copy
 
-Name, tagline, intro, availability card (`{ title, detail }`), contact links, resume path and footer motto are in
+Name, tagline, intro, availability line, contact links, resume path and footer motto are in
 `src/data/site.ts`.
 
 ### Resume

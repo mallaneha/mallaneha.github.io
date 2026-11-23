@@ -9,10 +9,10 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
 
 ## Page structure (`src/pages/index.astro`)
 
-1. Header: name (h1), tagline (muted), availability card (status dot, "Open to full-time roles", a muted
-   date line, LinkedIn and GitHub icons, and a "Get in touch" button that jumps to Connect; on phones the icons
-   and button wrap to a second line), "Resume (PDF)" below it when the file exists,
-   3 short paragraphs (now, what I build, which industries).
+1. Header: name (h1) with LinkedIn and GitHub icon links at the right of the same line (plus a resume icon
+   when the file exists), tagline (muted), then the availability line: status dot and `site.availability`
+   in a soft green highlight (`--color-highlight`, sweeps in once on load unless reduced motion), followed by a
+   "Get in touch →" link to Connect. Then 3 short paragraphs (now, what I build, which industries).
    The email is only in Connect.
 2. Experience: each row opens a drawer. The tile shows the company's logo (`logo:` in frontmatter,
    file in `public/logos/`) in its own colors on a light tile,
@@ -20,7 +20,7 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
 3. Projects: projects with `featured: true`, three in one line (stacked on phones), no icon tile, an open-link arrow on each. Each row opens a drawer.
 4. Writing: latest 3 published posts, then an "All writing · N posts →" pill button.
 5. Connect: one column: Email (copies, toast), LinkedIn, GitHub, and Resume when `site.resume` is set.
-   LinkedIn and GitHub also appear as icon links in the availability card in the header.
+   LinkedIn and GitHub also appear as icon links next to the name in the header.
 6. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound
    toggle (home page only) and the light/dark theme toggle.
    The theme follows the system until toggled; the choice is saved in localStorage (`theme`).
