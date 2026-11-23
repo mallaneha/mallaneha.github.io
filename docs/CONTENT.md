@@ -13,6 +13,7 @@ date: 2026-11-22 # required, YYYY-MM-DD
 type: post # post (full article) or note (3–5 sentence finding)
 tags: [evals, rag] # optional, lowercase-kebab, reuse existing tags first
 draft: true # new writing starts as a draft; drafts only show in `npm run dev`
+featured: true # optional; featured posts fill the home page's Writing section (3 rows) before the newest others
 series: llms-by-hand # optional; posts in a series are listed together, in part order
 part: 1 # required with series, never without it
 ---

@@ -18,6 +18,8 @@ const writing = defineCollection({
       type: z.enum(["post", "note"]).default("post"),
       tags: z.array(z.string().regex(slug)).default([]),
       draft: z.boolean().default(true),
+      // Featured posts fill the home page's Writing section first; the newest posts fill any space left.
+      featured: z.boolean().default(false),
       // Optional series: posts with the same `series` are listed together, in `part` order.
       series: z.string().regex(slug).optional(),
       part: z.number().int().positive().optional(),

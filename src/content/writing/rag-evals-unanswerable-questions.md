@@ -5,6 +5,7 @@ date: 2026-04-01
 type: post
 tags: [evals, rag, healthcare]
 draft: false
+featured: true
 ---
 
 When I added self-reflection to my [research agent](/writing/cutting-hallucinations-research-agent/),

@@ -5,6 +5,7 @@ date: 2025-08-01
 type: post
 tags: [evals, healthcare, governance]
 draft: false
+featured: true
 ---
 
 Before I worked on AI systems, I spent three and a half years preparing clinical trial data for FDA
