@@ -63,7 +63,8 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   /* Press feedback (:active scale): starts moving at once. */
   --transition-press: 160ms var(--ease-out);
-  --drawer-in: 500ms;
+  /* User-initiated motion stays within 300 ms (userinterface.wiki duration-max-300ms). */
+  --drawer-in: 300ms;
   --drawer-out: 300ms;
 
   /* Light. On --color-bg: text 18.9:1, body 7.6:1, muted 5.0:1, faint 4.5:1. */
