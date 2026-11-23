@@ -1,7 +1,9 @@
 /* Three-step animated story under a project drawer's Overview: problem → what it does → result.
    Raw HTML in src/content/projects/<slug>.md (`<figure class="story">`), styled only with tokens so it follows
-   the theme toggle. Three equal cards: label, scene (small looping motion), then the step's numbers at the bottom,
-   so the numbers line up across cards. With prefers-reduced-motion nothing moves.
+   the theme toggle. Three equal cards: label, scene (small motion), then the step's numbers at the bottom,
+   so the numbers line up across cards. The motion plays once each time the drawer opens and is done within 5 s
+   (WCAG 2.2.2: nothing moves on its own for longer, so no pause control is needed); then the scene rests on its
+   last frame. With prefers-reduced-motion nothing moves.
    Wider than the 30rem text column: up to --figure-wide, centered on the text and never wider than the drawer.
    Hidden below 48rem, where three cards would be too cramped; the case study's text carries the story there. */
 
@@ -145,7 +147,7 @@
   border-radius: 4px;
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--chart-4) 30%, transparent);
   opacity: 0;
-  animation: story-pulse 1.6s ease-in-out infinite;
+  animation: story-pulse 1.6s ease-in-out 3;
 }
 .story-doc.is-gone {
   border: 1px dashed var(--color-subtle);
@@ -195,18 +197,19 @@
   border-radius: 50%;
   background: var(--chart-3);
   opacity: 0;
-  animation: story-pass 3s linear infinite;
+  /* One pass each, staggered: clean, caught at Structure, clean, caught at NLI. Last one ends at 4.8 s. */
+  animation: story-pass 3s linear both;
 }
-.story-drop + .story-drop {
-  animation-delay: -1.5s;
+.story-drop:nth-of-type(2) {
+  animation-delay: 1.2s;
 }
 .story-drop.is-bad {
   background: var(--chart-4);
-  animation: story-stop-1 3s var(--ease-out) infinite -0.7s;
+  animation: story-stop-1 3s var(--ease-out) 0.6s both;
 }
 .story-drop.is-bad.is-late {
   animation-name: story-stop-3;
-  animation-delay: -2.2s;
+  animation-delay: 1.8s;
 }
 @keyframes story-pass {
   0% {
@@ -284,7 +287,7 @@
   white-space: nowrap;
 }
 .story-in {
-  animation: story-in 4s var(--ease-out) infinite;
+  animation: story-in 480ms var(--ease-out) both;
 }
 .story-in:nth-child(2) {
   animation-delay: 0.25s;
@@ -293,17 +296,9 @@
   animation-delay: 0.5s;
 }
 @keyframes story-in {
-  0% {
+  from {
     opacity: 0;
     transform: translateY(-4px);
-  }
-  12%,
-  88% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
-    opacity: 0;
   }
 }
 .story-card {
@@ -343,7 +338,7 @@
   z-index: -1;
   border-radius: inherit;
   background: color-mix(in srgb, var(--chart-4) 14%, transparent);
-  animation: story-flag 1.4s ease-in-out infinite;
+  animation: story-flag 1.4s ease-in-out 3;
 }
 @keyframes story-flag {
   50% {
@@ -360,10 +355,15 @@
   display: inline-block;
   font-size: var(--text-base);
   color: var(--chart-4);
-  animation: story-spin 2.4s linear infinite;
+  /* One turn per flag blink ("draft again"), then rest; a constant spin would read as loading. */
+  animation: story-spin 1.4s var(--ease-in-out) 3;
 }
 @keyframes story-spin {
-  to {
+  0% {
+    transform: rotate(0);
+  }
+  40%,
+  100% {
     transform: rotate(360deg);
   }
 }
@@ -386,6 +386,9 @@
 .story-pipe .story-chip {
   position: relative;
   z-index: 1;
+  /* The dots' travel is a fixed 5.5rem that starts and ends hidden behind the first and last chip;
+     a wrapped label would change the chip heights and show the jump. */
+  white-space: nowrap;
 }
 .story-flow {
   position: absolute;
@@ -395,7 +398,7 @@
   height: 0.375rem;
   border-radius: 50%;
   background: var(--chart-1);
-  animation: story-flow 1.8s linear infinite;
+  animation: story-flow 1.8s linear 2;
 }
 .story-flow:nth-child(2) {
   animation-delay: -0.6s;
@@ -417,7 +420,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  animation: story-scroll 8s linear infinite;
+  /* One set of comments (half the duplicated track) scrolls by, easing in and out; the end frame matches the start. */
+  animation: story-scroll 4.8s cubic-bezier(0.45, 0, 0.55, 1) forwards;
 }
 @keyframes story-scroll {
   to {
@@ -454,19 +458,28 @@
   font-size: 0.6875rem;
   color: var(--color-text);
   /* Revealed with clip-path, not scaleX, so the label isn't squashed. */
-  animation: story-grow 6s var(--ease-out) infinite;
+  animation: story-grow 1.2s var(--ease-out) both;
+}
+.story-bar ~ .story-bar {
+  animation-delay: 80ms;
 }
 .story-bar.is-good {
   background: color-mix(in srgb, var(--chart-3) 30%, var(--color-bg));
 }
 @keyframes story-grow {
-  0% {
+  from {
     clip-path: inset(0 100% 0 0);
   }
-  20%,
-  100% {
+  to {
     clip-path: inset(0);
   }
+}
+
+/* Hold the first frame until the drawer has started sliding up (and freeze it while it slides away),
+   so the motion isn't spent before anyone can see it. Reopening the drawer replays it. */
+.drawer:not(.is-visible) .story *,
+.drawer:not(.is-visible) .story *::after {
+  animation-play-state: paused;
 }
 
 @media (max-width: 47.99rem) {

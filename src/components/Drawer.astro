@@ -133,7 +133,8 @@ const linkAttrs = external
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
     opacity: 0;
-    transition: opacity var(--drawer-in) ease;
+    /* Same curve as the sheet, so the two land together. */
+    transition: opacity var(--drawer-in) var(--ease-drawer);
   }
   .drawer:global(.is-visible)::backdrop {
     opacity: 1;
