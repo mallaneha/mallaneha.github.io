@@ -1,0 +1,48 @@
+---
+import Base from "../../layouts/Base.astro";
+import RowList from "../../components/RowList.astro";
+import Row from "../../components/Row.astro";
+import { site } from "../../data/site";
+import { getWriting, formatDate } from "../../lib/content";
+
+const writing = await getWriting();
+---
+
+<Base title="Writing" description={site.writingBlurb}>
+  <p class="back">
+    <a href="/">← {site.name}</a>
+  </p>
+  <h1>Writing</h1>
+  <p class="muted blurb">{site.writingBlurb}</p>
+  {writing.length > 0 ? (
+    <RowList>
+      {writing.map((w) => (
+        <Row
+          icon="pen"
+          name={w.data.draft ? `[draft] ${w.data.title}` : w.data.title}
+          desc={`${w.data.type === "note" ? "Note · " : ""}${formatDate(w.data.date)}`}
+          href={`/writing/${w.id}/`}
+        />
+      ))}
+    </RowList>
+  ) : (
+    <p class="muted">First posts coming soon.</p>
+  )}
+</Base>
+
+<style>
+  .back,
+  .blurb {
+    font-size: var(--text-sm);
+  }
+  .back a {
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+  h1 {
+    margin-top: var(--space-8);
+  }
+  .blurb {
+    margin: var(--space-1) 0 var(--space-6);
+  }
+</style>

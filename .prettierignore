@@ -1,0 +1,8 @@
+dist/
+.astro/
+node_modules/
+package-lock.json
+docs/reference/
+test-results/
+playwright-report/
+.claude/worktrees/

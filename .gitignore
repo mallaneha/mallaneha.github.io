@@ -1,0 +1,24 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# env and secrets
+.env
+.env.*
+
+# personal agent notes
+CLAUDE.local.md
+.claude/settings.local.json
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# agent worktrees and test output
+.claude/worktrees/
+test-results/
+playwright-report/

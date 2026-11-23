@@ -1,0 +1,150 @@
+import { test, expect, type Page } from "@playwright/test";
+
+// Drawers (src/scripts/drawer.ts) and click effects (src/scripts/effects.ts) on the home page.
+
+const openDrawer = (page: Page) =>
+  page.locator("dialog[data-drawer][open]").first();
+
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
+});
+
+test("every drawer row opens its drawer, and Esc closes it", async ({
+  page,
+}, info) => {
+  const triggers = page.locator("[data-drawer-open]");
+  const count = await triggers.count();
+  expect(count).toBeGreaterThan(0);
+
+  for (let i = 0; i < count; i++) {
+    const trigger = triggers.nth(i);
+    const id = await trigger.getAttribute("data-drawer-open");
+    await trigger.click();
+    const dialog = page.locator(`dialog#${id}`);
+    await expect(dialog).toHaveClass(/is-visible/);
+    await expect(page).toHaveURL(new RegExp(`#${id}$`));
+    // Sheet is on screen and within the viewport width.
+    const box = await dialog.boundingBox();
+    const vw = page.viewportSize()!.width;
+    expect(box && box.width <= vw && box.y >= 0).toBeTruthy();
+    const overflow = await dialog
+      .locator(".body")
+      .evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(overflow, `${id} body scrolls sideways`).toBe(false);
+    await page.waitForTimeout(550);
+    await page.screenshot({
+      path: `test-results/shots/${info.project.name}/drawer-${id}.png`,
+    });
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toHaveAttribute("open");
+  }
+});
+
+test("close button, backdrop click and arrow keys", async ({ page }) => {
+  const first = page.locator("[data-drawer-open]").first();
+  await first.click();
+  await expect(openDrawer(page)).toHaveClass(/is-visible/);
+  const firstId = await openDrawer(page).getAttribute("id");
+
+  await page.keyboard.press("ArrowRight");
+  await expect(openDrawer(page)).not.toHaveAttribute("id", firstId!);
+  await page.keyboard.press("ArrowLeft");
+  await expect(openDrawer(page)).toHaveAttribute("id", firstId!);
+
+  await openDrawer(page).locator("[data-drawer-close]").click();
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+  // Focus returns to the row that opened the drawer.
+  const firstTarget = await first.getAttribute("data-drawer-open");
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.activeElement?.getAttribute("data-drawer-open"),
+      ),
+    )
+    .toBe(firstTarget);
+
+  await first.click();
+  await expect(openDrawer(page)).toHaveClass(/is-visible/);
+  await page.mouse.click(5, 5); // backdrop, above the sheet
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+});
+
+test("dragging the header down closes the drawer", async ({ page }) => {
+  test.skip(
+    !!test.info().project.use.hasTouch,
+    "mouse drag only on pointer devices",
+  );
+  await page.locator("[data-drawer-open]").first().click();
+  const dialog = openDrawer(page);
+  await expect(dialog).toHaveClass(/is-visible/);
+  await page.waitForTimeout(550);
+  const head = await dialog.locator("[data-drawer-handle]").boundingBox();
+  const x = head!.x + 40;
+  const y = head!.y + head!.height / 2;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x, y + 400, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+});
+
+test("deep link opens a drawer on load", async ({ page }) => {
+  const id = await page
+    .locator("[data-drawer-open]")
+    .first()
+    .getAttribute("data-drawer-open");
+  await page.goto(`/#${id}`);
+  await expect(page.locator(`dialog#${id}`)).toHaveAttribute("open");
+});
+
+test("click effects: spark canvas, mute toggle, copy email", async ({
+  page,
+  context,
+  browserName,
+}) => {
+  await expect(page.locator("canvas.spark-canvas")).toHaveCount(1);
+
+  const toggle = page.locator("[data-effects-toggle]");
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await page.reload();
+  await expect(page.locator("[data-effects-toggle]")).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+
+  if (browserName === "chromium") {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page
+      .locator('section[aria-labelledby="connect"] [data-copy]')
+      .click();
+    await expect(page.locator("#toast")).toHaveText("Email copied");
+  }
+});
+
+test("theme toggle flips the theme and remembers it", async ({ page }) => {
+  const bg = () =>
+    page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  const toggle = page.locator("[data-theme-toggle]");
+  const before = await bg();
+  const wasDark = (await toggle.getAttribute("aria-pressed")) === "true";
+
+  await toggle.click();
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-theme",
+    wasDark ? "light" : "dark",
+  );
+  await expect(toggle).toHaveAttribute("aria-pressed", String(!wasDark));
+  expect(await bg()).not.toBe(before);
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-theme",
+    wasDark ? "light" : "dark",
+  );
+  await expect(page.locator("[data-theme-toggle]")).toHaveAttribute(
+    "aria-pressed",
+    String(!wasDark),
+  );
+});

@@ -1,0 +1,52 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { getCollection } from "astro:content";
+import { site } from "../data/site";
+
+/** The resume path, or null until the PDF is actually in public/ (so we never link a missing file). */
+export const resumeHref =
+  site.resume && existsSync(join(process.cwd(), "public", site.resume))
+    ? site.resume
+    : null;
+
+/** Published writing, newest first. Drafts show in `npm run dev` only. */
+export async function getWriting() {
+  const all = await getCollection(
+    "writing",
+    ({ data }) => import.meta.env.DEV || !data.draft,
+  );
+  return all.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+}
+
+export async function getProjects() {
+  const all = await getCollection("projects");
+  return all.sort((a, b) => a.data.order - b.data.order);
+}
+
+export async function getExperience() {
+  const all = await getCollection("experience");
+  return all.sort((a, b) => a.data.order - b.data.order);
+}
+
+/** Where a project's "Visit" link points: a published write-up, else the repo, else the demo. */
+export function projectHref(
+  links: { repo?: string; demo?: string; post?: string },
+  published: Set<string>,
+) {
+  if (links.post && published.has(links.post))
+    return { href: `/writing/${links.post}/`, label: "Read" };
+  if (links.repo) return { href: links.repo, label: "Code" };
+  if (links.demo) return { href: links.demo, label: "Visit" };
+  return undefined;
+}
+
+export const years = (start: number, end?: number) =>
+  end && end !== start ? `${start}–${end}` : String(start);
+
+export function formatDate(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}

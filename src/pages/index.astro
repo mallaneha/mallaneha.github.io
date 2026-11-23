@@ -1,0 +1,285 @@
+---
+import { render } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import RowList from "../components/RowList.astro";
+import Row from "../components/Row.astro";
+import Drawer from "../components/Drawer.astro";
+import Icon from "../components/Icon.astro";
+import { site } from "../data/site";
+import {
+  getWriting,
+  getProjects,
+  getExperience,
+  projectHref,
+  years,
+  formatDate,
+  resumeHref,
+} from "../lib/content";
+
+const [projects, experience, writing] = await Promise.all([
+  getProjects(),
+  getExperience(),
+  getWriting(),
+]);
+const published = new Set(writing.map((w) => w.id));
+const featured = projects.filter((p) => p.data.featured);
+const building = projects.filter((p) => p.data.status === "building");
+const latest = writing.slice(0, 2);
+
+const featuredDrawers = await Promise.all(
+  featured.map(async (p) => ({
+    entry: p,
+    id: `work-${p.id}`,
+    link: projectHref(p.data.links, published),
+    Content: (await render(p)).Content,
+  })),
+);
+const experienceDrawers = await Promise.all(
+  experience.map(async (e) => ({
+    entry: e,
+    id: `role-${e.id}`,
+    Content: (await render(e)).Content,
+  })),
+);
+---
+
+<Base description={site.summary}>
+  <header>
+    <h1>{site.name}</h1>
+    <p class="tagline">{site.tagline}</p>
+    {site.availability && (
+      <p class="status">
+        <span class="badge">
+          <span class="dot" aria-hidden="true" />
+          {site.availability}
+        </span>
+        {resumeHref && (
+          <a class="resume" href={resumeHref}>
+            <Icon name="file" size={14} />
+            <span>Resume (PDF)</span>
+          </a>
+        )}
+      </p>
+    )}
+    {site.intro.map((line) => (
+      <p>{line}</p>
+    ))}
+    <p>
+      Reach me at{" "}
+      <button
+        type="button"
+        class="inline-copy"
+        data-copy={site.email}
+        data-copy-label="Email copied"
+        data-copy-fallback={`mailto:${site.email}`}
+      >
+        {site.email}
+      </button>
+      {resumeHref ? ", " : " or "}on <a href={site.links.linkedin}>LinkedIn</a>
+      {resumeHref && (
+        <>
+          , or read my <a href={resumeHref}>resume</a>
+        </>
+      )}
+      .
+    </p>
+  </header>
+
+  <Section id="featured" title="Featured">
+    <RowList>
+      {featuredDrawers.map(({ entry, id }) => (
+        <Row
+          icon={entry.data.icon}
+          name={entry.data.title}
+          desc={entry.data.summary}
+          drawer={id}
+        />
+      ))}
+    </RowList>
+  </Section>
+
+  <Section id="experience" title="Experience">
+    <RowList>
+      {experienceDrawers.map(({ entry, id }) => (
+        <Row
+          icon={entry.data.icon}
+          name={entry.data.company}
+          desc={entry.data.summary}
+          drawer={id}
+        />
+      ))}
+    </RowList>
+  </Section>
+
+  {building.length > 0 && (
+    <Section id="building" title="Building">
+      <RowList>
+        {building.map((p) => (
+          <Row
+            icon={p.data.icon}
+            name={p.data.title}
+            desc={p.data.summary}
+            meta="In progress"
+          />
+        ))}
+      </RowList>
+    </Section>
+  )}
+
+  <Section id="writing" title="Writing" blurb={site.writingBlurb}>
+    {latest.length > 0 ? (
+      <RowList>
+        {latest.map((w) => (
+          <Row
+            icon="pen"
+            name={w.data.draft ? `[draft] ${w.data.title}` : w.data.title}
+            desc={formatDate(w.data.date)}
+            href={`/writing/${w.id}/`}
+          />
+        ))}
+        <Row icon="file" name="All writing" href="/writing/" />
+      </RowList>
+    ) : (
+      <p class="muted small">First posts coming soon.</p>
+    )}
+  </Section>
+
+  <Section id="connect" title="Connect">
+    <RowList>
+      <Row
+        icon="mail"
+        name={site.email}
+        desc="Email"
+        copy={site.email}
+        copyLabel="Email copied"
+        href={`mailto:${site.email}`}
+      />
+      <Row
+        icon="link"
+        name="mallaneha"
+        desc="LinkedIn"
+        href={site.links.linkedin}
+      />
+      <Row
+        icon="code"
+        name="mallaneha"
+        desc="GitHub"
+        href={site.links.github}
+      />
+      {resumeHref && (
+        <Row icon="file" name="Resume" desc="PDF" href={resumeHref} />
+      )}
+    </RowList>
+  </Section>
+
+  {featuredDrawers.map(({ entry, id, link, Content }) => (
+    <Drawer
+      id={id}
+      icon={entry.data.icon}
+      name={entry.data.title}
+      desc={entry.data.summary}
+      href={link?.href}
+      hrefLabel={link?.label}
+    >
+      <Content />
+    </Drawer>
+  ))}
+  {experienceDrawers.map(({ entry, id, Content }) => (
+    <Drawer
+      id={id}
+      icon={entry.data.icon}
+      name={entry.data.company}
+      desc={`${entry.data.role} · ${years(entry.data.start, entry.data.end)}`}
+      href={entry.data.url}
+    >
+      <Content />
+    </Drawer>
+  ))}
+</Base>
+
+<style>
+  header {
+    font-size: var(--text-sm);
+    line-height: 1.5rem;
+    color: var(--color-body);
+  }
+  h1 {
+    color: var(--color-text);
+  }
+  .tagline {
+    margin: 0 0 var(--space-6);
+    color: var(--color-muted);
+  }
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+    margin: calc(-1 * var(--space-2)) 0 var(--space-6);
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    line-height: 1.25rem;
+  }
+  .resume {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    text-decoration: none;
+  }
+  .resume span {
+    text-decoration: underline dotted var(--color-subtle);
+    text-underline-offset: 4px;
+  }
+  .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-status);
+    box-shadow: 0 0 0 3px var(--color-status-ring);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .dot {
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+  }
+  @keyframes pulse {
+    50% {
+      box-shadow: 0 0 0 5px transparent;
+    }
+  }
+  .inline-copy {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--color-subtle);
+    text-decoration-style: dotted;
+    text-underline-offset: 4px;
+    cursor: pointer;
+  }
+  header a {
+    text-decoration-style: dotted;
+    text-decoration-color: var(--color-subtle);
+    text-underline-offset: 4px;
+  }
+  .inline-copy:hover,
+  header a:hover {
+    color: var(--color-muted);
+  }
+  .small {
+    font-size: var(--text-sm);
+  }
+</style>

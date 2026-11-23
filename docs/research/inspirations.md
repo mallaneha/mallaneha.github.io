@@ -39,6 +39,7 @@ Minimal, clean personal sites of AI engineers, forward deployed engineers (FDEs)
 ## Forward deployed engineers
 
 I couldn't find FDE personal sites that are truly minimal. The ones that show up (szymonpaluch.com, rohitghumare.com, heyarnoux.com) are consultant sites with a lot of promo blocks. Two details are still worth borrowing:
+
 - **Rohit Ghumare** – https://rohitghumare.com: a restrained article layout with breadcrumbs, numbered figures and "Keep reading" cards.
 - **David Arnoux** – https://www.heyarnoux.com: a row of big stat callouts under the intro and simple box-and-arrow diagrams of how he works. For an FDE these could show "customer problem → what I built → result".
 
@@ -53,4 +54,3 @@ I couldn't find FDE personal sites that are truly minimal. The ones that show up
 - **For an FDE angle specifically**: short customer case studies (problem, what was deployed, outcome) and a clear "what I'm looking for" line, which jxnl.co does well.
 
 Note: the sites in sections 1–2 come from well-known references; the network here blocked direct checks on some of them (karpathy.ai, lilianweng, huyenchip, simonwillison, leerob, paco.me, rauno.me, emilkowal.ski, jvns.ca). Eugene Yan, Hamel, Jason Liu, Brittany Chiang, Emilia's note and the FDE sites were opened and checked on 2026-11-22.
-
