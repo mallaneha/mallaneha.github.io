@@ -105,18 +105,42 @@ const TICK: { gain: number; layers: Layer[] } = {
 let audio: AudioContext | null = null;
 let master: GainNode | null = null; // one output gain, reused by every tick
 
-function tick() {
+// How long a tick lasts, in seconds (the last layer's offset + attack + decay).
+const TICK_LENGTH = Math.max(
+  ...TICK.layers.map((l) => l.offset + l.attack + l.decay),
+);
+
+function audioContext(): AudioContext | null {
   const AC =
     window.AudioContext ??
     (window as unknown as { webkitAudioContext?: typeof AudioContext })
       .webkitAudioContext;
-  if (!AC) return;
+  if (!AC) return null;
   try {
     audio ??= new AC();
   } catch {
-    return;
+    return null;
   }
-  const a = audio;
+  return audio;
+}
+
+// Waking a fresh page's audio takes tens of ms (over 100 ms on some machines). Start it on press, which
+// comes before the click, so the tick is ready by the time the click lands.
+function warmUp(e: Event) {
+  if (muted) return;
+  if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== " ") return;
+  if (!(e.target as Element | null)?.closest?.("a, button, summary, label"))
+    return;
+  const a = audioContext();
+  if (a && a.state === "suspended") a.resume().catch(() => {});
+}
+addEventListener("pointerdown", warmUp, true);
+addEventListener("keydown", warmUp, true);
+
+/** Play a tick. Resolves once it has finished playing (or right away if it can't play). */
+function tick(): Promise<void> {
+  const a = audioContext();
+  if (!a) return Promise.resolve();
   const play = () => {
     if (!master) {
       master = a.createGain();
@@ -153,8 +177,35 @@ function tick() {
       src.stop(t + l.attack + l.decay + 0.05);
     }
   };
-  if (a.state === "running") play();
-  else a.resume().then(play, () => {});
+  const played = () =>
+    new Promise<void>((done) => {
+      play();
+      setTimeout(done, TICK_LENGTH * 1000);
+    });
+  if (a.state === "running") return played();
+  // A fresh page's audio starts suspended; it wakes on this click, a few ms later.
+  return a.resume().then(played, () => {});
+}
+
+// A same-tab link click unloads the page before a fresh page's audio has even woken up, so the tick is
+// cut off (drawer rows on the home page don't navigate, which is why they always ticked). Hold that
+// navigation until the tick has played: about 50 ms, never more than NAV_WAIT_MS.
+const NAV_WAIT_MS = 150;
+let pendingTick: Promise<void> | null = null;
+
+function sameTabNavigation(e: MouseEvent): HTMLAnchorElement | null {
+  if (e.defaultPrevented || e.button !== 0) return null;
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return null;
+  const a = (e.target as Element | null)?.closest?.("a[href]");
+  if (!(a instanceof HTMLAnchorElement)) return null;
+  if (a.target && a.target !== "_self") return null;
+  if (a.hasAttribute("download")) return null;
+  const url = new URL(a.href, location.href);
+  if (url.origin !== location.origin) return null; // other sites: leave the browser alone
+  const samePage =
+    url.pathname === location.pathname && url.search === location.search;
+  if (samePage && url.hash) return null; // an in-page anchor doesn't unload the page
+  return a;
 }
 
 {
@@ -170,11 +221,29 @@ function tick() {
       // Keyboard "clicks" have no pointer position: skip the spark, keep the sound.
       if (e.detail > 0 && !reduceMotion.matches) burst(e.clientX, e.clientY);
       if (muted) return;
-      tick();
+      pendingTick = tick();
       navigator.vibrate?.(8);
     },
     true,
   );
+  // Bubble phase, after every other handler: only delay a navigation nothing else has taken over.
+  addEventListener("click", (e) => {
+    const tickDone = pendingTick;
+    pendingTick = null;
+    if (!tickDone) return;
+    const link = sameTabNavigation(e);
+    if (!link) return;
+    e.preventDefault();
+    const href = link.href;
+    let gone = false;
+    const go = () => {
+      if (gone) return;
+      gone = true;
+      location.assign(href);
+    };
+    tickDone.then(go);
+    setTimeout(go, NAV_WAIT_MS);
+  });
 }
 
 // ---------- mute toggle ----------
