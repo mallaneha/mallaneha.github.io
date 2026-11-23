@@ -22,7 +22,7 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
 5. Connect: one column: Email (copies, toast), LinkedIn, GitHub, and Resume when `site.resume` is set.
    LinkedIn and GitHub also appear as icon links next to the name in the header.
 6. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound
-   toggle (home page only) and the light/dark theme toggle.
+   toggle and the light/dark theme toggle.
    The theme follows the system until toggled; the choice is saved in localStorage (`theme`).
    Dark values live twice in `tokens.css` (system media query and `[data-theme="dark"]`): keep them in sync.
 
@@ -51,11 +51,11 @@ show ↗ on hover (always on touch screens).
 
 ## Click effects (`src/scripts/effects.ts`)
 
-Home page only (`<Base effects>` sets `data-effects` on `<body>`), and not for clicks inside an open
-drawer. Every click: 6 short lines burst outward from the pointer (12px radius, 300ms, 30% opacity, text
+Every page, for clicks on links and buttons (not on text or empty space), and not inside an open
+drawer. Each click: 6 short lines burst outward from the pointer (12px radius, 300ms, 30% opacity, text
 color), a soft synthesized two-tick sound, and an 8ms vibration on phones. The footer toggle mutes the
 sound and vibration but keeps the sparks; it's remembered in `localStorage`. No sparks for keyboard
-clicks or with `prefers-reduced-motion`. Posts, the writing index and 404 have no effects and no toggle.
+clicks or with `prefers-reduced-motion`; sound starts muted with `prefers-reduced-motion` until toggled on.
 
 ## Explainer widgets (`src/components/Explainers.astro`, `src/scripts/explainers.ts`)
 
