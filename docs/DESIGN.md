@@ -49,6 +49,25 @@ show ↗ on hover (always on touch screens).
   sections are separated by space alone (no `···`). To remove: delete both files and the `import("./mockups")`
   line in `drawer.ts`.
 
+## Margin grid (`src/scripts/margin-grid.ts`)
+
+From 1024px up, a fixed canvas behind every page puts a sparse, slow noise texture in the left and right margins,
+after oddgrid: 10px square cells, touching, lit where a 3D value-noise field crosses a threshold. About half the lit
+cells carry a marker (dot, ring, plus, cross, small square or dash). At rest it's barely there: three
+near-background grays (`--grid-1`..`--grid-3`) and gray markers (`--grid-dot`). Islands are small (at most 12 cells: a
+bigger one keeps only its strongest cells) and never spawn in the inner 40% of each margin; the threshold also rises
+toward the column and toward the top of the window, so the few specks sit out by the screen edges and lower down. It boils in place (no drift direction), slowly: a cell stays lit for several
+seconds.
+
+Hover highlights, never adds cells: every lit cell the mouse touches (fast moves fill in the cells in between)
+shows its own oddgrid color (`--grid-hue-1`..`--grid-hue-5`: pink, navy, olive, blue, orange, in patches from a second
+noise field; maroon markers `--grid-hue-dot`) and keeps it until that part of the cluster fades: a highlighted cell
+that blinks off is remembered while a neighbor is still lit. Touch screens
+never see color. Redrawn every 100ms; new seed per load (`?seed=<n>` pins it). One still frame with reduced motion;
+paused while the tab is hidden; redrawn after a resize. `effects.ts` imports it only on wide screens. If a page ever
+gets content wider than the column, widen the clear zone. Tests: `tests/visual/margin-grid.spec.ts`. Design:
+`docs/plans/2026-11-23-margin-grid-design.md`.
+
 ## Click effects (`src/scripts/effects.ts`)
 
 Every page, for clicks on links and buttons (not on text or empty space), and not inside an open

@@ -376,6 +376,14 @@ for (const el of document.querySelectorAll<HTMLElement>("[data-local-time]")) {
   el.hidden = false;
 }
 
+// Margin grid: noise texture in the side margins, wide screens only (phones never download it).
+const wideScreen = matchMedia("(min-width: 64rem)");
+const loadMarginGrid = () => {
+  if (wideScreen.matches) import("./margin-grid");
+};
+loadMarginGrid();
+wideScreen.addEventListener("change", loadMarginGrid);
+
 // Interactive explainers for the "LLMs by hand" posts and the RAG posts. Loaded only on pages that use one.
 if (
   document.querySelector("attention-lab, scale-lab, gpt-shape, serving-budget")

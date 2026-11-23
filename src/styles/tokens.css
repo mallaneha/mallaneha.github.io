@@ -117,6 +117,19 @@
   /* Header cat (src/components/header-cat.js): outline and shelf line. Decorative. */
   --color-cat-line: #22201f;
   --color-cat-ledge: #bfc3c8;
+  /* Margin grid (src/scripts/margin-grid.ts), decorative, behind the margins. At rest: three barely-there grays
+     and the dot. On hover it fades to oddgrid's palette (--grid-hue-*, the same in dark mode). Hex only: the
+     script parses them. */
+  --grid-1: #f8f8f8;
+  --grid-2: #f5f5f5;
+  --grid-3: #f2f2f2;
+  --grid-dot: #ededed;
+  --grid-hue-1: #ff87c3; /* pink */
+  --grid-hue-2: #0d2a8b; /* navy */
+  --grid-hue-3: #8d9a23; /* olive */
+  --grid-hue-4: #1b4f9f; /* blue */
+  --grid-hue-5: #fd5b1c; /* orange */
+  --grid-hue-dot: #520000;
 }
 
 /* Dark: follows the system unless the theme toggle chose light; or forced by the toggle. */
@@ -158,6 +171,10 @@
     --chart-on-other: #111111;
     --color-cat-line: #8d8880;
     --color-cat-ledge: #50545a;
+    --grid-1: #141414;
+    --grid-2: #161616;
+    --grid-3: #191919;
+    --grid-dot: #1c1c1c;
   }
 }
 
@@ -198,6 +215,10 @@
   --chart-on-other: #111111;
   --color-cat-line: #8d8880;
   --color-cat-ledge: #50545a;
+  --grid-1: #141414;
+  --grid-2: #161616;
+  --grid-3: #191919;
+  --grid-dot: #1c1c1c;
 }
 
 :root[data-theme="light"] {
