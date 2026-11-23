@@ -15,7 +15,7 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
 2. Experience: each row opens a drawer. The tile shows the company's logo (`logo:` in frontmatter,
    file in `public/logos/`) in grayscale (CSS filter, so the files keep their colors) on a light tile,
    or the icon when there's no logo.
-3. Featured: projects with `featured: true`. Each row opens a drawer.
+3. Projects: projects with `featured: true`, two per line, no icon tile, an open-link arrow on each. Each row opens a drawer.
 4. Writing: latest 2 published posts + "All writing".
 5. Connect: two columns. Email (copies, toast) | Resume (when the PDF exists), then LinkedIn | GitHub.
    On phones the email address wraps after the "@".

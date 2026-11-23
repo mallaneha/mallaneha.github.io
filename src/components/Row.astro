@@ -1,11 +1,11 @@
 ---
-// One list row: icon tile, name, one muted line. It opens a drawer, links somewhere,
+// One list row: icon tile (optional), name, one muted line. It opens a drawer, links somewhere,
 // copies a value, or is static. Modeled on the rows at ch.sh.
 import Icon from "./Icon.astro";
 import type { IconName } from "../data/icons";
 
 interface Props {
-  icon: IconName;
+  icon?: IconName; // leave out (with no logo) for a row without a tile
   logo?: string; // image under public/logos/, shown instead of the icon
   name: string;
   desc?: string;
@@ -14,10 +14,21 @@ interface Props {
   drawer?: string; // id of a <Drawer> to open
   copy?: string; // value to copy to the clipboard
   copyLabel?: string; // toast text after copying
+  openIcon?: boolean; // always show the open-link arrow at the end
 }
 
-const { icon, logo, name, desc, meta, href, drawer, copy, copyLabel } =
-  Astro.props;
+const {
+  icon,
+  logo,
+  name,
+  desc,
+  meta,
+  href,
+  drawer,
+  copy,
+  copyLabel,
+  openIcon,
+} = Astro.props;
 const external = Boolean(href?.startsWith("http"));
 
 let Tag: "button" | "a" | "div" = "div";
@@ -48,19 +59,25 @@ if (drawer) {
 
 <li>
   <Tag class:list={["row", { static: Tag === "div" }]} {...attrs}>
-    <span class:list={["tile", { logo }]}>
-      {logo ? (
-        <img src={logo} alt="" width="24" height="24" loading="lazy" />
-      ) : (
-        <Icon name={icon} />
-      )}
-    </span>
+    {(logo || icon) && (
+      <span class:list={["tile", { logo }]}>
+        {logo ? (
+          <img src={logo} alt="" width="24" height="24" loading="lazy" />
+        ) : (
+          icon && <Icon name={icon} />
+        )}
+      </span>
+    )}
     <span class="text">
       <span class="name">{name}</span>
       {desc && <span class="desc">{desc}</span>}
     </span>
     {meta && <span class="meta">{meta}</span>}
-    {external && !meta && <Icon name="arrowUpRight" size={14} class="arrow" />}
+    {openIcon ? (
+      <Icon name="arrowUpRight" size={14} class="arrow open" />
+    ) : (
+      external && !meta && <Icon name="arrowUpRight" size={14} class="arrow" />
+    )}
   </Tag>
 </li>
 
@@ -153,14 +170,23 @@ if (drawer) {
     margin-left: auto;
     flex-shrink: 0;
     color: var(--color-muted);
-    transition: opacity var(--transition);
+    transition:
+      opacity var(--transition),
+      transform var(--transition);
+  }
+  .row :global(.arrow.open) {
+    align-self: flex-start;
+    margin-top: 0.1875rem;
   }
   @media (hover: hover) and (min-width: 48rem) {
-    .row :global(.arrow) {
+    .row :global(.arrow:not(.open)) {
       opacity: 0;
     }
     .row:hover :global(.arrow) {
       opacity: 1;
+    }
+    .row:hover :global(.arrow.open) {
+      transform: translate(1px, -1px);
     }
   }
 </style>
