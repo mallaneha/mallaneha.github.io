@@ -83,8 +83,8 @@ const educationDrawers = await Promise.all(
         type="button"
         class="inline-copy"
         data-copy={site.email}
+        data-copy-email
         data-copy-label="Email copied"
-        data-copy-fallback={`mailto:${site.email}`}
       >
         {site.email}
       </button>
@@ -172,11 +172,11 @@ const educationDrawers = await Promise.all(
     <RowList columns={resumeHref ? 2 : 1}>
       <Row
         icon="mail"
-        name={site.email.replace("@", "@\u200b")}
+        name={site.email}
         desc="Email"
         copy={site.email}
+        copyEmail
         copyLabel="Email copied"
-        href={`mailto:${site.email}`}
       />
       {resumeHref && (
         <Row icon="file" name="Resume" desc="PDF" href={resumeHref} />

@@ -17,6 +17,7 @@ interface Props {
   drawer?: string; // id of a <Drawer> to open
   copy?: string; // value to copy to the clipboard
   copyLabel?: string; // toast text after copying
+  copyEmail?: boolean; // `copy` is a spelled-out email ("name at gmail dot com"): copy the real address
   openIcon?: boolean; // always show the open-link arrow at the end
 }
 
@@ -33,6 +34,7 @@ const {
   drawer,
   copy,
   copyLabel,
+  copyEmail,
   openIcon,
 } = Astro.props;
 const external = Boolean(href?.startsWith("http"));
@@ -52,6 +54,7 @@ if (drawer) {
   attrs = {
     type: "button",
     "data-copy": copy,
+    "data-copy-email": copyEmail,
     "data-copy-label": copyLabel ?? "Copied",
     "data-copy-fallback": href,
   };
