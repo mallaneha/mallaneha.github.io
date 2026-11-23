@@ -101,7 +101,7 @@ test("stops while the tab is hidden", async ({ page }) => {
   expect(await frames(page)).toBeLessThanOrEqual(n + 1);
 });
 
-test("hovering a cluster reveals the color of a few of its cells, and keeps the shape", async ({
+test("cells the mouse touches keep their color after it moves on", async ({
   page,
 }) => {
   const vw = page.viewportSize()!.width;
@@ -110,11 +110,11 @@ test("hovering a cluster reveals the color of a few of its cells, and keeps the 
     grid(page).evaluate((c) =>
       Number((c as HTMLCanvasElement).dataset.colored),
     );
-  // A still frame (reduced motion) so the clusters stay put while we hover them.
+  // A still frame (reduced motion) so the clusters stay put.
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?seed=7");
   await expect.poll(() => frames(page)).toBeGreaterThan(0);
-  await page.mouse.move(vw / 2, 300); // text column: nothing revealed
+  await page.mouse.move(vw / 2, 300); // text column: nothing highlighted
   await expect.poll(colored).toBe(0);
   const points = await grid(page).evaluate((c) => {
     const canvas = c as HTMLCanvasElement;
@@ -133,10 +133,11 @@ test("hovering a cluster reveals the color of a few of its cells, and keeps the 
   const [x, y] = points[Math.floor(points.length / 2)];
   await page.mouse.move(x, y);
   await expect.poll(colored).toBeGreaterThan(0);
-  expect(await colored()).toBeLessThanOrEqual(9);
-  // Empty space reveals nothing.
+  const touched = await colored();
+  // Moving away keeps the highlight (the cluster is still there).
   await page.mouse.move(vw / 2, 300);
-  await expect.poll(colored).toBe(0);
+  await page.waitForTimeout(300);
+  expect(await colored()).toBe(touched);
 });
 
 test("clusters stay small and never spawn near the text column", async ({

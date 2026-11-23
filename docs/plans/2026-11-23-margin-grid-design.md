@@ -109,3 +109,7 @@ What shipped differs from the plan above in these ways, all at Neha's request:
 - **Small, outer clusters.** `SCALE 0.16` for small features, and a hard cap of 12 cells per cluster (a bigger one
   keeps its 12 strongest cells). No cells in the inner 40% of each margin (`KEEP_OUT`); about 2.7× more ink in the
   bottom half of the window than the top.
+- **Hover highlights instead of patterns.** No random shapes: each lit cell the mouse touches turns its own color and
+  stays colored until its part of the cluster fades (a cell that blinks off is remembered while a neighbor is lit).
+  No easing, so the highlight is exactly where the cursor went. `SPEED 0.004` (about 11× slower than oddgrid) so a
+  cell stays lit ~6s (median; 1 in 10 for 13s+) and highlights last long enough to notice.

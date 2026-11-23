@@ -7,9 +7,9 @@
 
 const CELL = 10; // px, cell pitch
 const TICK = 100; // ms per frame (~10fps, cells step like the oddgrid recording)
-// Motion: boils in place like the oddgrid recording (no drift direction), but ~4.5x slower so it stays calm: a
-// cell stays lit ~5s, the field re-forms over ~10s. Much sparser than oddgrid on purpose: ~2% of cells lit, a few small islands.
-const SPEED = 0.01; // noise time per frame: slow and calm (oddgrid itself is ~0.045)
+// Motion: boils in place like the oddgrid recording (no drift direction), but ~11x slower so it stays calm: a
+// cell stays lit ~6s (1 in 10 for 13s+). Much sparser than oddgrid on purpose: ~2% of cells lit, a few small islands.
+const SPEED = 0.004; // noise time per frame: very slow and calm (oddgrid itself is ~0.045)
 const SCALE = 0.16; // noise lattice per cell: small islands
 // Noise above the threshold lights a cell. The threshold is LIT at the screen edge and rises by EDGE_BIAS toward
 // the text column, so islands sit out by the edges and almost never next to the text (oddgrid is 0.66 everywhere).
@@ -29,15 +29,6 @@ const MARKERS = 6;
 // Which hue a cell takes: a second noise field cut at its quantiles so the shares match oddgrid's
 // (pink 32%, navy 27%, olive 21%, blue 10%, orange 10%).
 const HUE_CUTS = [0.407, 0.545, 0.667, 0.747];
-// Hover reveal patterns around the pointer's cell, as [dx, dy] pairs (see draw()).
-const PATTERNS = [
-  [-1, -1, 0, -1, 1, -1, -1, 0, 0, 0, 1, 0, -1, 1, 0, 1, 1, 1], // all 8 around
-  [0, -1, -1, 0, 0, 0, 1, 0, 0, 1], // +
-  [-1, -1, 1, -1, 0, 0, -1, 1, 1, 1], // x
-  [-1, 0, 0, 0, 1, 0], // -
-];
-// The reveal eases toward the pointer (SPOT_EASE of the way per animation frame), so it drifts after the mouse.
-const SPOT_EASE = 0.06;
 const LEVELS = 2; // gray, full color
 const CLEAR_PAD = 2; // rem of empty band on each side of the text column
 
@@ -131,10 +122,10 @@ function measure() {
   clearRight = width / 2 + half;
 }
 
-let pointerX = -1e9; // CSS px, where the mouse is; far away = no spotlight
+let pointerX = -1e9; // CSS px, where the mouse is; far away = not over the page
 let pointerY = -1e9;
-let spotX = -1e9; // CSS px, the spotlight's center, trailing the pointer
-let spotY = -1e9;
+// Cells the pointer has crossed since the last draw, as [cx, cy] pairs (filled in between fast moves).
+let crossed: number[] = [];
 
 type RGB = [number, number, number];
 const rgb = (hex: string): RGB => {
@@ -161,13 +152,10 @@ function palette() {
   };
 }
 
-// Hover reveals color: when the (eased) pointer is on a lit cell, the lit cells of one small pattern around it
-// (PATTERNS) show their own hue instead of gray. The pattern is picked at random when the pointer reaches a cluster
-// (4-connected lit cells) and kept while it stays on that cluster, which is tracked frame to frame as it boils. A
-// new pattern only when that cluster disappears or the pointer lands on a different one.
-let cluster: Set<number> | null = null; // the hovered cluster's cell indices (cy * cols + cx)
-let clusterCols = 0;
-let pattern = PATTERNS[0];
+// Hover highlights: every lit cell the pointer touches shows its own oddgrid color, and keeps it until its part of
+// the cluster fades away. Indices are cy * cols + cx.
+let painted = new Set<number>();
+let paintedCols = 0;
 
 function component(lit: Map<number, number>, start: number, cols: number) {
   const seen = new Set([start]);
@@ -243,32 +231,36 @@ function draw() {
     biggest = Math.max(biggest, Math.min(cells.size, MAX_CLUSTER));
   }
 
-  // 3. Follow the hovered cluster as it boils; forget it once it's gone.
-  if (cluster && clusterCols !== cols) cluster = null;
-  if (cluster) {
-    let seed = -1;
-    for (const i of cluster)
-      if (lit.has(i)) {
-        seed = i;
-        break;
-      }
-    cluster = seed < 0 ? null : component(lit, seed, cols);
+  // 3. Highlight lit cells the pointer touched; drop highlights on cells that went dark.
+  if (paintedCols !== cols) {
+    painted = new Set();
+    paintedCols = cols;
   }
-  const pcx = Math.floor(spotX / CELL);
-  const pcy = Math.floor(spotY / CELL);
-  const here = pcy * cols + pcx;
+  if (pointerX > -1e8)
+    crossed.push(Math.floor(pointerX / CELL), Math.floor(pointerY / CELL));
+  for (let k = 0; k < crossed.length; k += 2) {
+    const cx = crossed[k];
+    const cy = crossed[k + 1];
+    const i = cy * cols + cx;
+    if (cx >= 0 && cx < cols && cy >= 0 && cy < rows && lit.has(i))
+      painted.add(i);
+  }
+  crossed = [];
+  // A highlighted cell that blinks off stays remembered (and shows again when relit) while any cell around it is
+  // still lit; once its whole neighborhood is dark, the cluster has gone from there and the highlight is dropped.
   const reveal = new Set<number>();
-  if (pcx >= 0 && pcx < cols && pcy >= 0 && pcy < rows && lit.has(here)) {
-    if (!cluster || !cluster.has(here)) {
-      cluster = component(lit, here, cols);
-      clusterCols = cols;
-      pattern = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
+  for (const i of painted) {
+    if (lit.has(i)) {
+      reveal.add(i);
+      continue;
     }
-    for (let k = 0; k < pattern.length; k += 2) {
-      const nx = pcx + pattern[k];
-      const i = (pcy + pattern[k + 1]) * cols + nx;
-      if (nx >= 0 && nx < cols && lit.has(i)) reveal.add(i);
-    }
+    const cx = i % cols;
+    let alive = false;
+    for (let dy = -1; dy <= 1 && !alive; dy++)
+      for (let dx = -1; dx <= 1 && !alive; dx++)
+        if (cx + dx >= 0 && cx + dx < cols && lit.has(i + dy * cols + dx))
+          alive = true;
+    if (!alive) painted.delete(i);
   }
 
   // 4. Group cells by fill style, so each style is set once.
@@ -382,42 +374,35 @@ new MutationObserver(() => timer || draw()).observe(document.documentElement, {
   attributes: true,
   attributeFilter: ["data-theme"],
 });
-// The color spotlight follows a mouse or pen (touch has no hover, so it stays gray). Its center eases toward the
-// pointer on animation frames, redrawing without advancing the noise, and stops once it has arrived. It appears
-// where the pointer enters and disappears when the pointer leaves the window.
-let spotFrame = 0;
-function followPointer() {
-  spotFrame = 0;
-  if (canvas.hidden) return;
-  const dx = pointerX - spotX;
-  const dy = pointerY - spotY;
-  const arrived = Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5;
-  if (arrived || still.matches) {
-    spotX = pointerX;
-    spotY = pointerY;
-  } else {
-    spotX += dx * SPOT_EASE;
-    spotY += dy * SPOT_EASE;
+// Highlights follow a mouse or pen (touch has no hover, so it stays gray). Each move records every cell along
+// the way, so fast moves don't skip cells, and redraws on the next animation frame without advancing the noise.
+let moveFrame = 0;
+function movePointer(x: number, y: number) {
+  if (pointerX > -1e8 && x > -1e8) {
+    const steps = Math.ceil(
+      Math.hypot(x - pointerX, y - pointerY) / (CELL / 2),
+    );
+    for (let k = 1; k < steps; k++) {
+      const f = k / steps;
+      crossed.push(
+        Math.floor((pointerX + (x - pointerX) * f) / CELL),
+        Math.floor((pointerY + (y - pointerY) * f) / CELL),
+      );
+    }
   }
-  draw();
-  if (!arrived && !still.matches)
-    spotFrame = requestAnimationFrame(followPointer);
-}
-function movePointer(x: number, y: number, jump: boolean) {
   pointerX = x;
   pointerY = y;
-  if (jump) {
-    spotX = x;
-    spotY = y;
-  }
-  if (!spotFrame) spotFrame = requestAnimationFrame(followPointer);
+  if (canvas.hidden || moveFrame) return;
+  moveFrame = requestAnimationFrame(() => {
+    moveFrame = 0;
+    draw();
+  });
 }
 document.addEventListener("pointermove", (e) => {
-  if (e.pointerType !== "touch")
-    movePointer(e.clientX, e.clientY, pointerX < -1e8);
+  if (e.pointerType !== "touch") movePointer(e.clientX, e.clientY);
 });
 document.documentElement.addEventListener("pointerleave", () =>
-  movePointer(-1e9, -1e9, true),
+  movePointer(-1e9, -1e9),
 );
 matchMedia("(prefers-color-scheme: dark)").addEventListener(
   "change",
