@@ -145,7 +145,8 @@ function bar(): { el: HTMLSpanElement; set: (f: number) => void } {
   const el = h("span", { class: "xp-bar", "aria-hidden": "true" }, fill);
   return {
     el,
-    set: (f) => (fill.style.width = `${Math.max(0, Math.min(1, f)) * 100}%`),
+    set: (f) =>
+      (fill.style.transform = `scaleX(${Math.max(0, Math.min(1, f))})`),
   };
 }
 
