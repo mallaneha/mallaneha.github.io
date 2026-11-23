@@ -120,15 +120,16 @@ if (drawer) {
     list-style: none;
   }
   .row {
-    /* Rows with a tile: outer corner = tile radius + the 4px vertical padding, so the
-       hover background and focus ring stay concentric with the tile. */
+    /* --row-inset: how far the hover background reaches past the content on each side.
+       The row bleeds out by the same amount, so text stays on the column edge. */
+    --row-inset: var(--space-3);
     --row-radius: var(--radius-row);
     display: flex;
     align-items: center;
     gap: var(--space-4);
-    width: calc(100% + 2 * var(--space-3));
-    margin: 0 calc(-1 * var(--space-3));
-    padding: var(--space-1) var(--space-4) var(--space-1) var(--space-3);
+    width: calc(100% + 2 * var(--row-inset));
+    margin: 0 calc(-1 * var(--row-inset));
+    padding: var(--space-1) var(--space-4) var(--space-1) var(--row-inset);
     border: 0;
     border-radius: var(--row-radius);
     background: transparent;
@@ -144,8 +145,23 @@ if (drawer) {
       transform var(--transition-press);
     -webkit-tap-highlight-color: transparent;
   }
+  /* Rows with a tile: the same 4px inset on the tile's top, bottom and left (the vertical
+     padding, so row height and the gaps between rows don't change), and an outer corner
+     of tile radius + inset, so the hover background and focus ring stay concentric with
+     the tile (visual-concentric-radius). The right side keeps the usual bleed so the
+     text column is as wide as before. The tile sits at the top: when the text wraps
+     (a long school name), it keeps the same 4px inset instead of floating mid-row. */
   .row.has-tile {
-    --row-radius: calc(var(--radius-tile) + var(--space-1));
+    --row-inset: var(--space-1);
+    --row-radius: calc(var(--radius-tile) + var(--row-inset));
+    align-items: flex-start;
+    width: calc(100% + var(--row-inset) + var(--space-3));
+    margin: 0 calc(-1 * var(--space-3)) 0 calc(-1 * var(--row-inset));
+    padding: var(--row-inset) var(--space-4) var(--row-inset) var(--row-inset);
+  }
+  .row.has-tile .meta,
+  .row.has-tile :global(.arrow:not(.open)) {
+    align-self: center;
   }
   /* Keep the focus ring on the row's own radius, not the global :focus-visible 4px. */
   .row:focus-visible {
