@@ -68,11 +68,22 @@ const year = new Date().getFullYear();
     cursor: pointer;
     transition:
       background-color var(--transition),
-      color var(--transition);
+      color var(--transition),
+      transform var(--transition);
   }
-  .control:hover {
-    background: var(--color-hover);
-    color: var(--color-text);
+  @media (hover: hover) and (pointer: fine) {
+    .control:hover {
+      background: var(--color-hover);
+      color: var(--color-text);
+    }
+  }
+  .control:active {
+    transform: scale(0.96);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .control:active {
+      transform: none;
+    }
   }
   .sound :global(.off),
   .sound[data-state="off"] :global(.on) {

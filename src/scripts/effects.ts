@@ -106,6 +106,7 @@ const TICK: { gain: number; layers: Layer[] } = {
 };
 let audio: AudioContext | null = null;
 let master: GainNode | null = null; // one output gain, reused by every tick
+let noise: AudioBuffer[] | null = null; // one noise buffer per layer, filled once, reused by every tick
 
 // How long a tick lasts, in seconds (the last layer's offset + attack + decay).
 const TICK_LENGTH = Math.max(
@@ -149,9 +150,8 @@ function tick(): Promise<void> {
       master.gain.value = TICK.gain;
       master.connect(a.destination);
     }
-    const out = master;
-    for (const l of TICK.layers) {
-      const t = a.currentTime + l.offset;
+    // A source node plays once, but its buffer can be reused: fill each layer's noise on the first tick.
+    noise ??= TICK.layers.map((l) => {
       const len = Math.max(
         1,
         Math.floor((l.attack + l.decay + 0.05) * a.sampleRate),
@@ -159,8 +159,14 @@ function tick(): Promise<void> {
       const buf = a.createBuffer(1, len, a.sampleRate);
       const data = buf.getChannelData(0);
       for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      return buf;
+    });
+    const out = master;
+    const bufs = noise;
+    TICK.layers.forEach((l, i) => {
+      const t = a.currentTime + l.offset;
       const src = a.createBufferSource();
-      src.buffer = buf;
+      src.buffer = bufs[i];
       const filter = a.createBiquadFilter();
       filter.type = "bandpass";
       filter.frequency.value = l.freq;
@@ -177,7 +183,7 @@ function tick(): Promise<void> {
       };
       src.start(t);
       src.stop(t + l.attack + l.decay + 0.05);
-    }
+    });
   };
   const played = () =>
     new Promise<void>((done) => {
