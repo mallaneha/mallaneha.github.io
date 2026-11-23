@@ -1,7 +1,7 @@
 ---
 title: "LLMs by hand, part 3: a serving budget"
 description: "Work out how many users a model can serve from four numbers: weights, KV cache, memory and bandwidth."
-date: 2026-11-22
+date: 2026-07-01
 type: post
 tags: [llm-systems]
 series: llms-by-hand

@@ -1,7 +1,7 @@
 ---
 title: "LLMs by hand, part 1: attention, one dot product at a time"
 description: "Build one attention head by hand with four tokens and two-dimensional vectors, then watch what scaling and the causal mask change."
-date: 2026-11-22
+date: 2026-05-01
 type: post
 tags: [llm-systems]
 series: llms-by-hand
