@@ -107,6 +107,11 @@
   --grid-2: #fafafa;
   --grid-3: #f8f8f8;
   --grid-dot: #f4f4f4;
+  /* Near the cursor the resting grays brighten to these (a small lantern). */
+  --grid-near-1: #f2f2f2;
+  --grid-near-2: #e8e8e8;
+  --grid-near-3: #dddddd;
+  --grid-near-dot: #b8b8b8;
   --grid-hue-1: #ff87c3; /* pink */
   --grid-hue-2: #0d2a8b; /* navy */
   --grid-hue-3: #8d9a23; /* olive */
@@ -158,6 +163,10 @@
     --grid-2: #141414;
     --grid-3: #151515;
     --grid-dot: #181818;
+    --grid-near-1: #1c1c1c;
+    --grid-near-2: #232323;
+    --grid-near-3: #2b2b2b;
+    --grid-near-dot: #444444;
   }
 }
 
@@ -202,6 +211,10 @@
   --grid-2: #141414;
   --grid-3: #151515;
   --grid-dot: #181818;
+  --grid-near-1: #1c1c1c;
+  --grid-near-2: #232323;
+  --grid-near-3: #2b2b2b;
+  --grid-near-dot: #444444;
 }
 
 :root[data-theme="light"] {

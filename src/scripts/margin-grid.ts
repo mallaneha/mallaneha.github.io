@@ -29,7 +29,14 @@ const MARKERS = 6;
 // Which hue a cell takes: a second noise field cut at its quantiles so the shares match oddgrid's
 // (pink 32%, navy 27%, olive 21%, blue 10%, orange 10%).
 const HUE_CUTS = [0.407, 0.545, 0.667, 0.747];
-const LEVELS = 2; // gray, full color
+// Fill levels: 0..NEAR_STEPS are grays from the faint resting tone up to the visible one near the cursor
+// (--grid-near-*); the last level is full oddgrid color (highlighted cells).
+const NEAR_STEPS = 3;
+const LEVELS = NEAR_STEPS + 2;
+const COLOR = LEVELS - 1;
+// Lantern: gray cells within NEAR_IN px of the cursor show at the visible tone, fading out by NEAR_OUT.
+const NEAR_IN = 40;
+const NEAR_OUT = 80;
 const CLEAR_PAD = 2; // rem of empty band on each side of the text column
 
 const wide = matchMedia("(min-width: 64rem)");
@@ -135,21 +142,41 @@ const rgb = (hex: string): RGB => {
 const blend = (a: RGB, b: RGB, m: number) =>
   `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * m)).join(" ")})`;
 
-// Fill styles for this frame: fills[level * 15 + shade * 5 + hue], dots[level]; level 0 = gray, LEVELS-1 = color.
+// Fill styles for this frame: fills[level * 15 + shade * 5 + hue], dots[level] (see LEVELS).
 function palette() {
   const cs = getComputedStyle(document.documentElement);
   const get = (name: string) => rgb(cs.getPropertyValue(name));
   const grays = [1, 2, 3].map((i) => get(`--grid-${i}`));
+  const nears = [1, 2, 3].map((i) => get(`--grid-near-${i}`));
   const hues = [1, 2, 3, 4, 5].map((i) => get(`--grid-hue-${i}`));
   const grayDot = get("--grid-dot");
+  const nearDot = get("--grid-near-dot");
   const hueDot = get("--grid-hue-dot");
-  const levels = Array.from({ length: LEVELS }, (_, l) => l / (LEVELS - 1));
-  return {
-    fills: levels.flatMap((m) =>
-      grays.flatMap((g) => hues.map((h) => blend(g, h, m))),
-    ),
-    dots: levels.map((m) => blend(grayDot, hueDot, m)),
-  };
+  const fills: string[] = [];
+  const dots: string[] = [];
+  for (let l = 0; l <= NEAR_STEPS; l++) {
+    const m = l / NEAR_STEPS;
+    grays.forEach((g, s) => {
+      const tone = blend(g, nears[s], m);
+      for (let h = 0; h < 5; h++) fills.push(tone);
+    });
+    dots.push(blend(grayDot, nearDot, m));
+  }
+  grays.forEach(() => hues.forEach((h) => fills.push(blend(h, h, 0))));
+  dots.push(blend(hueDot, hueDot, 0));
+  return { fills, dots };
+}
+
+// How far into the cursor's lantern a cell is: 0 (outside) .. NEAR_STEPS (center).
+function near(cx: number, cy: number) {
+  if (pointerX < -1e8) return 0;
+  const dist = Math.hypot(
+    (cx + 0.5) * CELL - pointerX,
+    (cy + 0.5) * CELL - pointerY,
+  );
+  if (dist >= NEAR_OUT) return 0;
+  if (dist <= NEAR_IN) return NEAR_STEPS;
+  return Math.round(((NEAR_OUT - dist) / (NEAR_OUT - NEAR_IN)) * NEAR_STEPS);
 }
 
 // Hover highlights: every lit cell the pointer touches shows its own oddgrid color, and keeps it until its part of
@@ -269,7 +296,7 @@ function draw() {
   for (const [i, code] of lit) {
     const cx = i % cols;
     const cy = (i - cx) / cols;
-    const l = reveal.has(i) ? LEVELS - 1 : 0;
+    const l = reveal.has(i) ? COLOR : near(cx, cy);
     groups[l * 15 + code].push(cx, cy);
     if (hash(cx, cy, -1) < DOT_SHARE)
       dots[l].push(cx, cy, Math.floor(hash(cx, cy, -2) * MARKERS));
