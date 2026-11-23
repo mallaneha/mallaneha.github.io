@@ -11,7 +11,7 @@ interface Props {
   logo?: string; // image under public/logos/, shown instead of the icon
   logoFull?: boolean; // the logo is a filled square: it covers the whole tile
   name: string;
-  desc: string;
+  desc?: string; // the muted line after the name; omit for a header with just the name
   href?: string;
   hrefLabel?: string;
 }
@@ -50,18 +50,22 @@ const linkAttrs = external
       </span>
       <p id={`${id}-title`} class="title">
         <span class="name">{name}</span>
-        <span class="dot" aria-hidden="true">
-          ·
-        </span>
-        <span class:list={["sub", { swap: href }]}>
-          <span class="desc">{desc}</span>
-          {href && (
-            <a class="pill pill-inline" {...linkAttrs}>
-              {hrefLabel}
-              <Icon name="arrowUpRight" size={12} />
-            </a>
-          )}
-        </span>
+        {(desc || href) && (
+          <>
+            <span class="dot" aria-hidden="true">
+              ·
+            </span>
+            <span class:list={["sub", { swap: href }]}>
+              {desc && <span class="desc">{desc}</span>}
+              {href && (
+                <a class="pill pill-inline" {...linkAttrs}>
+                  {hrefLabel}
+                  <Icon name="arrowUpRight" size={12} />
+                </a>
+              )}
+            </span>
+          </>
+        )}
       </p>
       {href && (
         <a class="pill pill-wide" {...linkAttrs}>
