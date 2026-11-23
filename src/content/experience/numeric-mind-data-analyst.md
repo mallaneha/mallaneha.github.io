@@ -18,7 +18,7 @@ and making sure they were right.
 <div class="stats">
   <div><strong>800+</strong><span>CDISC datasets and reports</span></div>
   <div><strong>10+</strong><span>pharmaceutical clients</span></div>
-  <div><strong>75%</strong><span>faster issue resolution</span></div>
+  <div><strong>75%</strong><span>less time to resolve issues</span></div>
 </div>
 
 ## Datasets
