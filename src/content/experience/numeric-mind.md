@@ -18,7 +18,7 @@ submission packages.
 
 <div class="stats">
   <div><strong>12</strong><span>analysts led</span></div>
-  <div><strong>15+</strong><span>studies delivered</span></div>
+  <div><strong>15+</strong><span>studies at once, all on time</span></div>
   <div><strong>60%</strong><span>fewer validation findings</span></div>
 </div>
 
@@ -32,8 +32,8 @@ cut validation findings by 60%.
 ## Pipelines
 
 I owned the statistical programming pipeline end to end: raw data to SDTM, ADaM and TLFs, then
-the Clinical Study Report. For each of more than 15 studies, the submission package was ready
-within 3 weeks of database lock.
+the Clinical Study Report. I carried more than 15 studies at the same time and delivered every one
+by its deadline, each submission package ready within 3 weeks of database lock.
 
 <ol class="flow">
   <li>Raw data</li>
