@@ -206,3 +206,14 @@ test("clicking or double-clicking the header cat selects no text", async ({
   await cat.click({ clickCount: 3 });
   expect(await page.evaluate(() => getSelection()?.toString() ?? "")).toBe("");
 });
+
+test("header cat: first click opens its eyes, a second click sits it up", async ({
+  page,
+}) => {
+  const cat = page.locator("header-cat");
+  await cat.click();
+  await expect(cat).toHaveClass(/peek/);
+  await cat.click();
+  await expect(cat).toHaveClass(/awake/);
+  await expect(cat).not.toHaveClass(/awake/, { timeout: 6000 });
+});

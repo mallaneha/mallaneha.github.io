@@ -6,6 +6,10 @@
  *  - Idle: the tail ripples slowly in an S-shaped wave and the cat breathes.
  *  - Hover: the tail moves a little wider and quicker and an ear twitches.
  *    Brushing the cursor across the tail bats it in that direction.
+ *  - Click again while its eyes are open: it sits up, awake, tail still
+ *    hanging off the ledge, then lies back down a few seconds later.
+ *  - Clicks sometimes meow, at random intervals (silent while the site's
+ *    sound toggle is off).
  *  - Click / Enter / Space: the tail flicks, an ear twitches and the cat
  *    pops open two big round golden eyes for a moment.
  *  - prefers-reduced-motion: no tail motion or breathing. Clicking still
@@ -70,11 +74,24 @@ const TEMPLATE = /* html */ `
   :host(.peek) .eye-open { opacity: 1; animation: pop .35s cubic-bezier(.3, 1.6, .5, 1); }
   :host(.peek) .eye-shut { opacity: 0; }
 
+  /* Two poses: lying asleep (.sleep) and sitting up awake (.sit). The tail is shared.
+     Sitting rises from the ledge; lying sinks into it. */
+  .sleep, .sit { transform-box: view-box; transition: opacity .2s ease, transform .45s cubic-bezier(.3, 1.45, .5, 1); }
+  .sleep { transform-origin: 64px 52.5px; }
+  .sit   { transform-origin: 85px 52.5px; opacity: 0; transform: scaleY(.55); }
+  :host(.awake) .sleep { opacity: 0; transform: scaleY(.6); }
+  :host(.awake) .sit   { opacity: 1; transform: none; }
+  .sit-body { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 3.4s ease-in-out infinite; }
+  .sit-eyes { transform-box: fill-box; transform-origin: 50% 50%; }
+  :host(.awake) .sit-eyes { animation: blink 3.6s 1.2s infinite; }
+
+  @keyframes blink   { 0%, 94%, 100% { transform: none; } 97% { transform: scaleY(.1); } }
   @keyframes breathe { 50% { transform: scale(1.012, 1.035); } }
   @keyframes pop     { from { transform: scale(.4, .1); } }
   @keyframes twitch  { 20% { transform: rotate(-16deg); } 45% { transform: rotate(4deg); } 70% { transform: rotate(-6deg); } }
   @media (prefers-reduced-motion: reduce) {
-    .body, :host(.twitch) .ear-r, :host(.peek) .eye-open { animation: none; }
+    .body, .sit-body, :host(.twitch) .ear-r, :host(.peek) .eye-open, :host(.awake) .sit-eyes { animation: none; }
+    .sleep, .sit { transition: none; }
   }
 </style>
 <svg viewBox="0 0 112 84" aria-hidden="true">
@@ -88,6 +105,8 @@ const TEMPLATE = /* html */ `
     <path class="tail-fill" stroke="var(--_fur)" stroke-width="3.8"/>
   </g>
 
+  <!-- pose 1: lying asleep -->
+  <g class="sleep">
   <!-- body, breathing -->
   <g class="body">
     <path class="line fur" d="M28 52 C24 38 38 24 62 23 C86 22 100 32 100 46 C100 50 99 52 97 52 Z" stroke-width="1.6"/>
@@ -130,7 +149,53 @@ const TEMPLATE = /* html */ `
   <ellipse class="line fur" cx="21" cy="51" rx="5" ry="2.5" stroke-width="1.4"/>
   <ellipse class="line fur" cx="33.5" cy="51.2" rx="5" ry="2.5" stroke-width="1.4"/>
   <path class="detail" d="M21 49.6 v2.4 M33.5 49.8 v2.4" stroke-width=".7"/>
+  </g>
+
+  <!-- pose 2: sitting up awake, near the right end of the ledge so the tail still hangs off it -->
+  <g class="sit">
+    <g class="sit-body">
+      <path class="line fur" d="M68 52 C66 41 70 29 79 25 C88 21 97 28 99 39 C100.5 46 100 50 98 52 Z" stroke-width="1.6"/>
+      <!-- haunch and front legs -->
+      <path class="detail" d="M88 52 C85 43 90 36 97 38" stroke-width="1.3"/>
+      <path class="detail" d="M73.5 35 C72.5 41 73 47 73.6 50.5 M80.8 36 C81.2 42 81 47 80.6 50.5" stroke-width=".9"/>
+    </g>
+    <ellipse class="line fur" cx="73.2" cy="51.3" rx="4.4" ry="2.3" stroke-width="1.4"/>
+    <ellipse class="line fur" cx="81.6" cy="51.3" rx="4.4" ry="2.3" stroke-width="1.4"/>
+    <path class="detail" d="M73.2 50 v2.3 M81.6 50 v2.3" stroke-width=".7"/>
+
+    <!-- ears -->
+    <path class="line fur" d="M67 16 L65.5 2.5 L75 9.5 Z" stroke-width="1.6"/>
+    <path d="M68.3 12.8 L67.7 6.6 L72.2 10.1 Z" fill="var(--_ear)"/>
+    <g class="ear-r">
+      <path class="line fur" d="M83 9.5 L92.5 2.5 L91 16 Z" stroke-width="1.6"/>
+      <path d="M85.8 10.1 L90.3 6.6 L89.7 12.8 Z" fill="var(--_ear)"/>
+    </g>
+
+    <!-- head -->
+    <ellipse class="line fur" cx="79" cy="18.5" rx="13.5" ry="11" stroke-width="1.6"/>
+    <g class="sit-eyes">
+      <circle cx="74" cy="17.6" r="3.4" fill="var(--_eye)" stroke="var(--_eyerim)" stroke-width=".6"/>
+      <ellipse cx="74.2" cy="17.9" rx="1.4" ry="2.6" fill="var(--_pupil)"/>
+      <circle cx="75.2" cy="16.5" r=".9" fill="#fff"/>
+      <circle cx="84" cy="17.6" r="3.4" fill="var(--_eye)" stroke="var(--_eyerim)" stroke-width=".6"/>
+      <ellipse cx="84.2" cy="17.9" rx="1.4" ry="2.6" fill="var(--_pupil)"/>
+      <circle cx="85.2" cy="16.5" r=".9" fill="#fff"/>
+    </g>
+    <path d="M77.7 22 h2.6 l-1.3 1.5 z" fill="var(--_ear)"/>
+    <path class="detail" d="M79 23.5 q-1.2 1.6 -2.6 .8 M79 23.5 q1.2 1.6 2.6 .8" stroke-width=".9"/>
+    <g class="detail" stroke-width=".7">
+      <path d="M68 22 L58.5 21"/><path d="M68 24 L59.5 26"/>
+      <path d="M90 22 L99.5 21"/><path d="M90 24 L98.5 26"/>
+    </g>
+  </g>
 </svg>`;
+
+// How long the cat stays sitting up after the last click.
+const AWAKE_MS = 4000;
+// Meows: chance that a click meows, and the random quiet gap after a meow.
+const MEOW_CHANCE = 0.5;
+const MEOW_GAP_MS = [2500, 9000];
+const MUTE_KEY = "effects-muted";
 
 // Tail region in viewBox units, for "batting" the tail with the cursor.
 const TAIL_BOX = { x0: 90, x1: 114, y0: 46, y1: 84 };
@@ -322,13 +387,100 @@ class HeaderCat extends HTMLElement {
 
   poke() {
     this.twitch();
-    this.restart("peek", 1400);
+    if (this.classList.contains("peek") || this.classList.contains("awake")) {
+      // A click while it's already looking: it sits up, and stays up a while
+      // (each further click keeps it up longer).
+      clearTimeout(this._peek);
+      this.classList.remove("peek");
+      this.classList.add("awake");
+      clearTimeout(this._awake);
+      this._awake = setTimeout(() => this.classList.remove("awake"), AWAKE_MS);
+    } else {
+      this.restart("peek", 1400);
+    }
+    this.maybeMeow();
     if (!this.reduce.matches)
       this.kickV += (Math.random() < 0.5 ? -1 : 1) * 260;
     this.dispatchEvent(
       new CustomEvent("cat-poke", { bubbles: true, composed: true }),
     );
   }
+}
+
+// ---------- meow ----------
+// A click meows only sometimes, and after each meow there's a fresh random
+// quiet gap, so meows come at irregular intervals. Synthesized (no audio file):
+// a sawtooth gliding up then down through two vowel formants, "ee" → "aa" → "oo".
+// Silent while the site's sound toggle is off (localStorage "effects-muted").
+
+let audioCtx = null;
+let nextMeowAt = 0;
+const rand = (a, b) => a + Math.random() * (b - a);
+
+function soundOff() {
+  try {
+    const saved = localStorage.getItem(MUTE_KEY);
+    if (saved !== null) return saved === "true";
+  } catch {
+    /* storage blocked: fall through */
+  }
+  // same default as the site: quiet for people who asked for reduced motion
+  return matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+HeaderCat.prototype.maybeMeow = function () {
+  const now = performance.now();
+  if (now < nextMeowAt || Math.random() > MEOW_CHANCE || soundOff()) return;
+  nextMeowAt = now + rand(MEOW_GAP_MS[0], MEOW_GAP_MS[1]);
+  const AC =
+    window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
+  if (!AC) return;
+  audioCtx ??= new AC();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  meow(audioCtx, audioCtx.currentTime + rand(0.06, 0.3));
+};
+
+function meow(ctx, t) {
+  const dur = rand(0.42, 0.75);
+  const f0 = rand(470, 720); // pitch varies from meow to meow
+  const end = t + dur;
+  const peak = t + dur * rand(0.28, 0.42);
+
+  const osc = ctx.createOscillator();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(f0 * 0.82, t);
+  osc.frequency.linearRampToValueAtTime(f0 * 1.22, peak);
+  osc.frequency.exponentialRampToValueAtTime(f0 * 0.68, end);
+
+  const out = ctx.createGain();
+  out.gain.setValueAtTime(0.0001, t);
+  out.gain.exponentialRampToValueAtTime(0.16, t + 0.05);
+  out.gain.setValueAtTime(0.16, end - dur * 0.35);
+  out.gain.exponentialRampToValueAtTime(0.0001, end);
+
+  const soften = ctx.createBiquadFilter();
+  soften.type = "lowpass";
+  soften.frequency.value = 3800;
+  soften.connect(ctx.destination);
+  out.connect(soften);
+
+  // formants [start, middle, end] in Hz, with their loudness
+  for (const [hz, q, level] of [
+    [[380, 900, 480], 5, 1],
+    [[2300, 1400, 900], 7, 0.55],
+  ]) {
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.Q.value = q;
+    bp.frequency.setValueAtTime(hz[0], t);
+    bp.frequency.linearRampToValueAtTime(hz[1], peak);
+    bp.frequency.linearRampToValueAtTime(hz[2], end);
+    const g = ctx.createGain();
+    g.gain.value = level * 3;
+    osc.connect(bp).connect(g).connect(out);
+  }
+  osc.start(t);
+  osc.stop(end + 0.05);
 }
 
 if (!customElements.get("header-cat"))
