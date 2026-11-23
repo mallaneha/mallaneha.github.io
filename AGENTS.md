@@ -42,6 +42,8 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 
 ## Rules
 
+- The availability line ("Open to full-time roles…") is hidden on purpose (`availability: null` in `src/data/site.ts`).
+  Don't delete it, its comments, or its markup and styles in `src/pages/index.astro`; it will be turned back on.
 - Every list entry is a `Row`: icon tile, name, one short muted line. Details go in a drawer, not on the page.
 - Don't add npm dependencies without asking.
 - Don't change slugs or URLs of published pages. If one must change, add a redirect in `astro.config.mjs`.
