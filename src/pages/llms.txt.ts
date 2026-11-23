@@ -33,7 +33,12 @@ export const GET: APIRoute = async () => {
     `> ${site.tagline}`,
     "",
     site.summary,
-    ...(site.availability ? ["", `Availability: ${site.availability}.`] : []),
+    ...(site.availability
+      ? [
+          "",
+          `Availability: ${site.availability.title}. ${site.availability.detail}.`,
+        ]
+      : []),
     "",
     "## Projects",
     ...projects.map(projectLine),

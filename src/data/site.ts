@@ -12,8 +12,11 @@ export const site = {
     "I build applied AI systems where data is sensitive and mistakes are costly: PII redaction, retrieval that holds up under attack, and agents you can trace and measure.",
     "I'm most interested in healthcare, banking and insurance.",
   ],
-  // Availability badge under the name. null hides it.
-  availability: "Open to full-time roles from January 2027" as string | null,
+  // Availability card under the name: a headline and one muted line. null hides it.
+  availability: {
+    title: "Open to full-time roles",
+    detail: "Starting January 2027",
+  } as { title: string; detail: string } | null,
   // One-sentence summary for meta tags and llms.txt.
   summary:
     "I build applied AI systems where data is sensitive and mistakes are costly. M.S. in AI Engineering (Information Security) at Carnegie Mellon. Previously at Autonomize AI on HIPAA-grade PII redaction and RAG, and 3.5 years shipping FDA clinical data submissions. Looking for full-time roles in healthcare, banking and insurance from January 2027.",
