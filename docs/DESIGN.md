@@ -68,7 +68,9 @@ fill with `--color-text`, the segmented control is a sunken track with the selec
 All widgets on one page, dev server only: http://localhost:4321/dev/widgets/ (`src/pages/dev/[page].astro`). Tables scroll inside the panel instead of the page.
 Colors come from one data palette of seven roles (`tokens.css`): `--chart-main` for the measured series and what
 went right, `--chart-alert` only for what went wrong or is dangerous, `--chart-neutral` for no verdict,
-`--chart-other` for a third category, each but neutral with a `-soft` step. The abstain lab colors each dot by its
+`--chart-other` for a third category, each but neutral with a `-soft` step. The palette is Bauhaus: primary blue,
+signal red, yellow and black. Yellow is only ever a fill: text on it is `--chart-on-other` (black), and yellow
+marks on white get a `--color-text` outline. The abstain lab colors each dot by its
 outcome at the current floor, so dots, bar and legend agree. Weights are bars next to the number, never colored cell
 backgrounds, so text contrast doesn't depend on the data. Hover, tap or arrow keys show a dot's question in a tooltip (toast colors). Bar transitions only run without
 `prefers-reduced-motion`.

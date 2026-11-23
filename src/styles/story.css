@@ -356,7 +356,7 @@
 .story-spin {
   display: inline-block;
   font-size: var(--text-base);
-  color: var(--chart-other);
+  color: var(--color-text);
   /* One turn per flag blink ("draft again"), then rest; a constant spin would read as loading. */
   animation: story-spin 1.4s var(--ease-in-out) 3;
 }

@@ -102,14 +102,18 @@
      what went right), alert (what went wrong or is dangerous, and nothing else), neutral (no verdict), other (a
      third category), each but neutral with a -soft step for a second series. main, alert, neutral and other are
      also used for text, so they need 4.5:1 on --color-bg; the soft steps are marks only and need 3:1.
-     Current values: "Ink & red pencil". Candidates to compare: /dev/widgets/ (src/data/dev-palettes.ts). */
-  --chart-main: #0b5cad;
-  --chart-main-soft: #5b8bd0;
-  --chart-alert: #b4233c;
-  --chart-alert-soft: #d9667a;
-  --chart-neutral: #737373;
-  --chart-other: #8f6412;
-  --chart-other-soft: #ad8536;
+     Current values: "Bauhaus", primary blue, signal red, yellow and black. The yellow (1.8:1 on white) is never text
+     and never under white text: --chart-on-other is the text color on it, and yellow marks get a --color-text
+     outline where they'd otherwise vanish. Light on white: main 7.8, main-soft 3.6, alert 5.0, alert-soft 3.5,
+     neutral 18.9. Candidates to compare: /dev/widgets/ (src/data/dev-palettes.ts). */
+  --chart-main: #1f3fd1;
+  --chart-main-soft: #6a80e6;
+  --chart-alert: #e10600;
+  --chart-alert-soft: #eb5a48;
+  --chart-neutral: #111111;
+  --chart-other: #f5b800;
+  --chart-other-soft: #fadb6e;
+  --chart-on-other: #111111;
   /* Header cat (src/components/header-cat.js): outline and shelf line. Decorative. */
   --color-cat-line: #22201f;
   --color-cat-ledge: #bfc3c8;
@@ -143,14 +147,15 @@
     --color-raised: #2e2e2e;
     --shadow-raised:
       0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
-    /* Data palette, dark: on --color-bg all ≥ 4.3:1, soft steps included. */
-    --chart-main: #8ab8ff;
-    --chart-main-soft: #4f7fc4;
-    --chart-alert: #ff7a8d;
-    --chart-alert-soft: #c4566a;
-    --chart-neutral: #8a8a8a;
-    --chart-other: #dba84f;
-    --chart-other-soft: #9c7a3c;
+    /* Data palette, dark, on --color-bg: main 6.6, main-soft 3.7, alert 5.3, alert-soft 3.6, neutral 16.1, other 12.5. */
+    --chart-main: #7b93ff;
+    --chart-main-soft: #4a63e0;
+    --chart-alert: #ff3b30;
+    --chart-alert-soft: #c7392e;
+    --chart-neutral: #ededed;
+    --chart-other: #ffcc00;
+    --chart-other-soft: #a88a1a;
+    --chart-on-other: #111111;
     --color-cat-line: #8d8880;
     --color-cat-ledge: #50545a;
   }
@@ -183,13 +188,14 @@
   --color-raised: #2e2e2e;
   --shadow-raised:
     0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
-  --chart-main: #8ab8ff;
-  --chart-main-soft: #4f7fc4;
-  --chart-alert: #ff7a8d;
-  --chart-alert-soft: #c4566a;
-  --chart-neutral: #8a8a8a;
-  --chart-other: #dba84f;
-  --chart-other-soft: #9c7a3c;
+  --chart-main: #7b93ff;
+  --chart-main-soft: #4a63e0;
+  --chart-alert: #ff3b30;
+  --chart-alert-soft: #c7392e;
+  --chart-neutral: #ededed;
+  --chart-other: #ffcc00;
+  --chart-other-soft: #a88a1a;
+  --chart-on-other: #111111;
   --color-cat-line: #8d8880;
   --color-cat-ledge: #50545a;
 }
