@@ -56,6 +56,14 @@ const educationDrawers = await Promise.all(
 
 <Base description={site.summary} effects>
   <header>
+    {site.availability && (
+      <p class="availability">
+        <mark>
+          <span class="dot" aria-hidden="true" />
+          {site.availability}
+        </mark>
+      </p>
+    )}
     <div class="top">
       <h1>{site.name}</h1>
       <span class="social">
@@ -85,15 +93,6 @@ const educationDrawers = await Promise.all(
       </span>
     </div>
     <p class="tagline">{site.tagline}</p>
-    {site.availability && (
-      <p class="availability">
-        <mark>
-          <span class="dot" aria-hidden="true" />
-          {site.availability}.
-        </mark>
-        <a href="#connect">Get in touch →</a>
-      </p>
-    )}
     {site.intro.map((line) => (
       <p>{line}</p>
     ))}
@@ -261,18 +260,17 @@ const educationDrawers = await Promise.all(
       calc(-1 * var(--space-2)) 0;
   }
   .availability {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-1) var(--space-3);
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-xs);
+    line-height: 1.25rem;
     color: var(--color-text);
   }
   .availability mark {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-1) var(--space-3);
-    margin-left: calc(-1 * var(--space-3));
+    padding: var(--space-1) var(--space-2);
+    margin-left: calc(-1 * var(--space-2));
     border-radius: var(--radius);
     background: linear-gradient(var(--color-highlight), var(--color-highlight))
       no-repeat 0 0 / 100% 100%;

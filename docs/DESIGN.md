@@ -9,10 +9,10 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
 
 ## Page structure (`src/pages/index.astro`)
 
-1. Header: name (h1) with LinkedIn and GitHub icon links at the right of the same line (plus a resume icon
-   when the file exists), tagline (muted), then the availability line: status dot and `site.availability`
-   in a soft green highlight (`--color-highlight`, sweeps in once on load unless reduced motion), followed by a
-   "Get in touch →" link to Connect. Then 3 short paragraphs (now, what I build, which industries).
+1. Header: the availability line first, above the name: status dot and `site.availability` in small text
+   on a soft green highlight (`--color-highlight`, sweeps in once on load unless reduced motion). Then the
+   name (h1) with LinkedIn and GitHub icon links at the right of the same line (plus a resume icon when the
+   file exists), and the tagline (muted). Then 3 short paragraphs (now, what I build, which industries).
    The email is only in Connect.
 2. Experience: each row opens a drawer. The tile shows the company's logo (`logo:` in frontmatter,
    file in `public/logos/`) in its own colors on a light tile,
