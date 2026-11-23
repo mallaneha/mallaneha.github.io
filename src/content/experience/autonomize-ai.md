@@ -16,7 +16,7 @@ A summer internship at Autonomize AI, a healthcare AI company. The work came dow
 keeping patient data private, and getting reliable answers out of messy insurance documents.
 
 <div class="stats">
-  <div><strong>97.7%</strong><span>PII recall, best tool</span></div>
+  <div><strong>3 tools</strong><span>benchmarked for HIPAA</span></div>
   <div><strong>100+</strong><span>Medicare PDFs</span></div>
   <div><strong>90%</strong><span>best-case extraction</span></div>
 </div>
@@ -25,7 +25,7 @@ keeping patient data private, and getting reliable answers out of messy insuranc
 
 For HIPAA compliance, I benchmarked Presidio, OpenMed and Private AI for PII redaction on healthcare
 datasets, across both text and multimodal pipelines. On text, the best of the three caught 97.7%
-of personal details. The redaction is reversible: placeholders map back to the real values, so
+of patient details. The redaction is reversible: placeholders map back to the real values, so
 customer data can be restored when it's needed.
 
 ## Document RAG
