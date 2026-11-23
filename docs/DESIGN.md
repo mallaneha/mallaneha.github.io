@@ -13,7 +13,8 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
    when the file exists), 3 short paragraphs (now, what I build, which industries),
    "Reach me at <email, click to copy>, on LinkedIn, or read my resume".
 2. Experience: each row opens a drawer. The tile shows the company's logo (`logo:` in frontmatter,
-   file in `public/logos/`) on a light tile, or the icon when there's no logo.
+   file in `public/logos/`) in grayscale (CSS filter, so the files keep their colors) on a light tile,
+   or the icon when there's no logo.
 3. Featured: projects with `featured: true`. Each row opens a drawer.
 4. Writing: latest 2 published posts + "All writing".
 5. Connect: two columns. Email (copies, toast) | Resume (when the PDF exists), then LinkedIn | GitHub.
