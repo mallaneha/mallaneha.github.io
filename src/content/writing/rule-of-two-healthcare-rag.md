@@ -83,12 +83,10 @@ has the member's claims in context, and it can email or file things. That doesn'
 attacker, just one document with instructions in it.
 
 At Autonomize, part of my work was testing generative AI systems against the OWASP Top 10 for LLM
-applications, using red- and blue-teaming agents. The finding that fits here is the first item on that
-list, prompt injection, in its indirect form: a test document with an instruction hidden in it [ADD:
-where it was hidden, for example white text or a footer], which the system followed when it read the
-document. [ADD: what the instruction made it do, at the level that's public] A person skimming the
-document wouldn't have seen the instruction. The model reads every word. <!-- TODO(Neha): confirm this
-finding and what can be said about it publicly -->
+applications, using red- and blue-teaming agents. Prompt injection is the first item on that list, and
+documents are one of the ways in: anything the system reads is a place to hide an instruction. A person
+skimming a document won't see an instruction in a footer or in white text. The model reads every word. I
+can't share specific findings from that work.
 
 ## Four ways out
 

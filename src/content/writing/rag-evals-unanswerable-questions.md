@@ -10,8 +10,7 @@ draft: true
 When I added self-reflection to my [research agent](/writing/cutting-hallucinations-research-agent/),
 hallucinations went down and "I don't know" answers went up. I said at the end of that post that you
 should count those refusals and report them. Doing that properly turned out to need a different eval set
-from the one I started with. <!-- TODO(Neha): confirm every question in the research agent eval set had
-an answer in the documents -->
+from the one I started with.
 
 Every question in it had an answer somewhere in the documents. That sounds reasonable, and it hides the
 problem. If every question can be answered, every refusal counts as a mistake, so the system that never
@@ -39,12 +38,12 @@ Health plan documents are full of nearly relevant text: last year's plan next to
 in-network rule next to the out-of-network one. A made-up answer that cites a real paragraph from the
 wrong section is the failure I worry about most.
 
-I saw a plainer version of this in my research agent. In the baseline, when I asked something the
-documents didn't cover, the model answered anyway, from whatever it picked up in training. [ADD: the
-question, and what the agent said] The answer read just as well as the grounded ones, and nothing in it
-hinted that the documents had nothing to say. The LangSmith trace showed it: the retrieved chunks had
-nothing to do with the question. <!-- TODO(Neha): confirm this was a question with no answer in the
-documents, not only a retrieval miss -->
+I saw a milder version of this in my research agent. Every question in my eval set had an answer, but
+retrieval didn't always find it. When no relevant chunk came back, the baseline answered anyway, from
+whatever the model picked up in training. Those answers read just as well as the grounded ones, and
+nothing in them hinted that the context didn't support them. Only the trace showed that the retrieved
+chunks never contained the answer. If a missed retrieval gets a confident answer, a question with no
+answer at all will too.
 
 ## Five outcomes, not two
 
