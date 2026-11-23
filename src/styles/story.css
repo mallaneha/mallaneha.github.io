@@ -1,7 +1,7 @@
 /* Three-step animated story under a project drawer's Overview: problem → what it does → result.
    Raw HTML in src/content/projects/<slug>.md (`<figure class="story">`), styled only with tokens so it follows
-   the theme toggle. Each step is highlighted in turn on a 12 s loop. Text is never dimmed, so contrast holds
-   in every frame; with prefers-reduced-motion nothing moves and every step shows in full. */
+   the theme toggle. Three equal cards: label, scene (small looping motion), then the step's numbers at the bottom,
+   so the numbers line up across cards. With prefers-reduced-motion nothing moves. */
 
 .story {
   container-type: inline-size;
@@ -25,28 +25,9 @@
   gap: var(--space-3);
   min-width: 0;
   padding: var(--space-3) var(--space-2);
-  border: 1px solid transparent;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-row);
-  animation: story-spot 12s var(--ease-out) infinite;
-}
-.story-step:nth-child(2) {
-  animation-delay: -8s;
-}
-.story-step:nth-child(3) {
-  animation-delay: -4s;
-}
-@keyframes story-spot {
-  0%,
-  34%,
-  100% {
-    border-color: transparent;
-    background-color: transparent;
-  }
-  3%,
-  31% {
-    border-color: var(--color-border);
-    background-color: var(--color-bg);
-  }
+  background: var(--color-bg);
 }
 .story-label {
   color: var(--color-faint);
@@ -56,6 +37,7 @@
   color: var(--color-text);
 }
 .story-scene {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -64,24 +46,34 @@
 .story-note {
   color: var(--color-muted);
 }
-.story-num {
+/* The step's numbers: a dotted rule, a small title, then one or two numbers, each with its label below. */
+.story-stats {
   display: flex;
   flex-direction: column;
-  margin-top: auto;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: 1px dotted var(--color-subtle);
   color: var(--color-muted);
 }
-.story-num strong {
+.story-stats-title {
+  color: var(--color-faint);
+}
+.story-stat {
+  display: flex;
+  flex-direction: column;
+}
+.story-stat strong {
   font-size: var(--text-lg);
   line-height: 1.5rem;
   font-weight: var(--weight-semibold);
   font-variant-numeric: tabular-nums;
   color: var(--color-text);
 }
-.story .is-bad strong,
+.story .is-bad > strong,
 .story-mark.is-bad {
   color: var(--chart-4);
 }
-.story .is-good strong,
+.story .is-good > strong,
 .story-mark.is-good {
   color: var(--chart-3);
 }
@@ -413,55 +405,44 @@
   font-size: 0.6875rem;
   color: var(--color-text);
   transform-origin: left center;
-  animation: story-grow 12s var(--ease-out) infinite;
+  animation: story-grow 6s var(--ease-out) infinite;
 }
 .story-bar.is-good {
   background: color-mix(in srgb, var(--chart-3) 30%, var(--color-bg));
 }
 @keyframes story-grow {
-  0%,
-  64%,
-  76%,
+  0% {
+    transform: scaleX(0);
+  }
+  20%,
   100% {
     transform: scaleX(1);
   }
-  66% {
-    transform: scaleX(0);
-  }
 }
 
-/* Narrow drawers (phones): one step per row, label and number left, scene right. */
+/* Narrow drawers (phones): one card per row, the scene on the left and its numbers in a column on the right. */
 @container (width < 26rem) {
   .story-steps {
     grid-template-columns: minmax(0, 1fr);
   }
   .story-step {
     display: grid;
-    grid-template-columns: 5.5rem minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
-    column-gap: var(--space-3);
-    row-gap: var(--space-2);
+    grid-template-columns: minmax(0, 1fr) 6rem;
+    gap: var(--space-3);
   }
   .story-label {
-    grid-area: 1 / 1;
+    grid-column: 1 / -1;
   }
-  .story-num {
-    grid-area: 2 / 1;
-    margin-top: 0;
-  }
-  .story-scene {
-    grid-area: 1 / 2 / 3 / 3;
+  .story-stats {
+    padding: 0 0 0 var(--space-3);
+    border-top: 0;
+    border-left: 1px dotted var(--color-subtle);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .story *,
-  .story-step {
+  .story * {
     animation: none !important;
-  }
-  .story-step {
-    border-color: var(--color-border);
-    background: var(--color-bg);
   }
   .story-drop,
   .story-flow {
