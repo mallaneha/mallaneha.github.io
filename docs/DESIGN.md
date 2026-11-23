@@ -80,8 +80,8 @@ contrast doesn't depend on the data. Hover, tap or arrow keys show a dot's quest
 - Sizes: rows and drawers at `--text-sm` (14px); post bodies at `--text-base`.
 - Colors: text, body, muted, faint, subtle (dotted rules), border, surface, hover, overlay. Each has
   a dark-mode value; contrast ratios are noted in the file.
-- Chart series: `--chart-ink`, `-red`, `-graphite`, `-brass` (+ `-soft` steps) for the post widgets;
-  `--chart-1` to `--chart-5` for the drawer figures (`mockups.css`, `story.css`).
+- Data colors: `--chart-ink`, `-red`, `-graphite`, `-brass` (+ `-soft` steps), one palette for the post widgets
+  and the drawers' figures (`mockups.css`, `story.css`). Red means wrong, flagged or dangerous, and nothing else.
 - Motion: `--ease-drawer`, `--drawer-in`, `--drawer-out`, `--transition`.
 
 ## Voice

@@ -145,7 +145,7 @@ const MOCKUPS: Record<string, Mockup> = {
       },
       {
         label: "Poisoned",
-        body: "Q: How severe is CVE-YYYY-NNNN?\nRetrieved: [[poisoned]] · [[poisoned]] · CVE doc\nA: [[what the attacker wrote]]",
+        body: "Q: How severe is CVE-YYYY-NNNN?\nRetrieved: [[!poisoned]] · [[!poisoned]] · CVE doc\nA: [[!what the attacker wrote]]",
         note: "2 planted documents out of 1,063 flipped the answer 59% of the time.",
       },
     ],
@@ -272,13 +272,16 @@ function h<K extends keyof HTMLElementTagNameMap>(
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
-// "[[x]]" → <mark>x</mark>; "\n" → line break.
+// "[[x]]" → <mark>x</mark> (look here); "[[!x]]" → <mark class="is-bad"> (wrong or malicious, in red); "\n" → line break.
 function rich(text: string) {
   const out = h("p", { class: "mk-text" });
   text.split("\n").forEach((line, i) => {
     if (i) out.append(h("br"));
     line.split(/(\[\[.*?\]\])/).forEach((part) => {
-      if (part.startsWith("[[")) out.append(h("mark", {}, part.slice(2, -2)));
+      if (part.startsWith("[[!"))
+        out.append(h("mark", { class: "is-bad" }, part.slice(3, -2)));
+      else if (part.startsWith("[["))
+        out.append(h("mark", {}, part.slice(2, -2)));
       else if (part) out.append(part);
     });
   });
