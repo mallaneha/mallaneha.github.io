@@ -1,0 +1,19 @@
+---
+// Astro wrapper for <header-cat>. Copy header-cat.js next to this file.
+// Usage: <h1>Neha Malla <HeaderCat /></h1>
+interface Props {
+  label?: string;
+  noLedge?: boolean;
+  size?: string;
+}
+const { label = "Sleeping cat", noLedge = false, size } = Astro.props;
+---
+
+<header-cat
+  label={label}
+  no-ledge={noLedge || undefined}
+  style={size ? `--cat-size:${size}` : undefined}
+></header-cat>
+<script>
+  import "./header-cat.js";
+</script>
