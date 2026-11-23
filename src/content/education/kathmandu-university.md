@@ -14,12 +14,7 @@ order: 20
 
 A bachelor's in computer engineering at Kathmandu University in Dhulikhel, Nepal. My projects there covered machine learning, computer vision, cryptography and OCR.
 
-## Courses
-
-- Data Structures and Algorithms
-- Discrete Structures
-- Statistics and Probability
-- Machine Learning
+Relevant courses: Data Structures and Algorithms, Discrete Structures, Statistics and Probability, and Machine Learning.
 
 ## Rennervate
 
