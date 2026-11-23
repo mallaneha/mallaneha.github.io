@@ -9,6 +9,8 @@ interface Props {
   logo?: string; // image under public/logos/, shown instead of the icon
   logoSize?: number; // px, default 24
   logoFull?: boolean; // the logo is a filled square: it covers the whole tile
+  logoAlt?: string; // debug only: alternative logo the ?debug panel can swap in (see scripts/debug.ts)
+  logoAltSize?: number; // px of logoAlt inside the tile, default 24
   glyph?: string; // a letter (e.g. Nepali क) shown in the tile instead of the icon
   name: string;
   desc?: string;
@@ -26,6 +28,8 @@ const {
   logo,
   logoSize = 24,
   logoFull = false,
+  logoAlt,
+  logoAltSize = 24,
   glyph,
   name,
   desc,
@@ -77,6 +81,8 @@ if (drawer) {
             width={logoFull ? 40 : logoSize}
             height={logoFull ? 40 : logoSize}
             loading="lazy"
+            data-logo-alt={logoAlt}
+            data-logo-alt-size={logoAlt && logoAltSize}
           />
         ) : glyph ? (
           <span class="glyph" lang="ne" aria-hidden="true">

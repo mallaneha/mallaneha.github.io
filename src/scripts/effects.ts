@@ -382,4 +382,16 @@ if (
   import("./rag-explainers");
 }
 
+// Debug panel (e.g. the CMU logo toggle). Visitors never get it: `?debug` turns it on, `?debug=0` off.
+if (/[?&]debug\b/.test(location.search) || hasDebugFlag()) {
+  import("./debug");
+}
+function hasDebugFlag() {
+  try {
+    return localStorage.getItem("debug") === "1";
+  } catch {
+    return false;
+  }
+}
+
 export {};
