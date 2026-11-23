@@ -7,6 +7,7 @@ import type { IconName } from "../data/icons";
 interface Props {
   icon?: IconName; // leave out (with no logo) for a row without a tile
   logo?: string; // image under public/logos/, shown instead of the icon
+  glyph?: string; // a letter (e.g. Nepali क) shown in the tile instead of the icon
   name: string;
   desc?: string;
   meta?: string;
@@ -20,6 +21,7 @@ interface Props {
 const {
   icon,
   logo,
+  glyph,
   name,
   desc,
   meta,
@@ -59,10 +61,14 @@ if (drawer) {
 
 <li>
   <Tag class:list={["row", { static: Tag === "div" }]} {...attrs}>
-    {(logo || icon) && (
+    {(logo || glyph || icon) && (
       <span class:list={["tile", { logo }]}>
         {logo ? (
           <img src={logo} alt="" width="24" height="24" loading="lazy" />
+        ) : glyph ? (
+          <span class="glyph" lang="ne" aria-hidden="true">
+            {glyph}
+          </span>
         ) : (
           icon && <Icon name={icon} />
         )}
@@ -135,8 +141,15 @@ if (drawer) {
     /* Multiply drops a JPEG's white box into the tile. */
     mix-blend-mode: multiply;
   }
+  .glyph {
+    font-family: var(--font-devanagari);
+    font-size: 1.125rem;
+    line-height: 1;
+    font-weight: var(--weight-medium);
+  }
   .tile :global(svg),
-  .tile img {
+  .tile img,
+  .tile .glyph {
     transition: transform var(--transition);
   }
   .row:not(.static):hover .tile {
@@ -146,7 +159,8 @@ if (drawer) {
     background: var(--color-logo-tile);
   }
   .row:not(.static):hover .tile :global(svg),
-  .row:not(.static):hover .tile img {
+  .row:not(.static):hover .tile img,
+  .row:not(.static):hover .tile .glyph {
     transform: scale(1.1);
   }
   .text {

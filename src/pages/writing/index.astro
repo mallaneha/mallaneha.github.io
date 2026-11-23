@@ -3,7 +3,7 @@ import Base from "../../layouts/Base.astro";
 import RowList from "../../components/RowList.astro";
 import Row from "../../components/Row.astro";
 import { site } from "../../data/site";
-import { getWriting, formatDate } from "../../lib/content";
+import { getWriting, formatDate, nepaliLetter } from "../../lib/content";
 
 const writing = await getWriting();
 ---
@@ -16,9 +16,9 @@ const writing = await getWriting();
   <p class="muted blurb">{site.writingBlurb}</p>
   {writing.length > 0 ? (
     <RowList>
-      {writing.map((w) => (
+      {writing.map((w, i) => (
         <Row
-          icon="pen"
+          glyph={nepaliLetter(i)}
           name={w.data.draft ? `[draft] ${w.data.title}` : w.data.title}
           desc={`${w.data.type === "note" ? "Note · " : ""}${formatDate(w.data.date)}`}
           href={`/writing/${w.id}/`}
