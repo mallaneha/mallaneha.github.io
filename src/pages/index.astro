@@ -85,35 +85,31 @@ const educationDrawers = await Promise.all(
         </h1>
         <p class="tagline">{site.tagline}</p>
       </div>
-      {/* The social icons. The dev toolbar's "Cat position" app can move the cat in here, onto a
-          shelf above them (see the .perch styles). */}
-      <div class="perch">
-        <span class="social">
-          <a
-            href={site.links.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="GitHub"
-            title="GitHub"
-          >
-            <Icon name="github" />
+      <span class="social">
+        <a
+          href={site.links.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub"
+          title="GitHub"
+        >
+          <Icon name="github" />
+        </a>
+        <a
+          href={site.links.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="LinkedIn"
+          title="LinkedIn"
+        >
+          <Icon name="linkedin" />
+        </a>
+        {resumeHref && (
+          <a href={resumeHref} aria-label="Resume (PDF)" title="Resume (PDF)">
+            <Icon name="file" />
           </a>
-          <a
-            href={site.links.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            title="LinkedIn"
-          >
-            <Icon name="linkedin" />
-          </a>
-          {resumeHref && (
-            <a href={resumeHref} aria-label="Resume (PDF)" title="Resume (PDF)">
-              <Icon name="file" />
-            </a>
-          )}
-        </span>
-      </div>
+        )}
+      </span>
     </div>
     {site.intro.map((line) => (
       <p>{line}</p>
@@ -315,67 +311,23 @@ const educationDrawers = await Promise.all(
     --glyph-top: calc(var(--cat) * 52.5 / 84 - var(--glyph) + 1.5px);
     position: relative;
     display: flex;
+    flex: none;
     margin-top: calc(var(--glyph-top) - var(--pad) / 2);
     margin-right: calc(var(--pad) / -2);
   }
 
-  /* Alternative, previewed with the dev toolbar's "Cat position" app (src/dev/cat-position.ts),
-     which moves the cat into .perch: the cat sleeps on its own shelf at the right and the icons
-     hang just under it, left of its tail. Measurements come from the cat's 112×84 drawing
-     (header-cat.js): the shelf is drawn at y 52.5, 1.4 thick; the tail's left edge is 16.4
-     from the right. --pad is then one small gap used everywhere: between icons, from the last
-     icon to the tail, and from the shelf down to the icons. */
-  .perch {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    flex: none;
-  }
-  .perch :global(header-cat) {
-    display: block;
-  }
-  /* The name's baseline sits level with the cat's shelf. */
-  :global(html[data-cat-pos="shelf"]) .title {
-    padding-top: calc(var(--cat) * 52.5 / 84 - 1em - 1px);
-  }
-  :global(html[data-cat-pos="shelf"]) .social {
-    --pad: 3px;
-    /* top: bottom of the shelf line + gap, minus the link's own padding */
-    margin-top: calc(var(--cat) * (53.2 / 84 - 1) + var(--pad) / 2);
-    margin-right: calc(var(--cat) * 16.4 / 84 + var(--pad) / 2);
-  }
-  :global(html[data-cat-pos="shelf"]) .social a {
-    border-radius: var(--radius);
-  }
-  /* Bigger touch target on touch screens without moving the icons: it grows downward only,
-     so it never covers the cat above or a neighbouring icon. */
-  @media (pointer: coarse) {
-    :global(html[data-cat-pos="shelf"]) .social a::after {
-      content: "";
-      position: absolute;
-      inset: 0 0 calc(-1 * var(--space-4));
-    }
-  }
-
-  /* Phones: no cat in either position; the icons sit centred on the name's line. */
+  /* Phones: no cat; the icons sit centred on the name's line. */
   @media (max-width: 47.99rem) {
     .top :global(header-cat) {
       display: none;
     }
-    :global(html[data-cat-pos="shelf"]) .title {
-      padding-top: 0;
-    }
-    .social,
-    :global(html[data-cat-pos="shelf"]) .social {
+    .social {
       --pad: calc(2.75rem - var(--glyph));
       --glyph-top: calc(
         (var(--text-base) * var(--leading-tight) - var(--glyph)) / 2
       );
       margin-top: calc(var(--glyph-top) - var(--pad) / 2);
       margin-right: calc(var(--pad) / -2);
-    }
-    :global(html[data-cat-pos="shelf"]) .social a {
-      border-radius: var(--radius-row);
     }
   }
   .availability {
