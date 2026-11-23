@@ -149,7 +149,7 @@
   padding: 0 2px;
   border-radius: 2px;
   /* A highlighter: brass means "look here" and carries no verdict; red is kept for .is-bad. */
-  background: color-mix(in srgb, var(--chart-other) 22%, transparent);
+  background: color-mix(in srgb, var(--chart-other) 35%, transparent);
   color: var(--color-text);
 }
 .mk-text mark.is-bad {
@@ -235,14 +235,16 @@
   content: " ✕";
   color: var(--chart-alert);
 }
+/* The yellow is a fill, never a line or text on white (1.8:1). */
 .mk-stage.is-loop {
   border-style: solid;
-  border-color: var(--chart-other);
+  border-color: var(--color-text);
+  background: color-mix(in srgb, var(--chart-other) 30%, var(--color-bg));
   color: var(--color-text);
 }
 .mk-stage.is-loop::after {
   content: " ↺";
-  color: var(--chart-other);
+  color: var(--color-text);
 }
 
 /* Filter */

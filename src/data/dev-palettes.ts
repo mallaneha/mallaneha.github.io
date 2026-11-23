@@ -35,10 +35,34 @@ const v = (...c: string[]): Values =>
 
 export const PALETTES: Palette[] = [
   {
+    id: "bauhaus",
+    name: "Bauhaus",
+    story:
+      "In use. Primary blue, signal red, yellow and black. Yellow is a fill only, with black text and outlines on it.",
+    light: v(
+      "#1f3fd1",
+      "#6a80e6",
+      "#e10600",
+      "#eb5a48",
+      "#111111",
+      "#f5b800",
+      "#fadb6e",
+    ),
+    dark: v(
+      "#7b93ff",
+      "#4a63e0",
+      "#ff3b30",
+      "#c7392e",
+      "#ededed",
+      "#ffcc00",
+      "#a88a1a",
+    ),
+  },
+  {
     id: "ink",
     name: "Ink & red pencil",
     story:
-      "The current one. Fountain-pen blue and a red correction pencil, with brass as the odd one out.",
+      "The previous one. Fountain-pen blue and a red correction pencil, with brass as the odd one out.",
     light: v(
       "#0b5cad",
       "#5b8bd0",
@@ -104,30 +128,6 @@ export const PALETTES: Palette[] = [
       "#8a8a8a",
       "#f0b429",
       "#a87d1f",
-    ),
-  },
-  {
-    id: "bauhaus",
-    name: "Bauhaus",
-    story:
-      "Primary blue, signal red, yellow and black. The boldest option; black carries the neutral role.",
-    light: v(
-      "#1f3fd1",
-      "#8193ec",
-      "#e10600",
-      "#f47a6b",
-      "#111111",
-      "#f5b800",
-      "#fadb6e",
-    ),
-    dark: v(
-      "#5b78ff",
-      "#2f45a8",
-      "#ff3b30",
-      "#a8322b",
-      "#ededed",
-      "#ffcc00",
-      "#a88a1a",
     ),
   },
   {
@@ -230,8 +230,18 @@ export const PALETTES: Palette[] = [
 
 /** CSS that applies a palette when <html data-palette="id">, in light and dark, over the tokens.css values. */
 export function paletteCss(): string {
+  // Text on the "other" color: near-black or white, whichever reads better (as --chart-on-other in tokens.css).
+  const lum = (hex: string) => {
+    const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+    const [r, g, b] = c.map((x) =>
+      x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4,
+    );
+    return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+  };
+  const on = (hex: string) => (lum(hex) > 0.18 ? "#111111" : "#ffffff");
   const decl = (vals: Values) =>
-    ROLES.map((r) => `--chart-${r}: ${vals[r]};`).join(" ");
+    ROLES.map((r) => `--chart-${r}: ${vals[r]};`).join(" ") +
+    ` --chart-on-other: ${on(vals.other)};`;
   return PALETTES.map(
     (p) =>
       // html:root[…] outranks tokens.css's :root and its dark blocks (:root:not(…), :root[data-theme]).
