@@ -25,7 +25,9 @@ export const site = {
   },
   // Path under public/. The link appears only once that file exists (see resumeHref in src/lib/content.ts).
   // The PDF must not contain a phone number or street address; `npm run check` scans public/ for phone numbers.
-  resume: "/neha-malla-resume.pdf" as string | null,
+  // null hides every resume link (header, "Reach me" sentence, Connect, llms.txt). Hidden on 2026-11-23;
+  // set back to "/neha-malla-resume.pdf" to show it again.
+  resume: null as string | null,
   // One-line footer motto. null hides it.
   motto: null as string | null,
 } as const;

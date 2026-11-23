@@ -139,7 +139,8 @@ const experienceDrawers = await Promise.all(
   </Section>
 
   <Section id="connect" title="Connect">
-    <RowList columns={2}>
+    {/* With a resume: Email | Resume, LinkedIn | GitHub. Without: Email alone, then LinkedIn | GitHub. */}
+    <RowList columns={resumeHref ? 2 : 1}>
       <Row
         icon="mail"
         name={site.email.replace("@", "@\u200b")}
@@ -151,6 +152,8 @@ const experienceDrawers = await Promise.all(
       {resumeHref && (
         <Row icon="file" name="Resume" desc="PDF" href={resumeHref} />
       )}
+    </RowList>
+    <RowList columns={2}>
       <Row
         icon="link"
         name="mallaneha"
