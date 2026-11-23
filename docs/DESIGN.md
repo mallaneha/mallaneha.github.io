@@ -61,7 +61,7 @@ bigger one keeps only its strongest cells) and never spawn in the inner 40% of e
 toward the column and toward the top of the window, so the few specks sit out by the screen edges and lower down. It boils in place (no drift direction), slowly: a cell stays lit for several
 seconds.
 
-Hover highlights, never adds cells: every lit cell the mouse touches (fast moves fill in the cells in between)
+Hover highlights, never adds cells: every lit cell the mouse touches, plus the lit cells among its 8 neighbors, (fast moves fill in the cells in between)
 shows its own oddgrid color (`--grid-hue-1`..`--grid-hue-5`: pink, navy, olive, blue, orange, in patches from a second
 noise field; maroon markers `--grid-hue-dot`) and keeps it until that part of the cluster fades: a highlighted cell
 that blinks off is remembered while a neighbor is still lit. Touch screens

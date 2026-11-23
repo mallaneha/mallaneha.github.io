@@ -179,7 +179,7 @@ function near(cx: number, cy: number) {
   return Math.round(((NEAR_OUT - dist) / (NEAR_OUT - NEAR_IN)) * NEAR_STEPS);
 }
 
-// Hover highlights: every lit cell the pointer touches shows its own oddgrid color, and keeps it until its part of
+// Hover highlights: every lit cell the pointer touches, and the lit cells around it, shows its own oddgrid color, and keeps it until its part of
 // the cluster fades away. Indices are cy * cols + cx.
 let painted = new Set<number>();
 let paintedCols = 0;
@@ -265,12 +265,17 @@ function draw() {
   }
   if (pointerX > -1e8)
     crossed.push(Math.floor(pointerX / CELL), Math.floor(pointerY / CELL));
+  // Each touched cell also colors the lit cells among its 8 neighbors (a 3x3 around the cursor).
   for (let k = 0; k < crossed.length; k += 2) {
-    const cx = crossed[k];
-    const cy = crossed[k + 1];
-    const i = cy * cols + cx;
-    if (cx >= 0 && cx < cols && cy >= 0 && cy < rows && lit.has(i))
-      painted.add(i);
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const cx = crossed[k] + dx;
+        const cy = crossed[k + 1] + dy;
+        const i = cy * cols + cx;
+        if (cx >= 0 && cx < cols && cy >= 0 && cy < rows && lit.has(i))
+          painted.add(i);
+      }
+    }
   }
   crossed = [];
   // A highlighted cell that blinks off stays remembered (and shows again when relit) while any cell around it is

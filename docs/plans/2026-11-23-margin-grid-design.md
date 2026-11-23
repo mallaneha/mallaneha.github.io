@@ -116,3 +116,4 @@ What shipped differs from the plan above in these ways, all at Neha's request:
 - **Lantern.** Resting grays faded further (`#fb`/`#fa`/`#f8`, markers `#f4` light; `#13`/`#14`/`#15`, `#18` dark).
   Within 40px of the mouse, fading out by 80px, cells brighten to the earlier visible grays (`--grid-near-*`:
   `#f2`/`#e8`/`#dd`, markers `#b8` light; `#1c`/`#23`/`#2b`, `#44` dark). Touched cells still turn to color.
+- **3×3 highlight.** Touching a cell also colors the lit cells among its 8 neighbors.
