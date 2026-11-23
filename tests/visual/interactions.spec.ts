@@ -123,6 +123,18 @@ test("click effects: spark canvas, mute toggle, copy email", async ({
   }
 });
 
+test("click effects are home-page only; footer shows local time", async ({
+  page,
+}) => {
+  await expect(page.locator("[data-local-time] time")).toHaveText(
+    /^\d{1,2}:\d{2}\s?(AM|PM)$/,
+  );
+  await page.goto("/writing/");
+  await expect(page.locator("canvas.spark-canvas")).toHaveCount(0);
+  await expect(page.locator("[data-effects-toggle]")).toHaveCount(0);
+  await expect(page.locator("[data-local-time]")).toBeVisible();
+});
+
 test("theme toggle flips the theme and remembers it", async ({ page }) => {
   const bg = () =>
     page.evaluate(() => getComputedStyle(document.body).backgroundColor);

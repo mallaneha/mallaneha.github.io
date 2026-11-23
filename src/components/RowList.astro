@@ -1,4 +1,12 @@
-<ul>
+---
+// A list of Rows. `columns={2}` puts them side by side (short rows such as profile links).
+interface Props {
+  columns?: 1 | 2;
+}
+const { columns = 1 } = Astro.props;
+---
+
+<ul class:list={{ cols: columns === 2 }}>
   <slot />
 </ul>
 
@@ -9,5 +17,14 @@
     gap: var(--space-1);
     margin: 0;
     padding: 0;
+  }
+  /* Rows bleed var(--space-3) past each side for their hover background, so the column gap is twice that. */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-1) var(--space-6);
+  }
+  ul + ul {
+    margin-top: var(--space-1);
   }
 </style>

@@ -6,6 +6,7 @@ import type { IconName } from "../data/icons";
 
 interface Props {
   icon: IconName;
+  logo?: string; // image under public/logos/, shown instead of the icon
   name: string;
   desc?: string;
   meta?: string;
@@ -15,7 +16,8 @@ interface Props {
   copyLabel?: string; // toast text after copying
 }
 
-const { icon, name, desc, meta, href, drawer, copy, copyLabel } = Astro.props;
+const { icon, logo, name, desc, meta, href, drawer, copy, copyLabel } =
+  Astro.props;
 const external = Boolean(href?.startsWith("http"));
 
 let Tag: "button" | "a" | "div" = "div";
@@ -46,8 +48,12 @@ if (drawer) {
 
 <li>
   <Tag class:list={["row", { static: Tag === "div" }]} {...attrs}>
-    <span class="tile">
-      <Icon name={icon} />
+    <span class:list={["tile", { logo }]}>
+      {logo ? (
+        <img src={logo} alt="" width="24" height="24" loading="lazy" />
+      ) : (
+        <Icon name={icon} />
+      )}
     </span>
     <span class="text">
       <span class="name">{name}</span>
@@ -103,13 +109,25 @@ if (drawer) {
     background: var(--color-surface);
     transition: background-color var(--transition);
   }
-  .tile :global(svg) {
+  .tile.logo {
+    border: 1px solid var(--color-border);
+    background: var(--color-logo-tile);
+  }
+  .tile img {
+    border-radius: var(--radius-logo);
+  }
+  .tile :global(svg),
+  .tile img {
     transition: transform var(--transition);
   }
   .row:not(.static):hover .tile {
     background: var(--color-surface-hover);
   }
-  .row:not(.static):hover .tile :global(svg) {
+  .row:not(.static):hover .tile.logo {
+    background: var(--color-logo-tile);
+  }
+  .row:not(.static):hover .tile :global(svg),
+  .row:not(.static):hover .tile img {
     transform: scale(1.1);
   }
   .text {

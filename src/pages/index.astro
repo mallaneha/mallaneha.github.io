@@ -24,7 +24,6 @@ const [projects, experience, writing] = await Promise.all([
 ]);
 const published = new Set(writing.map((w) => w.id));
 const featured = projects.filter((p) => p.data.featured);
-const building = projects.filter((p) => p.data.status === "building");
 const latest = writing.slice(0, 2);
 
 const featuredDrawers = await Promise.all(
@@ -44,16 +43,18 @@ const experienceDrawers = await Promise.all(
 );
 ---
 
-<Base description={site.summary}>
+<Base description={site.summary} effects>
   <header>
     <h1>{site.name}</h1>
     <p class="tagline">{site.tagline}</p>
-    {site.availability && (
+    {(site.availability || resumeHref) && (
       <p class="status">
-        <span class="badge">
-          <span class="dot" aria-hidden="true" />
-          {site.availability}
-        </span>
+        {site.availability && (
+          <span class="badge">
+            <span class="dot" aria-hidden="true" />
+            {site.availability}
+          </span>
+        )}
         {resumeHref && (
           <a class="resume" href={resumeHref}>
             <Icon name="file" size={14} />
@@ -86,6 +87,20 @@ const experienceDrawers = await Promise.all(
     </p>
   </header>
 
+  <Section id="experience" title="Experience">
+    <RowList>
+      {experienceDrawers.map(({ entry, id }) => (
+        <Row
+          icon={entry.data.icon}
+          logo={entry.data.logo}
+          name={entry.data.company}
+          desc={entry.data.summary}
+          drawer={id}
+        />
+      ))}
+    </RowList>
+  </Section>
+
   <Section id="featured" title="Featured">
     <RowList>
       {featuredDrawers.map(({ entry, id }) => (
@@ -98,34 +113,6 @@ const experienceDrawers = await Promise.all(
       ))}
     </RowList>
   </Section>
-
-  <Section id="experience" title="Experience">
-    <RowList>
-      {experienceDrawers.map(({ entry, id }) => (
-        <Row
-          icon={entry.data.icon}
-          name={entry.data.company}
-          desc={entry.data.summary}
-          drawer={id}
-        />
-      ))}
-    </RowList>
-  </Section>
-
-  {building.length > 0 && (
-    <Section id="building" title="Building">
-      <RowList>
-        {building.map((p) => (
-          <Row
-            icon={p.data.icon}
-            name={p.data.title}
-            desc={p.data.summary}
-            meta="In progress"
-          />
-        ))}
-      </RowList>
-    </Section>
-  )}
 
   <Section id="writing" title="Writing" blurb={site.writingBlurb}>
     {latest.length > 0 ? (
@@ -155,6 +142,8 @@ const experienceDrawers = await Promise.all(
         copyLabel="Email copied"
         href={`mailto:${site.email}`}
       />
+    </RowList>
+    <RowList columns={2}>
       <Row
         icon="link"
         name="mallaneha"
@@ -167,12 +156,21 @@ const experienceDrawers = await Promise.all(
         desc="GitHub"
         href={site.links.github}
       />
-      {resumeHref && (
-        <Row icon="file" name="Resume" desc="PDF" href={resumeHref} />
-      )}
     </RowList>
   </Section>
 
+  {experienceDrawers.map(({ entry, id, Content }) => (
+    <Drawer
+      id={id}
+      icon={entry.data.icon}
+      logo={entry.data.logo}
+      name={entry.data.company}
+      desc={`${entry.data.role} · ${years(entry.data.start, entry.data.end)}`}
+      href={entry.data.url}
+    >
+      <Content />
+    </Drawer>
+  ))}
   {featuredDrawers.map(({ entry, id, link, Content }) => (
     <Drawer
       id={id}
@@ -181,17 +179,6 @@ const experienceDrawers = await Promise.all(
       desc={entry.data.summary}
       href={link?.href}
       hrefLabel={link?.label}
-    >
-      <Content />
-    </Drawer>
-  ))}
-  {experienceDrawers.map(({ entry, id, Content }) => (
-    <Drawer
-      id={id}
-      icon={entry.data.icon}
-      name={entry.data.company}
-      desc={`${entry.data.role} · ${years(entry.data.start, entry.data.end)}`}
-      href={entry.data.url}
     >
       <Content />
     </Drawer>

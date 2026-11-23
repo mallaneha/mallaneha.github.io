@@ -12,12 +12,14 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
 1. Header: name (h1), tagline (muted), availability badge (pill with a status dot, plus "Resume (PDF)"
    when the file exists), 3 short paragraphs (now, what I build, which industries),
    "Reach me at <email, click to copy>, on LinkedIn, or read my resume".
-2. Featured: projects with `featured: true`. Each row opens a drawer.
-3. Experience: each row opens a drawer.
-4. Building: `status: building` projects, static rows marked "In progress".
-5. Writing: latest 2 published posts + "All writing".
-6. Connect: email (copies, toast), LinkedIn, GitHub, resume when available.
-7. Footer: optional motto · © year · city, then the sound toggle and the light/dark theme toggle.
+2. Experience: each row opens a drawer. The tile shows the company's logo (`logo:` in frontmatter,
+   file in `public/logos/`) on a light tile, or the icon when there's no logo.
+3. Featured: projects with `featured: true`. Each row opens a drawer.
+4. Writing: latest 2 published posts + "All writing".
+5. Connect: email (copies, toast), then LinkedIn and GitHub side by side in two columns. The resume
+   lives only at the top (header badge line and the "Reach me" sentence).
+6. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound
+   toggle (home page only) and the light/dark theme toggle.
    The theme follows the system until toggled; the choice is saved in localStorage (`theme`).
    Dark values live twice in `tokens.css` (system media query and `[data-theme="dark"]`): keep them in sync.
 
@@ -40,10 +42,11 @@ show ↗ on hover (always on touch screens).
 
 ## Click effects (`src/scripts/effects.ts`)
 
-Every click: 6 short lines burst outward from the pointer (12px radius, 300ms, 30% opacity, text
-color), a soft synthesized two-tick sound, and an 8ms vibration on phones. The footer toggle mutes
-all three and is remembered in `localStorage`. No sparks for keyboard clicks or with
-`prefers-reduced-motion`.
+Home page only (`<Base effects>` sets `data-effects` on `<body>`), and not for clicks inside an open
+drawer. Every click: 6 short lines burst outward from the pointer (12px radius, 300ms, 30% opacity, text
+color), a soft synthesized two-tick sound, and an 8ms vibration on phones. The footer toggle mutes the
+sound and vibration but keeps the sparks; it's remembered in `localStorage`. No sparks for keyboard
+clicks or with `prefers-reduced-motion`. Posts, the writing index and 404 have no effects and no toggle.
 
 ## Explainer widgets (`src/components/Explainers.astro`, `src/scripts/explainers.ts`)
 

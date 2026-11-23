@@ -4,6 +4,8 @@ export const site = {
   tagline: "Safe AI for high-stakes data.",
   url: "https://mallaneha.github.io",
   location: "Pittsburgh, PA",
+  // IANA zone for the local time shown next to the location in the footer.
+  timeZone: "America/New_York",
   // Header paragraphs, in order. Plain text; {email} and {linkedin} become links.
   intro: [
     "Currently finishing an M.S. in AI Engineering (Information Security) at Carnegie Mellon. Previously at Autonomize AI, and 3.5 years at Numeric Mind shipping FDA clinical data submissions.",

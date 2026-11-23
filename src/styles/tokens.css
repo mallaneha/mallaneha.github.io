@@ -34,6 +34,7 @@
   --radius: 4px;
   --radius-row: 6px;
   --radius-tile: 10px;
+  --radius-logo: 4px;
   --radius-sheet: 16px;
 
   --transition: 150ms ease;
@@ -51,6 +52,7 @@
   --color-border: #ececec;
   --color-surface: #f7f7f7;
   --color-surface-hover: #eeeeee;
+  --color-logo-tile: #ffffff; /* company logos keep their own colors */
   --color-hover: #f4f4f4;
   --color-accent: #0b5cad;
   /* Availability dot (non-text, 3:1 needed): 5.0:1 on white. */
@@ -83,6 +85,7 @@
     --color-border: #262626;
     --color-surface: #1c1c1c;
     --color-surface-hover: #2a2a2a;
+    --color-logo-tile: #ececec;
     --color-hover: #1c1c1c;
     --color-accent: #8ab8ff;
     --color-status: #3fb950;
@@ -112,6 +115,7 @@
   --color-border: #262626;
   --color-surface: #1c1c1c;
   --color-surface-hover: #2a2a2a;
+  --color-logo-tile: #ececec;
   --color-hover: #1c1c1c;
   --color-accent: #8ab8ff;
   --color-status: #3fb950;

@@ -1,6 +1,7 @@
 // Click feedback modeled on ch.sh: a small spark burst on a canvas, a soft synthesized
-// "tick", and an 8ms vibration on phones. One toggle ([data-effects-toggle]) mutes all three.
-// Also: [data-copy] buttons copy their value and show a toast.
+// "tick", and an 8ms vibration on phones. Only on pages whose <body> has data-effects (the home page),
+// and never for clicks inside a drawer. The toggle ([data-effects-toggle]) mutes the sound and vibration;
+// the sparks stay. Also: theme toggle, [data-copy] buttons with a toast, and the footer's local time.
 
 const KEY = "effects-muted";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -13,6 +14,7 @@ function readMuted() {
   }
 }
 let muted = readMuted();
+const effectsOn = document.body.hasAttribute("data-effects");
 
 // ---------- sparks (same parameters as ch.sh's ClickSpark defaults) ----------
 const SPARK = {
@@ -28,8 +30,8 @@ type Spark = { x: number; y: number; angle: number; start: number };
 const canvas = document.createElement("canvas");
 canvas.className = "spark-canvas";
 canvas.setAttribute("aria-hidden", "true");
-document.body.append(canvas);
-const ctx = canvas.getContext("2d");
+if (effectsOn) document.body.append(canvas);
+const ctx = effectsOn ? canvas.getContext("2d") : null;
 let sparks: Spark[] = [];
 let raf = 0;
 
@@ -39,8 +41,10 @@ function resize() {
   canvas.height = innerHeight * dpr;
   ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-resize();
-addEventListener("resize", resize);
+if (effectsOn) {
+  resize();
+  addEventListener("resize", resize);
+}
 
 const easeOut = (t: number) => t * (2 - t);
 
@@ -145,17 +149,21 @@ function tick() {
   else a.resume().then(play, () => {});
 }
 
-addEventListener(
-  "click",
-  (e) => {
-    if (muted) return;
-    // Keyboard "clicks" have no pointer position: skip the spark, keep the sound.
-    if (e.detail > 0 && !reduceMotion.matches) burst(e.clientX, e.clientY);
-    tick();
-    navigator.vibrate?.(8);
-  },
-  true,
-);
+if (effectsOn) {
+  addEventListener(
+    "click",
+    (e) => {
+      // Drawers are for reading: no effects inside one (a backdrop click targets the <dialog> too).
+      if ((e.target as Element | null)?.closest?.("dialog")) return;
+      // Keyboard "clicks" have no pointer position: skip the spark, keep the sound.
+      if (e.detail > 0 && !reduceMotion.matches) burst(e.clientX, e.clientY);
+      if (muted) return;
+      tick();
+      navigator.vibrate?.(8);
+    },
+    true,
+  );
+}
 
 // ---------- mute toggle ----------
 function syncToggles() {
@@ -165,6 +173,7 @@ function syncToggles() {
     b.setAttribute("aria-pressed", String(!muted));
     b.dataset.state = muted ? "off" : "on";
     b.title = muted ? "Click sounds off" : "Click sounds on";
+    b.setAttribute("aria-label", "Click sounds");
   }
 }
 syncToggles();
@@ -240,6 +249,30 @@ document.addEventListener("click", async (e) => {
     if (copyFallback) location.href = copyFallback;
   }
 });
+
+// ---------- local time in the footer ----------
+// <span data-local-time="America/New_York" hidden> · <time></time></span>, shown once filled.
+for (const el of document.querySelectorAll<HTMLElement>("[data-local-time]")) {
+  const out = el.querySelector("time");
+  if (!out) continue;
+  let fmt: Intl.DateTimeFormat;
+  try {
+    fmt = new Intl.DateTimeFormat("en-US", {
+      timeZone: el.dataset.localTime,
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    continue; // unknown time zone: leave it hidden
+  }
+  const update = () => {
+    out.textContent = fmt.format(new Date());
+    window.setTimeout(update, 60_000 - (Date.now() % 60_000) + 50);
+  };
+  update();
+  out.setAttribute("aria-label", "Local time");
+  el.hidden = false;
+}
 
 // Interactive explainers for the "Build it" posts. Loaded only on pages that use one.
 if (

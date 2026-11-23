@@ -67,7 +67,8 @@ start: 2026
 end: 2026 # omit if current
 location: "Austin, TX" # optional, city only
 summary: "AI/ML Intern · 2026" # ≤ 60 chars, shown under the name
-icon: pulse
+icon: pulse # fallback when there's no logo
+logo: /logos/autonomize-ai.png # optional, the company's logo under public/logos/ (square, ~80px)
 url: https://... # optional, becomes the drawer's "Visit" pill
 order: 10
 ---
