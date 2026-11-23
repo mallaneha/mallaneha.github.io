@@ -1,0 +1,22 @@
+---
+// Two Sections side by side (Experience and Education). Stacks on phones.
+---
+
+<div class="columns">
+  <slot />
+</div>
+
+<style>
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* Rows bleed var(--space-3) past each side for their hover background, so the column gap is twice that
+     (the same as RowList columns). */
+  @media (min-width: 40rem) {
+    .columns {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-6);
+    }
+  }
+</style>

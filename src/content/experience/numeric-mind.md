@@ -4,7 +4,7 @@ role: "Senior Data Analyst"
 start: 2024
 end: 2025
 location: "Kathmandu, Nepal"
-summary: "Senior Data Analyst · 2024–2025"
+summary: "Senior Data Analyst"
 icon: table
 logo: /logos/numeric-mind.jpg
 order: 20

@@ -45,6 +45,11 @@ export async function getExperience() {
   return all.sort((a, b) => a.data.order - b.data.order);
 }
 
+export async function getEducation() {
+  const all = await getCollection("education");
+  return all.sort((a, b) => a.data.order - b.data.order);
+}
+
 /** Where a project's "Visit" link points: a published write-up, else the repo, else the demo. */
 export function projectHref(
   links: { repo?: string; demo?: string; post?: string },
