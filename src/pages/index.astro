@@ -69,35 +69,35 @@ const educationDrawers = await Promise.all(
       </p>
     )}
     <div class="top">
-      <div class="name">
-        <h1>{site.name}</h1>
+      <h1>{site.name}</h1>
+      <div class="end">
+        <span class="social">
+          <a
+            href={site.links.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            title="LinkedIn"
+          >
+            <Icon name="linkedin" />
+          </a>
+          <a
+            href={site.links.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            title="GitHub"
+          >
+            <Icon name="github" />
+          </a>
+          {resumeHref && (
+            <a href={resumeHref} aria-label="Resume (PDF)" title="Resume (PDF)">
+              <Icon name="file" />
+            </a>
+          )}
+        </span>
         <HeaderCat />
       </div>
-      <span class="social">
-        <a
-          href={site.links.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="LinkedIn"
-          title="LinkedIn"
-        >
-          <Icon name="linkedin" />
-        </a>
-        <a
-          href={site.links.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub"
-          title="GitHub"
-        >
-          <Icon name="github" />
-        </a>
-        {resumeHref && (
-          <a href={resumeHref} aria-label="Resume (PDF)" title="Resume (PDF)">
-            <Icon name="file" />
-          </a>
-        )}
-      </span>
     </div>
     <p class="tagline">{site.tagline}</p>
     {site.intro.map((line) => (
@@ -248,15 +248,19 @@ const educationDrawers = await Promise.all(
     color: var(--color-body);
   }
   h1 {
-    display: inline;
     color: var(--color-text);
   }
+  /* Social icons, then the cat at the far right. */
+  .end {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
   /* Follow the site's theme toggle, not only the system setting. */
-  .name :global(header-cat) {
+  .end :global(header-cat) {
     --cat-size: 2.5rem;
     --cat-line: var(--color-cat-line);
     --cat-ledge: var(--color-cat-ledge);
-    margin-left: var(--space-1);
   }
   .tagline {
     margin: 0 0 var(--space-6);
@@ -270,8 +274,7 @@ const educationDrawers = await Promise.all(
   }
   /* Negative margins so the icon buttons don't make the name row taller. */
   .top .social {
-    margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2))
-      calc(-1 * var(--space-2)) 0;
+    margin: calc(-1 * var(--space-2)) 0;
   }
   .availability {
     margin: 0 0 var(--space-4);
