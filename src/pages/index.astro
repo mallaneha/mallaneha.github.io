@@ -75,17 +75,8 @@ const educationDrawers = await Promise.all(
       </div>
       {/* The cat sleeps on a shelf; the social icons hang just under it, left of its tail. */}
       <div class="perch">
-        <HeaderCat noLedge />
+        <HeaderCat />
         <span class="social">
-          <a
-            href={site.links.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            title="LinkedIn"
-          >
-            <Icon name="linkedin" />
-          </a>
           <a
             href={site.links.github}
             target="_blank"
@@ -94,6 +85,15 @@ const educationDrawers = await Promise.all(
             title="GitHub"
           >
             <Icon name="github" />
+          </a>
+          <a
+            href={site.links.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            title="LinkedIn"
+          >
+            <Icon name="linkedin" />
           </a>
           {resumeHref && (
             <a href={resumeHref} aria-label="Resume (PDF)" title="Resume (PDF)">
@@ -270,12 +270,12 @@ const educationDrawers = await Promise.all(
     padding-top: calc(var(--cat) * 52.5 / 84 - 1em - 1px);
   }
 
-  /* Cat + shelf + icons. Measurements come from the cat's 112×84 drawing (header-cat.js):
-     the shelf is at y 52.5 and ends at x 94; the tail's left edge is 16.4 from the right.
-     --gap is the one spacing used everywhere: between icons, from the last icon to the
-     tail, and from the shelf down to the icons. */
+  /* Cat + its shelf + icons tucked under it. Measurements come from the cat's 112×84
+     drawing (header-cat.js): the shelf is drawn at y 52.5, 1.4 thick; the tail's left
+     edge is 16.4 from the right. --gap is the one spacing used everywhere: between
+     icons, from the last icon to the tail, and from the shelf down to the icons. */
   .perch {
-    --gap: var(--space-2);
+    --gap: 3px;
     --glyph: 1rem;
     display: flex;
     flex-direction: column;
@@ -288,29 +288,13 @@ const educationDrawers = await Promise.all(
     --cat-line: var(--color-cat-line);
     --cat-ledge: var(--color-cat-ledge);
     display: block;
-    position: relative;
-    z-index: 1; /* paws over the shelf line */
   }
   .social {
     position: relative;
     display: flex;
-    /* top: shelf line (1px, centered on y 52.5) + gap, minus the link's own padding */
-    margin-top: calc(var(--cat) * (52.5 / 84 - 1) + 0.5px + var(--gap) / 2);
+    /* top: bottom of the shelf line + gap, minus the link's own padding */
+    margin-top: calc(var(--cat) * (53.2 / 84 - 1) + var(--gap) / 2);
     margin-right: calc(var(--cat) * 16.4 / 84 + var(--gap) / 2);
-  }
-  /* The shelf: overhangs the icons by the same amount on both sides; the right end is
-     where the cat's drawing ends it, at the tail. */
-  .social::before {
-    content: "";
-    position: absolute;
-    top: calc(-1px - var(--gap) / 2);
-    left: calc(
-      var(--cat) * 1.6 / 84 - var(--gap) / 2
-    ); /* same overhang as the right end */
-    right: calc(var(--cat) * (18 - 16.4) / 84 - var(--gap) / 2);
-    height: 1px;
-    border-radius: 1px;
-    background: var(--color-cat-ledge);
   }
   .availability {
     margin: 0 0 var(--space-4);
@@ -363,13 +347,13 @@ const educationDrawers = await Promise.all(
     background: var(--color-hover);
     color: var(--color-text);
   }
-  /* Bigger touch target on phones without moving the icons: taller, and wider
-     only into the gaps (never overlapping a neighbour). */
+  /* Bigger touch target on phones without moving the icons: it grows downward only,
+     so it never covers the cat above or a neighbouring icon. */
   @media (pointer: coarse) {
     .social a::after {
       content: "";
       position: absolute;
-      inset: calc(-1 * var(--space-2)) 0;
+      inset: 0 0 calc(-1 * var(--space-4));
     }
   }
   .dot {

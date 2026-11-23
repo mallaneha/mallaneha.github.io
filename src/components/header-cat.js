@@ -10,7 +10,7 @@
  *  - Click / Enter / Space while asleep: the tail flicks, an ear twitches,
  *    it opens its eyes for a moment and purrs softly. WAKE_CLICKS clicks in
  *    a row (no pause longer than WAKE_PAUSE_MS) wake it up.
- *  - When it wakes up it sits up and gives one short, high, cute "mew".
+ *  - When it wakes up it sits up and gives one tiny, quiet kitten "mew".
  *  - Purring and the mew are silent while the site's sound toggle is off.
  *  - prefers-reduced-motion: no tail motion or breathing. Clicking still
  *    opens the eyes, without motion.
@@ -447,58 +447,63 @@ function audio() {
   return audioCtx;
 }
 
-// A small, high "mew" for waking up: a bright sawtooth that lifts then falls,
-// through "ee" → "ah" → "oo" vowel formants, with a little vibrato. Short and soft.
+// A tiny kitten "mew" for waking up, soft and quiet: a quick little upward chirp
+// that rounds off and falls, like "mi-yew". A triangle wave (smoother than a
+// sawtooth) through gentle "ee" → "ew" vowel formants, with a faint flutter.
 function mew() {
   const ctx = audio();
   if (!ctx) return;
   const t = ctx.currentTime + 0.12; // a beat after it sits up
-  const dur = 0.5;
-  const peak = t + dur * 0.32;
+  const dur = 0.36;
+  const top = t + 0.09;
   const end = t + dur;
-  const f0 = 880;
+  const f0 = 1250;
 
   const osc = ctx.createOscillator();
-  osc.type = "sawtooth";
-  osc.frequency.setValueAtTime(f0 * 0.9, t);
-  osc.frequency.linearRampToValueAtTime(f0 * 1.3, peak);
-  osc.frequency.exponentialRampToValueAtTime(f0 * 0.78, end);
-  const vibrato = ctx.createOscillator();
-  vibrato.frequency.value = 7;
-  const vibratoDepth = ctx.createGain();
-  vibratoDepth.gain.value = 14;
-  vibrato.connect(vibratoDepth).connect(osc.frequency);
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(f0 * 0.82, t);
+  osc.frequency.exponentialRampToValueAtTime(f0 * 1.18, top); // the chirp up
+  osc.frequency.exponentialRampToValueAtTime(f0 * 0.86, end); // and a soft fall
+  const flutter = ctx.createOscillator();
+  flutter.frequency.value = 11;
+  const flutterDepth = ctx.createGain();
+  flutterDepth.gain.value = 18;
+  flutter.connect(flutterDepth).connect(osc.frequency);
 
+  // quiet: well under the click tick
   const out = ctx.createGain();
+  const level = 0.045;
   out.gain.setValueAtTime(0.0001, t);
-  out.gain.exponentialRampToValueAtTime(0.12, t + 0.04);
-  out.gain.setValueAtTime(0.12, end - dur * 0.4);
+  out.gain.exponentialRampToValueAtTime(level, t + 0.03);
+  out.gain.setValueAtTime(level, t + dur * 0.45);
   out.gain.exponentialRampToValueAtTime(0.0001, end);
   const soften = ctx.createBiquadFilter();
   soften.type = "lowpass";
-  soften.frequency.value = 5000;
+  soften.frequency.value = 4200;
   out.connect(soften).connect(ctx.destination);
 
-  // formants [start, middle, end] in Hz, Q, loudness
-  for (const [hz, q, level] of [
-    [[550, 1050, 650], 5, 1],
-    [[2800, 1900, 1300], 8, 0.6],
-    [[3600, 3000, 2600], 10, 0.25],
+  // the plain tone carries most of it; two soft formants give the vowel
+  const dry = ctx.createGain();
+  dry.gain.value = 0.7;
+  osc.connect(dry).connect(out);
+  for (const [hz, q, gain] of [
+    [[2600, 2200, 1500], 6, 0.9],
+    [[3400, 3000, 2500], 9, 0.4],
   ]) {
     const bp = ctx.createBiquadFilter();
     bp.type = "bandpass";
     bp.Q.value = q;
     bp.frequency.setValueAtTime(hz[0], t);
-    bp.frequency.linearRampToValueAtTime(hz[1], peak);
+    bp.frequency.linearRampToValueAtTime(hz[1], top);
     bp.frequency.linearRampToValueAtTime(hz[2], end);
     const g = ctx.createGain();
-    g.gain.value = level * 3;
+    g.gain.value = gain;
     osc.connect(bp).connect(g).connect(out);
   }
   osc.start(t);
-  vibrato.start(t);
+  flutter.start(t);
   osc.stop(end + 0.05);
-  vibrato.stop(end + 0.05);
+  flutter.stop(end + 0.05);
 }
 
 function purr() {
