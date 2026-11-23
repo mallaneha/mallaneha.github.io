@@ -56,8 +56,6 @@ retrieved documents, and the self-reflection step reduced hallucinations by 80%.
 I traced the agent end to end with LangSmith to evaluate its routing, debug execution traces, and
 keep improving retrieval accuracy.
 
-> If you can't see why the agent answered, you can't fix it when it's wrong.
-
 ## Deployment
 
 Milvus, the LangGraph backend and the MCP services run as separate microservices on GKE, built with
@@ -67,5 +65,3 @@ for multilingual questions.
 ## Takeaways
 
 Reflection costs an extra model call. In research, a wrong answer that sounds right costs more.
-
-> The full write-up covers how I measured the 80%.

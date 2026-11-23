@@ -27,8 +27,6 @@ I benchmarked Presidio, OpenMed and Private AI on healthcare datasets for PII re
 text and multimodal pipelines, for HIPAA compliance. The pipeline reached 97.7% anonymization
 recall, with reversible pseudonymization so customer data can be restored when needed.
 
-> In redaction, recall is the number that matters: a missed name is a leak.
-
 ## Document RAG
 
 I hardened a RAG ingestion pipeline for over 100 Medicare Evidence of Coverage PDFs. The layouts
