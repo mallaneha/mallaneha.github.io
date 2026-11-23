@@ -13,10 +13,11 @@
     "lint": "prettier --check .",
     "links": "node scripts/check-links.mjs dist",
     "pii": "node scripts/check-public-pii.mjs public",
-    "check": "npm run typecheck && npm run lint && npm run build && npm run links && npm run pii",
+    "check": "npm run typecheck && npm run lint && npm run build && npm run links && npm run pii && npm run placeholders",
     "format": "prettier --write .",
     "test:visual": "playwright test",
-    "test:visual:live": "BASE_URL=https://mallaneha.github.io playwright test"
+    "test:visual:live": "BASE_URL=https://mallaneha.github.io playwright test",
+    "placeholders": "node scripts/check-placeholders.mjs"
   },
   "dependencies": {
     "astro": "^7.4.13"

@@ -18,6 +18,13 @@ draft: true # new writing starts as a draft; drafts only show in `npm run dev`
 
 Existing tags: `evals`, `rag`, `agents`, `healthcare`, `governance`, `security`, `llm-systems`.
 
+### Placeholders in drafts
+
+Drafts can mark what only Neha can supply: `[PERSONAL EXAMPLE: …]` for a first-person story, `[GAP: …]` for a step
+the explanation skips, and `TODO(Neha)` in HTML comments. They show as plain text in `npm run dev`, so they're easy
+to spot. `npm run check` (`scripts/check-placeholders.mjs`) fails if any of them is left in published content: writing
+with `draft: false`, projects, experience or `src/data/`. Fill them in or delete them before publishing.
+
 ### Interactive widgets in posts
 
 The "Build it" posts embed widgets as raw HTML in the Markdown: `<attention-lab>`, `<scale-lab>`, `<gpt-shape>` and

@@ -14,7 +14,8 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 
 - `npm run dev`: dev server at http://localhost:4321 (drafts are visible here)
 - `npm run build`: production build into `dist/` (drafts excluded)
-- `npm run check`: type-check + Prettier check + build + internal link check + phone-number scan of `public/`. **Run before saying a task is done.**
+- `npm run check`: type-check + Prettier check + build + internal link check + phone-number scan of `public/` +
+  placeholder check (published content can't contain `[PERSONAL EXAMPLE: …]`, `[GAP: …]` or `TODO(Neha)`). **Run before saying a task is done.**
 - `npm run format`: Prettier
 - `node scripts/check-links.mjs dist --external`: also check external URLs (slow, needs network)
 - `npm run test:visual`: Playwright smoke, interaction and explainer-widget tests (own server on port 4329) of every page
