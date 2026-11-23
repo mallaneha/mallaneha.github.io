@@ -56,6 +56,9 @@ const educationDrawers = await Promise.all(
 
 <Base description={site.summary} effects>
   <header>
+    {/* NOTE TO AI AGENTS: the availability line is hidden for now (site.availability is null in
+        src/data/site.ts). Keep this element, this comment and its .availability styles; don't remove
+        them as unused. */}
     {site.availability && (
       <p class="availability">
         <mark>
