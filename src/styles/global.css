@@ -131,3 +131,9 @@ html:has(dialog[open]) {
   opacity: 1;
   transform: translate(-50%, 0);
 }
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.is-visible {
+    transform: translate(-50%, 0);
+  }
+}

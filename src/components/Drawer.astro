@@ -55,7 +55,7 @@ const linkAttrs = external
         <span class:list={["sub", { swap: href }]}>
           <span class="desc">{desc}</span>
           {href && (
-            <a class="pill pill-inline" {...linkAttrs} tabindex="-1">
+            <a class="pill pill-inline" {...linkAttrs}>
               {hrefLabel}
               <Icon name="arrowUpRight" size={12} />
             </a>
@@ -124,6 +124,9 @@ const linkAttrs = external
   }
   .drawer:global(.is-visible)::backdrop {
     opacity: 1;
+  }
+  .drawer:global(.is-closing)::backdrop {
+    transition-duration: var(--drawer-out);
   }
 
   .head {
@@ -247,6 +250,12 @@ const linkAttrs = external
       background-color var(--transition),
       color var(--transition);
   }
+  @media (pointer: coarse) {
+    .close {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
   .close:hover {
     background: var(--color-hover);
     color: var(--color-text);
@@ -265,8 +274,24 @@ const linkAttrs = external
       padding: 0.125rem var(--space-2);
       transform: translateY(-50%);
       opacity: 0;
-      pointer-events: none;
       animation: swap-in 6s infinite;
+    }
+    /* The whole slot is the link's hit area, so it can be tapped in either phase. */
+    .swap .pill-inline::before {
+      content: "";
+      position: absolute;
+      inset: -0.5rem -0.75rem;
+    }
+    /* Keyboard focus or hover holds the link in view. */
+    .swap:focus-within .pill-inline,
+    .swap:hover .pill-inline {
+      animation: none;
+      opacity: 1;
+    }
+    .swap:focus-within .desc,
+    .swap:hover .desc {
+      animation: none;
+      opacity: 0;
     }
     .swap .desc {
       animation: swap-out 6s infinite;
@@ -289,12 +314,10 @@ const linkAttrs = external
     0%,
     42% {
       opacity: 0;
-      pointer-events: none;
     }
     50%,
     92% {
       opacity: 1;
-      pointer-events: auto;
     }
     100% {
       opacity: 0;
@@ -450,9 +473,14 @@ const linkAttrs = external
     .drawer::backdrop {
       transition: none;
     }
-    .swap .desc,
+    /* No swapping: the link stays visible (the description is on the row that opened the drawer). */
+    .swap .desc {
+      animation: none;
+      opacity: 0;
+    }
     .swap .pill-inline {
       animation: none;
+      opacity: 1;
     }
   }
 </style>
