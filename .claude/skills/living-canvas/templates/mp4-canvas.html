@@ -1,0 +1,59 @@
+<!doctype html>
+<!-- living-canvas MP4 template. Copy, keep the LC contract, replace draw(). -->
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>living-canvas</title>
+<style>
+  html,body{margin:0;height:100%;background:#0e1012;display:grid;place-items:center;overflow:hidden}
+  canvas{max-width:100vw;max-height:100vh;aspect-ratio:var(--ar)}
+</style></head><body>
+<canvas id="c"></canvas>
+<script>
+// ---------- frame contract (do not remove) ----------
+const LC = window.LC = { duration: 9, fps: 30, width: 1920, height: 1080, render: null };
+const cv = document.getElementById('c'); let ctx = cv.getContext('2d'); let SC = 1;
+function size(w, h, s){ SC = s; cv.width = w*s; cv.height = h*s; document.body.style.setProperty('--ar', w+'/'+h); }
+window.__lcExport = (w, h, s) => { exporting = true; size(w, h, s); };
+window.__lcFrame = (t) => { LC.render(t); return cv.toDataURL('image/png'); };
+let exporting = false;
+
+// ---------- helpers ----------
+const C = { bg:'#121416', panel:'#1c1f22', a1:'#d97757', a2:'#6ebeb4', text:'#efe8dc' };
+const sm = x => (x = Math.max(0, Math.min(1, x)), x*x*(3-2*x));
+const ramp = (t, a, b) => sm((t-a)/(b-a));
+// stage k is "on" from s to e; returns 0.35..1 with soft edges, loop-safe
+function act(t, s, e, r=0.4){ const T=LC.duration;
+  const v = s===0 ? Math.max(1-ramp(t,e-r,e), ramp(t,T-r,T)) : Math.min(ramp(t,s-r,s), 1-ramp(t,e-r,e));
+  return 0.35 + 0.65*v; }
+function rr(x,y,w,h,r){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); }
+function text(s,x,y,size,color,weight=400,align='left'){ ctx.font=`${weight} ${size}px Inter, system-ui, sans-serif`;
+  ctx.fillStyle=color; ctx.textAlign=align; ctx.textBaseline='top'; ctx.fillText(s,x,y); }
+
+// ---------- the piece: everything is a pure function of t ----------
+const STAGES = [['1 · BEFORE','The problem, in plain words'],['2 · THE TOOL','What the subject does'],['3 · AFTER','The result, with a real number']];
+LC.render = function draw(t){
+  const W = LC.width, H = LC.height, T = LC.duration;
+  ctx.setTransform(SC,0,0,SC,0,0);
+  ctx.fillStyle = C.bg; ctx.fillRect(0,0,W,H);
+  text('Your Project', W/2, 80, 64, C.text, 600, 'center');
+  text('One plain sentence that says what it does', W/2, 168, 26, 'rgba(239,232,220,.7)', 400, 'center');
+  const A = [act(t,0,3), act(t,3,6), act(t,6,T-0.5)];
+  STAGES.forEach(([lab,cap],k) => {
+    const x = 120 + k*580, y = 300, w = 520, h = 560, a = A[k];
+    ctx.globalAlpha = 1; rr(x,y,w,h,22); ctx.fillStyle = C.panel; ctx.fill();
+    ctx.lineWidth = a > .6 ? 3 : 1.5; ctx.strokeStyle = a > .6 ? C.a1 : 'rgba(239,232,220,.25)'; ctx.stroke();
+    ctx.globalAlpha = a; text(lab, x+w/2, y-44, 20, C.a1, 600, 'center');
+    text(cap, x+w/2, y+h+20, 20, C.text, 400, 'center');
+    // stage content placeholder: a bar that grows while the stage is active
+    const g = ramp(t, k*3+0.2, k*3+2.2) * (1 - ramp(t, T-0.5, T));
+    rr(x+40, y+h/2-20, (w-80)*g, 40, 10); ctx.fillStyle = k===2 ? C.a2 : C.a1; ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+};
+
+// ---------- live mode: same draw(), driven by the clock ----------
+function fit(){ const s = Math.min(innerWidth/LC.width, innerHeight/LC.height) * devicePixelRatio; size(LC.width, LC.height, s); }
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function loop(now){ if (exporting) return; LC.render(still ? LC.duration*0.85 : (now/1000) % LC.duration); requestAnimationFrame(loop); }
+addEventListener('resize', () => { if (!exporting) fit(); });
+fit(); requestAnimationFrame(loop);
+</script></body></html>
