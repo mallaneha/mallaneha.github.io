@@ -82,8 +82,13 @@ comes in by fax. Someone emails a document that ends up in the member's file. Th
 has the member's claims in context, and it can email or file things. That doesn't take a sophisticated
 attacker, just one document with instructions in it.
 
-[PERSONAL EXAMPLE: from the OWASP red-teaming work at Autonomize, a case where document text steered the
-system, described only at the level that's public]
+At Autonomize, part of my work was testing generative AI systems against the OWASP Top 10 for LLM
+applications, using red- and blue-teaming agents. The finding that fits here is the first item on that
+list, prompt injection, in its indirect form: a test document with an instruction hidden in it [ADD:
+where it was hidden, for example white text or a footer], which the system followed when it read the
+document. [ADD: what the instruction made it do, at the level that's public] A person skimming the
+document wouldn't have seen the instruction. The model reads every word. <!-- TODO(Neha): confirm this
+finding and what can be said about it publicly -->
 
 ## Four ways out
 

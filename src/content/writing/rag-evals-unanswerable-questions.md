@@ -39,8 +39,12 @@ Health plan documents are full of nearly relevant text: last year's plan next to
 in-network rule next to the out-of-network one. A made-up answer that cites a real paragraph from the
 wrong section is the failure I worry about most.
 
-[PERSONAL EXAMPLE: a question from the Medicare Evidence of Coverage work, or the research agent, that
-had no answer in the documents and got a confident answer anyway]
+I saw a plainer version of this in my research agent. In the baseline, when I asked something the
+documents didn't cover, the model answered anyway, from whatever it picked up in training. [ADD: the
+question, and what the agent said] The answer read just as well as the grounded ones, and nothing in it
+hinted that the documents had nothing to say. The LangSmith trace showed it: the retrieved chunks had
+nothing to do with the question. <!-- TODO(Neha): confirm this was a question with no answer in the
+documents, not only a retrieval miss -->
 
 ## Five outcomes, not two
 

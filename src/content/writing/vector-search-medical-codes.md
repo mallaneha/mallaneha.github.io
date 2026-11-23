@@ -75,8 +75,17 @@ strong vector hit on the right one, and hybrid only gets it right once the keywo
 
 ## What I'd do on real plan documents
 
-[PERSONAL EXAMPLE: what code lookups looked like in the Medicare Evidence of Coverage pipeline, and
-whether exact-code questions came up]
+In my Medicare Evidence of Coverage work, the identifiers that mattered most weren't diagnosis codes.
+They were plan identifiers. More than 100 PDFs from different plans cover the same ground in nearly the
+same words, so a chunk about one plan's copay looks almost identical to the same chunk from another
+plan. [ADD: what happened when plans got mixed, for example a copay answered from the wrong plan] That's
+the code problem again, with a plan ID in place of E11.65. <!-- TODO(Neha): confirm plan IDs were the
+identifiers that mattered, and how chunks were tied to their plan -->
+
+It's also worth checking whether your documents contain codes at all. [ADD: whether the Evidence of
+Coverage benefits charts list CPT or HCPCS codes, or only plain-language service names like "primary
+care visit"] If they don't, a code in the query has nothing exact to match, and a mapping from codes to
+service names will do more than any search setting.
 
 If I were building retrieval over plan documents again, I'd do four things.
 
