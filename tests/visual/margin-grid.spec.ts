@@ -1,5 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 
+// The grid is turned off for now (loader commented out in effects.ts). Remove this line when it comes back.
+test.skip();
+
 // The margin grid (src/scripts/margin-grid.ts): noise texture in the side margins from 1024px up.
 
 const grid = (page: Page) => page.locator("canvas.margin-grid");
