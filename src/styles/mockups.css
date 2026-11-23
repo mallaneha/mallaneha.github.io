@@ -1,0 +1,263 @@
+/* Interactive mockups behind the "···" dividers in drawers. Loaded with src/scripts/mockups.ts only.
+   Remove both files and the import line in src/scripts/drawer.ts to go back to plain dividers. */
+
+/* The divider is now a real element (.mk) between sections, so drop the CSS "···" and its spacing. */
+.drawer .case.has-mockups > h2:not(:first-child) {
+  margin-top: var(--space-8);
+}
+.drawer .case.has-mockups > h2:not(:first-child)::before {
+  content: none;
+}
+
+.mk {
+  margin-top: var(--space-8);
+  text-align: center;
+}
+.mk-dots {
+  color: var(--color-faint);
+  user-select: none;
+}
+.mk-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-row);
+  background: transparent;
+  color: var(--color-faint);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    color var(--transition);
+}
+.mk-toggle:hover,
+.mk-toggle[aria-expanded="true"] {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+.mk-toggle-label {
+  text-decoration: underline dotted var(--color-subtle);
+  text-underline-offset: 4px;
+}
+
+.mk-panel {
+  margin-top: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-tile);
+  background: var(--color-surface);
+  text-align: left;
+}
+.mk-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  color: var(--color-text);
+  font-weight: var(--weight-medium);
+}
+.mk-tag {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-normal);
+}
+.mk-note {
+  min-height: 2.5rem;
+  margin: var(--space-4) 0 0;
+  color: var(--color-body);
+}
+
+/* Buttons */
+.mk-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.mk-chip,
+.mk-button {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-row);
+  background: var(--color-bg);
+  color: var(--color-muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    color var(--transition);
+}
+.mk-chip:hover,
+.mk-button:hover {
+  color: var(--color-text);
+}
+.mk-chip[aria-pressed="true"] {
+  border-color: var(--color-text);
+  color: var(--color-text);
+}
+.mk-button {
+  margin-top: var(--space-2);
+}
+.mk-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Steps read as a sequence. */
+.mk-steps .mk-chip:not(:last-child)::after {
+  content: " →";
+  color: var(--color-faint);
+}
+.mk-trace {
+  flex-direction: column;
+  align-items: stretch;
+}
+.mk-trace .mk-chip {
+  text-align: left;
+  font-family: var(--font-mono);
+}
+
+/* Compare */
+.mk-view {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-row);
+  background: var(--color-bg);
+}
+.mk-text {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+  overflow-wrap: anywhere;
+}
+.mk-text mark {
+  padding: 0 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--chart-4) 22%, transparent);
+  color: var(--color-text);
+}
+
+/* Bars */
+.mk-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 7.5rem) 1fr 3rem;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 44px;
+  margin-top: var(--space-1);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-row);
+  background: transparent;
+  color: var(--color-body);
+  font: inherit;
+  font-size: var(--text-xs);
+  text-align: left;
+  cursor: pointer;
+}
+.mk-bar:hover {
+  background: var(--color-hover);
+}
+.mk-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-surface-hover);
+  overflow: hidden;
+}
+.mk-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--chart-1);
+}
+.mk-val {
+  font-family: var(--font-mono);
+  color: var(--color-text);
+  text-align: right;
+}
+
+/* Route */
+.mk-route {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.mk-stage {
+  padding: var(--space-1) var(--space-3);
+  border: 1px dashed var(--color-subtle);
+  border-radius: var(--radius-row);
+  color: var(--color-faint);
+  font-size: var(--text-xs);
+}
+.mk-stage.is-passed {
+  border-style: solid;
+  border-color: var(--chart-3);
+  color: var(--color-text);
+}
+.mk-stage.is-caught {
+  border-style: solid;
+  border-color: var(--chart-4);
+  color: var(--color-text);
+}
+.mk-stage.is-caught::after {
+  content: " ✕ stopped";
+  color: var(--chart-4);
+}
+.mk-stage.is-loop {
+  border-style: solid;
+  border-color: var(--chart-2);
+  color: var(--color-text);
+}
+.mk-stage.is-loop::after {
+  content: " ↺ retry";
+  color: var(--chart-2);
+}
+
+/* Filter */
+.mk-list {
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.mk-item {
+  padding: var(--space-1) 0;
+  font-size: var(--text-xs);
+  color: var(--color-body);
+}
+.mk-item::before {
+  content: "● match  ";
+  color: var(--chart-3);
+  font-family: var(--font-mono);
+}
+.mk-list.is-filtered .mk-item.is-flagged {
+  color: var(--color-faint);
+  text-decoration: line-through;
+}
+.mk-list.is-filtered .mk-item.is-flagged::before {
+  content: "○ skip   ";
+  color: var(--color-faint);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mk-fill {
+    transition: width 400ms ease;
+  }
+  .mk-stage {
+    transition:
+      border-color var(--transition),
+      color var(--transition);
+  }
+}
