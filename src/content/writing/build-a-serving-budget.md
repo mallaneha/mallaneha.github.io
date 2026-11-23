@@ -1,5 +1,5 @@
 ---
-title: "Build it: a serving budget for an LLM"
+title: "Build it, part 3: a serving budget for an LLM"
 description: "Work out how many users a model can serve from four numbers: weights, KV cache, memory and bandwidth."
 date: 2026-11-22
 type: post
@@ -8,19 +8,29 @@ draft: true
 ---
 
 <!--
-TODO(Neha) before publishing. Part 3 of 3 in the "Build it" series. Drafted from the reading notes in
-mynotes/transformer/ (kipply's inference arithmetic and Google's "All About Transformer Inference").
-Rewrite in your own voice. Consider linking to your self-hosting draft (self-hosting-llms-vllm.md).
+TODO(Neha) before publishing. Part 3 of 3 in the "Build it" series. The voice pass is done: first person,
+written to an engineer a year or two behind you. Fill in every [PERSONAL EXAMPLE: ...] with something
+real or delete it, then delete the marker. Consider linking to your self-hosting draft
+(self-hosting-llms-vllm.md) once it's published.
 Every number below is what the widget computes. They match the reference tables within rounding.
 -->
 
-When a model generates text, each new token needs the whole model: every weight is read from memory
-once per step. On top of that, every request in the batch reads its own KV cache, the keys and values
-saved from [part 1](/writing/build-attention/). This post turns those two facts into a budget: how
-many requests fit, how long each step takes, and how many tokens per second you get.
+This is the last part of my "Build it" series. Here you turn a model and some hardware into a budget:
+how many requests fit in memory, how long each generation step takes, and how many tokens per second
+you get. It covers decoding, the phase where the model generates one token at a time. It doesn't cover
+prefill, communication between chips, or real measurements. Everything here is arithmetic, and the last
+section says how far off that arithmetic can be.
 
-The running example is LLaMA 2-13B on eight TPU v5e chips, the worked example in Google's _How To
-Scale Your Model_. You can switch setups and change any number in the widget.
+Two facts drive the whole budget. When a model generates text, each new token needs the whole model:
+every weight is read from memory once per step. On top of that, every request in the batch reads its
+own KV cache, the keys and values saved from [part 1](/writing/build-attention/).
+
+[PERSONAL EXAMPLE: a serving or self-hosting decision you've faced, e.g. why patient data meant
+running the model yourself]
+
+The running example is LLaMA 2-13B on eight TPU v5e chips (Google's AI accelerators), the worked
+example in Google's _How To Scale Your Model_. You can switch setups and change any number in the
+widget.
 
 <serving-budget>
 <div class="xp-fallback"><p>This is an interactive serving calculator. With JavaScript on, you can change the model, hardware and batch size and see memory, step time and throughput update.</p><p>For LLaMA 2-13B on 8× TPU v5e with full multi-head attention and 8,192-token sequences: the weights take 26 GB of 137 GB, each sequence's KV cache takes 6.7 GB, and at most 16 sequences fit. Batch 1 runs at 5.0 ms per step (about 201 tokens/s). Batch 16 runs at 20.3 ms per step (about 787 tokens/s).</p></div>
@@ -42,7 +52,7 @@ KV bytes per token = 2 (K and V) × bytes per number × head dim × KV heads × 
 ```
 
 That's about 0.8 MB for every token of every request. At 8,192 tokens a sequence needs 6.7 GB, a
-quarter of the model's weights.
+quarter of the model's weights. If you only compute one number for a deployment, I'd make it this one.
 
 ## Step 3: how many requests fit
 
@@ -66,28 +76,29 @@ caches.
 
 ## Step 5: the critical batch
 
-The math term only wins when the batch is big enough. Each parameter costs 2 FLOPs per token and 2
-bytes to read, so the crossover is at batch = FLOP/s ÷ bandwidth. For a v5e that's 197 TFLOP/s ÷ 820
-GB/s ≈ 240. kipply gets 208 for an A100 the same way. Below that batch, the chips mostly wait for
-memory.
+The critical batch is the batch size where the weight matmuls stop waiting on memory and start waiting
+on math. Each parameter costs 2 FLOPs per token and 2 bytes to read, so the crossover is at batch =
+FLOP/s ÷ bandwidth. For a v5e that's 197 TFLOP/s ÷ 820 GB/s ≈ 240. kipply gets 208 for an A100 the same
+way. Below that batch, the chips mostly wait for memory.
 
 Here, memory runs out at 16, far below 240. This setup can never batch enough to make the matmuls
 compute-bound. The KV cache is the bottleneck.
 
 ## Step 6: shrink the cache
 
-Switch the widget to the GQA setup, where 8 KV heads are shared by all 40 query heads. The cache drops
-to 164 kB per token and 1.3 GB per sequence, and 83 sequences fit instead of 16. At batch 64 the model
-runs at about 3,750 tokens per second, almost five times the best the full-attention setup can do.
+Switch the widget to the setup with grouped-query attention (GQA), where 8 KV heads are shared by all
+40 query heads. The cache drops to 164 kB per token and 1.3 GB per sequence, and 83 sequences fit
+instead of 16. At batch 64 the model runs at about 3,750 tokens per second, almost five times the best
+the full-attention setup can do.
 
-That's why grouped-query attention is everywhere now. LLaMA-3 8B, for example, uses 32 query heads
-and 8 KV heads. The other architecture changes from [part 2](/writing/build-gpt2-parameter-count/)
+That's why grouped-query attention is everywhere now. LLaMA-3 8B, for example, uses 32 query heads and
+8 KV heads. The other architecture changes from [part 2](/writing/build-gpt2-parameter-count/)
 (multi-head latent attention, sliding-window layers, sharing KV across layers) go after the same
 number. Raschka's architecture gallery even lists KV-cache growth per token on each model's card.
 
-Quantizing helps the same way. Set weights and KV cache to int8, and the weights drop to 13 GB, a
-sequence to 671 MB, and 185 sequences fit. The critical batch halves to 120, because each parameter is
-now 1 byte to read for the same 2 FLOPs.
+Quantizing, storing numbers in fewer bits, helps the same way. Set weights and KV cache to int8, and
+the weights drop to 13 GB, a sequence to 671 MB, and 185 sequences fit. The critical batch halves to
+120, because each parameter is now 1 byte to read for the same 2 FLOPs.
 
 ## kipply's 52B example
 
@@ -97,13 +108,16 @@ requests of 2,048 tokens. kipply rounds 2 MB to 0.002 GB and gets about 8,000 to
 On four GPUs, 56 GB is free, enough for about 26,700 tokens, or 13 requests of 2,048 tokens. A batch-1
 step then takes about 18 ms, of which 17 ms is reading the weights.
 
-## What this leaves out
+## How far off the arithmetic is
 
-These are lower bounds. kipply checked this kind of estimate against a real 13B deployment: the
-arithmetic predicted 16.8 ms per token, and the measured time was 22.0 ms. Most of the gap was
-achieved bandwidth (about 90% of the spec) and intermediate activations. The model above also ignores
-communication between chips, the attention math itself, and prefill, the step that processes the
-prompt before generation starts. Prefill is compute-bound, a different budget.
+Treat every number in this post as a lower bound. kipply checked this kind of estimate against a real
+13B deployment: the arithmetic predicted 16.8 ms per token, and the measured time was 22.0 ms. Most of
+the gap was achieved bandwidth (about 90% of the spec) and intermediate activations. The model above
+also ignores communication between chips, the attention math itself, and prefill, the step that
+processes the prompt before generation starts. Prefill is compute-bound, a different budget.
+
+[PERSONAL EXAMPLE: if you've measured a real deployment, how far your arithmetic was from the measured
+number]
 
 ## Further reading
 
@@ -116,3 +130,6 @@ prompt before generation starts. Prefill is compute-bound, a different budget.
   across chips.
 - Sebastian Raschka, [LLM Architecture Gallery](https://sebastianraschka.com/llm-architecture-gallery/),
   to compare the KV-cache cost of real models.
+
+If you want to check you've got this, do kipply's 12 exercises next. They push the same arithmetic
+further.

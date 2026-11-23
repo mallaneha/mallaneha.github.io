@@ -49,7 +49,7 @@ syllabus that starts from LLM architecture and pre-training
 
 ## Further reading
 
-- [Build it: attention, one dot product at a time](/writing/build-attention/), which computes one head
+- [Build it, part 1: attention, one dot product at a time](/writing/build-attention/), which computes one head
   by hand and shows how every token's vector reaches every other.
 - Rohit Ghumare, [Inside the Transformer](https://rohitghumare.com/guides/inside-the-transformer/):
   a long build-it-yourself walkthrough, from the original architecture to current variants.
