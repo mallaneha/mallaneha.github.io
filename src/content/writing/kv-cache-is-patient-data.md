@@ -19,5 +19,5 @@ derived from the prompt, so every tier it moves to is one more place where patie
 stored. That puts cache offloading in scope for the same encryption, retention and access rules as
 the prompt itself. CMU's 11-868 has a lecture on better KV caches for LLM serving, with CacheGen and
 CacheBlend as readings ([syllabus](https://llmsystem.github.io/llmsystem2026fall/docs/Syllabus)).
-[Build it: a serving budget](/writing/build-a-serving-budget/) shows how big that cache gets.
+[Build it, part 3: a serving budget](/writing/build-a-serving-budget/) shows how big that cache gets.
 <!-- TODO(Neha): end with your own one-line takeaway or open question. -->
