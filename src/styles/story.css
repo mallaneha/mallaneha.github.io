@@ -250,13 +250,36 @@
 }
 
 /* Research assistant: retrieved sources arrive one by one; a draft gets checked. */
+.story-store {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+.story-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.story-tag {
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
 .story-in {
   animation: story-in 4s var(--ease-out) infinite;
 }
-.story-in:nth-child(3) {
+.story-in:nth-child(2) {
   animation-delay: 0.25s;
 }
-.story-in:nth-child(4) {
+.story-in:nth-child(3) {
   animation-delay: 0.5s;
 }
 @keyframes story-in {
@@ -366,7 +389,7 @@
   }
 }
 .story-feed {
-  height: 6.75rem;
+  height: 3.75rem;
   overflow: hidden;
   mask-image: linear-gradient(transparent, black 12%, black 88%, transparent);
 }
