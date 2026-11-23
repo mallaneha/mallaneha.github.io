@@ -14,6 +14,8 @@ order: 30
 An end-to-end data pipeline on GCP: batch ingestion of FIFA player data, live streaming of World
 Cup comments, and models that predict player ratings.
 
+<img class="canvas" src="/canvas/systoolchain.svg" width="480" height="300" loading="lazy" alt="SysToolChain in three steps. Batch: files in Cloud Storage go through PySpark on Dataproc into PostgreSQL, 144K+ player records. Stream: live World Cup YouTube comments flow through Kafka, which counts player mentions. Predict: a Random Forest halves the rating error, 0.97 RMSE against 1.94 for the linear baseline, with 0.98 R squared.">
+
 <div class="stats">
   <div><strong>144K+</strong><span>player records</span></div>
   <div><strong>0.98 R²</strong><span>Random Forest</span></div>

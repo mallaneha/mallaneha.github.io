@@ -17,6 +17,8 @@ A research assistant built to keep answers grounded in its sources. It uses an a
 workflow in LangGraph over a Milvus vector store, then checks its own answers before returning
 them.
 
+<img class="canvas" src="/canvas/research-assistant-agent.svg" width="480" height="300" loading="lazy" alt="RAG Research Assistant in three steps. Retrieve: a question goes to the Milvus vector store and the top documents come back. Reflect: the draft answer is checked claim by claim; a claim with no source is flagged and the agent drafts again. Grounded: only sourced claims are returned, with citations, giving 80% fewer hallucinations.">
+
 <div class="stats">
   <div><strong>80%</strong><span>fewer hallucinations</span></div>
   <div><strong>GKE</strong><span>deployed as microservices</span></div>

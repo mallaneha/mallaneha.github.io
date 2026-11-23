@@ -15,6 +15,8 @@ Vector Guard is a layered defense for retrieval-augmented generation. I first at
 system built for a security operations center (SOC), then built filters that stop poisoned
 documents from steering its answers.
 
+<img class="canvas" src="/canvas/vector-guard.svg" width="480" height="300" loading="lazy" alt="Vector Guard in three steps. Attack: 2 of 5 retrieved documents are poisoned and the answer comes out wrong, 59% attack success. Four checks: structure, embedding, NLI contradiction and LLM score; poisoned documents stop at a check, clean ones pass. Defended: poisoned documents removed, the answer is right, 3% attack success.">
+
 <div class="stats">
   <div><strong>59% → 3%</strong><span>attack success, threat intel</span></div>
   <div><strong>72% → 24%</strong><span>attack success, NQ benchmark</span></div>
