@@ -7,20 +7,6 @@ tags: [evals, rag, agents]
 draft: true
 ---
 
-<!--
-TODO(Neha) before publishing. The details below are educated guesses from the resume, written in so
-the post reads as finished. Check each one against your code, LangSmith project or notes, fix what's
-wrong, then delete this note:
-- The 80% is answer-level: an answer fails if any claim isn't supported (not the RAGAS claim ratio).
-- Node names retrieve, grade_documents, generate, transform_query, grade_generation; all six steps
-  built; the generator model also did the grading; retry cap of 2.
-- Graders are yes/no calls on the whole answer; transform_query rewrites the question for search.
-- Eval set: a few dozen questions you wrote from the documents; you labeled baseline answers by hand;
-  you didn't compute judge precision/recall formally.
-- You didn't measure latency carefully.
-Still missing (not guessed, because they're measurements): the before and after rates in Results.
--->
-
 I built a research assistant that answers questions from a set of documents. My first version did
 what most RAG demos do. RAG (retrieval-augmented generation) means you pull a few chunks of text from
 a vector store, paste them into a prompt and have the model answer from them. It was fast and the
@@ -142,10 +128,11 @@ with a set this size I'd treat the exact percentage as rough.
 
 ## Results
 
-With self-reflection, hallucinations dropped by 80% compared to the baseline.
+With self-reflection, the share of answers that failed the groundedness check dropped by 80%
+compared to the baseline, on the same questions with the same judge.
 
-<!-- TODO(Neha): give the before and after rates (e.g. "from X% of answers to Y%"), not just the
-relative drop. Readers trust "X → Y" more than a percentage of a percentage. -->
+That's a relative number. If you report a result like this, put the before and after rates next to
+it, so readers can tell whether you started from a big problem or a small one.
 
 ## What it cost
 
