@@ -115,8 +115,7 @@ if (drawer) {
   }
   .tile img {
     border-radius: var(--radius-logo);
-    /* Logos in gray so they match the monochrome icons; multiply drops a JPEG's white box into the tile. */
-    filter: grayscale(1);
+    /* Multiply drops a JPEG's white box into the tile. */
     mix-blend-mode: multiply;
   }
   .tile :global(svg),

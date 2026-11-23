@@ -112,7 +112,7 @@ const MOCKUPS: Record<string, Mockup> = {
       },
     ],
   },
-  "role-numeric-mind:validation": {
+  "role-numeric-mind-data-analyst:validation": {
     title: "From finding to record",
     context:
       "Pinnacle 21 checks datasets against CDISC and FDA rules. A finding names a rule and a dataset, not the patient record behind it.",

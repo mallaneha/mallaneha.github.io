@@ -37,7 +37,8 @@ Each should link to its GitHub repo, or later to a write-up post. Repo URLs are 
 An addition to the paco.me layout, since she's job-hunting.
 
 - **Autonomize AI, AI/ML Intern (2026):** HIPAA-grade PII redaction at 97.7% recall, RAG over 100+ Medicare PDFs.
-- **Numeric Mind, Senior Data Analyst (2021–2025):** led 12 analysts, 15+ FDA submission packages.
+- **Numeric Mind, Senior Data Analyst (Apr 2024–Apr 2025):** led 12 analysts, 15+ FDA submission packages.
+- **Numeric Mind, Data Analyst (Oct 2021–Apr 2024):** 800+ CDISC datasets and reports, 10+ pharma clients, Pinnacle 21 debugging tool (−75% resolution time).
 
 ### Writing
 
