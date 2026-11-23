@@ -83,7 +83,9 @@ const educationDrawers = await Promise.all(
           {site.name}
           <HeaderCat />
         </h1>
-        <p class="tagline">{site.tagline}</p>
+        <p class="tagline">
+          <mark>{site.tagline}</mark>
+        </p>
       </div>
       <span class="social">
         <a
@@ -116,7 +118,7 @@ const educationDrawers = await Promise.all(
         {line
           .split("==")
           .map((part, i) =>
-            i % 2 ? <mark class="intro-mark">{part}</mark> : part,
+            i % 2 ? <span class="intro-mark">{part}</span> : part,
           )}
       </p>
     ))}
@@ -356,21 +358,27 @@ const educationDrawers = await Promise.all(
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }
-  /* A highlighted phrase in the intro (==…== in site.intro): same marker as the availability line. */
-  .intro-mark {
+  /* The tagline wears the availability line's green marker. */
+  .tagline mark {
     padding: 0 0.15em;
     margin: 0 -0.15em;
     border-radius: var(--radius);
     background: linear-gradient(var(--color-highlight), var(--color-highlight))
       no-repeat 0 0 / 100% 100%;
-    color: inherit;
+    color: var(--color-text); /* muted on the marker is only 4.2:1 */
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }
   @media (prefers-reduced-motion: no-preference) {
-    .intro-mark {
+    .tagline mark {
       animation: sweep 700ms 200ms var(--ease-drawer) backwards;
     }
+  }
+  /* A phrase wrapped in ==…== in site.intro. */
+  .intro-mark {
+    text-decoration: underline dotted;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
   }
   .availability .dot {
     flex: none;
