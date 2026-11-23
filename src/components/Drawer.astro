@@ -8,13 +8,23 @@ interface Props {
   id: string;
   icon: IconName;
   logo?: string; // image under public/logos/, shown instead of the icon
+  logoFull?: boolean; // the logo is a filled square: it covers the whole tile
   name: string;
   desc: string;
   href?: string;
   hrefLabel?: string;
 }
 
-const { id, icon, logo, name, desc, href, hrefLabel = "Visit" } = Astro.props;
+const {
+  id,
+  icon,
+  logo,
+  logoFull = false,
+  name,
+  desc,
+  href,
+  hrefLabel = "Visit",
+} = Astro.props;
 const external = Boolean(href?.startsWith("http"));
 const linkAttrs = external
   ? { href, target: "_blank", rel: "noopener noreferrer" }
@@ -24,9 +34,15 @@ const linkAttrs = external
 <dialog id={id} class="drawer" data-drawer aria-labelledby={`${id}-title`}>
   <div class="head" data-drawer-handle>
     <div class="head-inner">
-      <span class:list={["title-icon", { logo }]}>
+      <span class:list={["title-icon", { logo, full: logo && logoFull }]}>
         {logo ? (
-          <img src={logo} alt="" width="18" height="18" loading="lazy" />
+          <img
+            src={logo}
+            alt=""
+            width={logoFull ? 22 : 18}
+            height={logoFull ? 22 : 18}
+            loading="lazy"
+          />
         ) : (
           <Icon name={icon} />
         )}
@@ -147,6 +163,13 @@ const linkAttrs = external
     padding: 2px;
     border-radius: var(--radius-logo);
     background: var(--color-logo-tile);
+  }
+  .title-icon.full {
+    padding: 0;
+    overflow: hidden;
+  }
+  .title-icon.full img {
+    border-radius: 0;
   }
   .title-icon img {
     border-radius: var(--radius-logo);

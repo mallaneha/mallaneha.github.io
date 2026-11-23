@@ -63,6 +63,8 @@ const experience = defineCollection({
       .string()
       .regex(/^\/logos\/[\w-]+\.(png|svg|webp|jpg)$/)
       .optional(),
+    // The logo is a filled square (e.g. CMU's red one) and covers its whole tile.
+    logoFull: z.boolean().default(false),
     url: z.url().optional(),
     order: z.number().int().default(100),
   }),
@@ -83,6 +85,8 @@ const education = defineCollection({
       .string()
       .regex(/^\/logos\/[\w-]+\.(png|svg|webp|jpg)$/)
       .optional(),
+    // The logo is a filled square (e.g. CMU's red one) and covers its whole tile.
+    logoFull: z.boolean().default(false),
     url: z.url().optional(),
     order: z.number().int().default(100),
   }),

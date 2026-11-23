@@ -105,6 +105,7 @@ const educationDrawers = await Promise.all(
           <Row
             icon={entry.data.icon}
             logo={entry.data.logo}
+            logoSize={20}
             name={entry.data.company}
             desc={entry.data.summary}
             drawer={id}
@@ -119,6 +120,7 @@ const educationDrawers = await Promise.all(
           <Row
             icon={entry.data.icon}
             logo={entry.data.logo}
+            logoFull={entry.data.logoFull}
             name={entry.data.school}
             desc={entry.data.summary}
             drawer={id}
@@ -182,13 +184,13 @@ const educationDrawers = await Promise.all(
     </RowList>
     <RowList columns={2}>
       <Row
-        icon="link"
+        icon="linkedin"
         name="mallaneha"
         desc="LinkedIn"
         href={site.links.linkedin}
       />
       <Row
-        icon="code"
+        icon="github"
         name="mallaneha"
         desc="GitHub"
         href={site.links.github}
@@ -213,6 +215,7 @@ const educationDrawers = await Promise.all(
       id={id}
       icon={entry.data.icon}
       logo={entry.data.logo}
+      logoFull={entry.data.logoFull}
       name={entry.data.school}
       desc={`${entry.data.degree} · ${years(entry.data.start, entry.data.end)}`}
       href={entry.data.url}
