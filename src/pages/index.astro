@@ -78,12 +78,16 @@ const educationDrawers = await Promise.all(
     )}
     <div class="top">
       <div class="title">
-        <h1>{site.name}</h1>
+        {/* The cat lies right after the name (Astro drops the line break; the gap is a margin). */}
+        <h1>
+          {site.name}
+          <HeaderCat />
+        </h1>
         <p class="tagline">{site.tagline}</p>
       </div>
-      {/* The cat sleeps on a shelf; the social icons hang just under it, left of its tail. */}
+      {/* The social icons. The dev toolbar's "Cat position" app can move the cat in here, onto a
+          shelf above them (see the .perch styles). */}
       <div class="perch">
-        <HeaderCat />
         <span class="social">
           <a
             href={site.links.github}
@@ -283,31 +287,13 @@ const educationDrawers = await Promise.all(
     color: var(--color-muted);
   }
   .top {
-    --cat: 2.5rem; /* the cat's height; the name and the perch both measure from it */
-    /* "next to the name" variant: icons end level with the cat's shelf, i.e. the name's baseline */
-    --name-icons-top: calc(var(--cat) * 52.5 / 84 - var(--glyph, 1rem));
+    --cat: 2.5rem; /* the cat's height */
+    --glyph: 1rem; /* the social icons' size */
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-4);
     margin-bottom: var(--space-6);
-  }
-  /* The name's baseline sits level with the cat's shelf. */
-  .title {
-    padding-top: calc(var(--cat) * 52.5 / 84 - 1em - 1px);
-  }
-
-  /* Cat + its shelf + icons tucked under it. Measurements come from the cat's 112×84
-     drawing (header-cat.js): the shelf is drawn at y 52.5, 1.4 thick; the tail's left
-     edge is 16.4 from the right. --gap is the one spacing used everywhere: between
-     icons, from the last icon to the tail, and from the shelf down to the icons. */
-  .perch {
-    --gap: 3px;
-    --glyph: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    flex: none;
   }
   .top :global(header-cat) {
     --cat-size: var(--cat);
@@ -315,42 +301,81 @@ const educationDrawers = await Promise.all(
     --cat-line: var(--color-cat-line);
     --cat-ledge: var(--color-cat-ledge);
   }
-  .perch :global(header-cat) {
-    display: block;
-  }
-  /* Variant, previewed with the dev toolbar's "Cat position" app (src/dev/cat-position.ts):
-     the cat sits right after the name, its ledge on the name's baseline, and the icons move
-     onto the name's line. */
-  :global(html[data-cat-pos="name"]) .title {
-    padding-top: 0;
-  }
+  /* The cat lies right after the name; header-cat.js puts its ledge on the name's baseline. */
   h1 :global(header-cat) {
     margin-left: var(--space-2);
   }
-  :global(html[data-cat-pos="name"]) .social {
-    margin-top: var(--name-icons-top);
-    margin-right: calc(var(--gap) / -2);
-  }
+  /* The icons are ordinary controls like the footer's theme and sound buttons: 44px targets,
+     touching, glyphs flush with the text column's right edge (each link's padding hangs
+     outside it). --glyph-top is where the glyph's top edge sits, measured from the top of the
+     header row, so the icons are centred on the name: its baseline is level with the cat's
+     ledge (52.5 of the drawing's 84), and the glyph ends 1.5px under it. */
   .social {
+    --pad: calc(2.75rem - var(--glyph));
+    --glyph-top: calc(var(--cat) * 52.5 / 84 - var(--glyph) + 1.5px);
     position: relative;
     display: flex;
-    /* top: bottom of the shelf line + gap, minus the link's own padding */
-    margin-top: calc(var(--cat) * (53.2 / 84 - 1) + var(--gap) / 2);
-    margin-right: calc(var(--cat) * 16.4 / 84 + var(--gap) / 2);
+    margin-top: calc(var(--glyph-top) - var(--pad) / 2);
+    margin-right: calc(var(--pad) / -2);
   }
-  /* Phones: no cat. The icons sit on the name's line, their glyphs flush with the
-     right edge of the text column (the link's half-gap padding hangs outside it). */
-  @media (max-width: 47.99rem) {
-    .title {
-      padding-top: 0;
+
+  /* Alternative, previewed with the dev toolbar's "Cat position" app (src/dev/cat-position.ts),
+     which moves the cat into .perch: the cat sleeps on its own shelf at the right and the icons
+     hang just under it, left of its tail. Measurements come from the cat's 112×84 drawing
+     (header-cat.js): the shelf is drawn at y 52.5, 1.4 thick; the tail's left edge is 16.4
+     from the right. --pad is then one small gap used everywhere: between icons, from the last
+     icon to the tail, and from the shelf down to the icons. */
+  .perch {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex: none;
+  }
+  .perch :global(header-cat) {
+    display: block;
+  }
+  /* The name's baseline sits level with the cat's shelf. */
+  :global(html[data-cat-pos="shelf"]) .title {
+    padding-top: calc(var(--cat) * 52.5 / 84 - 1em - 1px);
+  }
+  :global(html[data-cat-pos="shelf"]) .social {
+    --pad: 3px;
+    /* top: bottom of the shelf line + gap, minus the link's own padding */
+    margin-top: calc(var(--cat) * (53.2 / 84 - 1) + var(--pad) / 2);
+    margin-right: calc(var(--cat) * 16.4 / 84 + var(--pad) / 2);
+  }
+  :global(html[data-cat-pos="shelf"]) .social a {
+    border-radius: var(--radius);
+  }
+  /* Bigger touch target on touch screens without moving the icons: it grows downward only,
+     so it never covers the cat above or a neighbouring icon. */
+  @media (pointer: coarse) {
+    :global(html[data-cat-pos="shelf"]) .social a::after {
+      content: "";
+      position: absolute;
+      inset: 0 0 calc(-1 * var(--space-4));
     }
+  }
+
+  /* Phones: no cat in either position; the icons sit centred on the name's line. */
+  @media (max-width: 47.99rem) {
     .top :global(header-cat) {
       display: none;
     }
+    :global(html[data-cat-pos="shelf"]) .title {
+      padding-top: 0;
+    }
     .social,
-    :global(html[data-cat-pos="name"]) .social {
-      margin-top: 0;
-      margin-right: calc(var(--gap) / -2);
+    :global(html[data-cat-pos="shelf"]) .social {
+      --pad: calc(2.75rem - var(--glyph));
+      --glyph-top: calc(
+        (var(--text-base) * var(--leading-tight) - var(--glyph)) / 2
+      );
+      margin-top: calc(var(--glyph-top) - var(--pad) / 2);
+      margin-right: calc(var(--pad) / -2);
+    }
+    :global(html[data-cat-pos="shelf"]) .social a {
+      border-radius: var(--radius-row);
     }
   }
   .availability {
@@ -387,14 +412,15 @@ const educationDrawers = await Promise.all(
       background-size: 0% 100%;
     }
   }
-  /* Each link is the glyph plus half a gap on every side, so neighbours sit one gap apart. */
+  /* Each link is the glyph plus half of --pad on every side, so neighbouring glyphs sit
+     --pad apart. */
   .social a {
     position: relative;
     display: grid;
     place-items: center;
-    width: calc(var(--glyph) + var(--gap));
-    height: calc(var(--glyph) + var(--gap));
-    border-radius: var(--radius);
+    width: calc(var(--glyph) + var(--pad));
+    height: calc(var(--glyph) + var(--pad));
+    border-radius: var(--radius-row);
     color: var(--color-muted);
     transition:
       background-color var(--transition),
@@ -403,15 +429,6 @@ const educationDrawers = await Promise.all(
   .social a:hover {
     background: var(--color-hover);
     color: var(--color-text);
-  }
-  /* Bigger touch target on phones without moving the icons: it grows downward only,
-     so it never covers the cat above or a neighbouring icon. */
-  @media (pointer: coarse) {
-    .social a::after {
-      content: "";
-      position: absolute;
-      inset: 0 0 calc(-1 * var(--space-4));
-    }
   }
   .dot {
     position: relative;
