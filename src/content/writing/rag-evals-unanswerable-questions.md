@@ -1,5 +1,5 @@
 ---
-title: "Your RAG eval set needs questions it can't answer"
+title: "Evaluating RAG refusals with unanswerable questions"
 description: "Without unanswerable questions, refusing always looks like a mistake. How I score hallucinations, wrong refusals and right refusals."
 date: 2026-11-23
 type: post
