@@ -198,7 +198,28 @@
   .xp-tabs label:hover {
     color: var(--color-text);
   }
-  .xp-tabs label:has(input:checked) {
+  /* The selected look: a copy of the labels on top, clipped to the checked one (--i of --n). Moving the clip
+     carries the background and the text color across together, so there's no crossfade between two labels. */
+  .xp-tabs {
+    position: relative;
+  }
+  .xp-tabs-active {
+    --w: calc((100% - (var(--n) - 1) * 2px) / var(--n) + 2px);
+    position: absolute;
+    inset: 2px;
+    display: flex;
+    gap: 2px;
+    pointer-events: none;
+    clip-path: inset(
+      0 calc((var(--n) - 1 - var(--i)) * var(--w)) 0 calc(var(--i) * var(--w))
+        round var(--radius)
+    );
+  }
+  .xp-tabs-active span {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius);
     background: var(--color-surface-hover);
     color: var(--color-text);
     font-weight: var(--weight-medium);
@@ -424,7 +445,7 @@
   }
 
   .xp-stack {
-    display: flex;
+    position: relative;
     height: 14px;
     margin: var(--space-3) 0 var(--space-2);
     border-radius: var(--radius);
@@ -440,8 +461,12 @@
     display: block;
     background: var(--color-border);
   }
+  /* Each segment spans the track; stackBar() in explainer-kit.ts moves and scales it into place. */
   .xp-seg {
-    min-width: 0;
+    position: absolute;
+    inset: 0;
+    transform: scaleX(0);
+    transform-origin: left;
   }
   .xp-swatch {
     flex: none;
@@ -688,6 +713,10 @@
     display: none;
   }
 
+  .xp-ranks td,
+  .xp-chunks li {
+    transition: background-color var(--transition);
+  }
   .xp-ranks td.is-target {
     color: var(--color-text);
     font-weight: var(--weight-medium);
@@ -779,6 +808,9 @@
     fill: var(--color-bg);
     stroke: var(--color-subtle);
     stroke-width: 1;
+    transition:
+      fill var(--transition),
+      stroke var(--transition);
   }
   .xp-venn-core.is-on {
     fill: var(--chart-4);
@@ -881,16 +913,24 @@
     .xp-bar-fill {
       transition: transform var(--duration-state) var(--ease-out);
     }
-    /* Segments share one stacked bar, so their widths have to reflow together. */
+    /* Start and share ease on the same curve, so neighbouring segments stay joined. */
     .xp-seg {
-      transition: width var(--duration-state) var(--ease-out);
+      transition: transform var(--duration-state) var(--ease-out);
+    }
+    /* The selected tab slides to the new one; arrow keys jump (data-via="key"). */
+    .xp-tabs-active {
+      transition: clip-path var(--duration-state) var(--ease-out);
+    }
+    .xp-tabs[data-via="key"] .xp-tabs-active {
+      transition: none;
     }
     .xp-hbar-fill {
       transition: transform var(--duration-state) var(--ease-out);
     }
     .xp.is-instant .xp-bar-fill,
     .xp.is-instant .xp-seg,
-    .xp.is-instant .xp-hbar-fill {
+    .xp.is-instant .xp-hbar-fill,
+    .xp.is-instant .xp-q {
       transition: none;
     }
   }

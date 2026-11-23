@@ -20,6 +20,7 @@ import {
   select,
   slider,
   softmax,
+  stackBar,
   tableHead,
   weightCell,
 } from "./explainer-kit";
@@ -551,9 +552,11 @@ class GptShape extends HTMLElement {
 
       const p = gpt2Params(V, C, D, L);
       total.textContent = `${int(p.total)} parameters (${params(p.total)})`;
-      segs.forEach((seg, i) => {
-        seg.style.width = `${(p[parts[i]!.key] / p.total) * 100}%`;
-      });
+      stackBar(
+        segs,
+        parts.map((part) => p[part.key]),
+        p.total,
+      );
       legend.replaceChildren(
         ...parts.map((part) =>
           h(
@@ -850,9 +853,11 @@ class ServingBudget extends HTMLElement {
         ],
       ];
       memBar.classList.toggle("is-over", !r.fits);
-      memSegs.forEach((seg, i) => {
-        seg.style.width = `${(segs[i]![0] / r.memory) * 100}%`;
-      });
+      stackBar(
+        memSegs,
+        segs.map(([v]) => v),
+        r.memory,
+      );
       memLegend.replaceChildren(
         ...segs.map(([, label], i) =>
           h(

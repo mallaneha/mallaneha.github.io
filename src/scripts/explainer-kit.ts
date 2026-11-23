@@ -213,9 +213,47 @@ export function choice(legend: string, options: string[], value: number) {
       "div",
       { class: "xp-tabs" },
       ...options.map((o, i) => h("label", {}, inputs[i]!, h("span", {}, o))),
+      // The selected look is a copy of the labels, clipped to the checked one. Moving the clip slides the
+      // background and the text change together (see .xp-tabs-active).
+      h(
+        "div",
+        { class: "xp-tabs-active", "aria-hidden": "true" },
+        ...options.map((o) => h("span", {}, o)),
+      ),
     ),
   );
+  const tabs = wrap.querySelector<HTMLElement>(".xp-tabs")!;
+  tabs.style.setProperty("--n", String(options.length));
+  const sync = () =>
+    tabs.style.setProperty(
+      "--i",
+      String(
+        Math.max(
+          0,
+          inputs.findIndex((i) => i.checked),
+        ),
+      ),
+    );
+  sync();
+  // Arrow keys move the selection instantly; a click or tap slides.
+  tabs.addEventListener("pointerdown", () => (tabs.dataset.via = "pointer"));
+  tabs.addEventListener("keydown", () => (tabs.dataset.via = "key"));
+  for (const input of inputs) input.addEventListener("change", sync);
   return { wrap, inputs };
+}
+
+/**
+ * Lays out the segments of one stacked bar (.xp-stack) with transforms, not widths: each segment spans the whole
+ * track and is moved to its start and scaled to its share. Starts and shares ease on the same curve, so
+ * neighbouring edges stay joined mid-transition, and nothing reflows.
+ */
+export function stackBar(segs: HTMLElement[], values: number[], total: number) {
+  let start = 0;
+  segs.forEach((seg, i) => {
+    const f = total > 0 ? Math.max(0, values[i]!) / total : 0;
+    seg.style.transform = `translateX(${start * 100}%) scaleX(${f})`;
+    start += f;
+  });
 }
 
 export function bar(): { el: HTMLSpanElement; set: (f: number) => void } {

@@ -11,6 +11,7 @@ import {
   pct,
   s,
   slider,
+  stackBar,
   tableHead,
 } from "./explainer-kit";
 
@@ -201,10 +202,12 @@ class AbstainLab extends HTMLElement {
         c.classList.toggle("is-hidden", !withNone && e.kind === "none");
         c.classList.toggle("is-refused", e.score < t - 1e-9);
       });
-      for (const [k] of labels) {
-        segs[k].style.width = `${(r[k] / r.n) * 100}%`;
-        counts[k].textContent = String(r[k]);
-      }
+      stackBar(
+        labels.map(([k]) => segs[k]),
+        labels.map(([k]) => r[k]),
+        r.n,
+      );
+      for (const [k] of labels) counts[k].textContent = String(r[k]);
       legend
         .querySelector('[data-k="madeUp"]')!
         .toggleAttribute("hidden", !withNone);
