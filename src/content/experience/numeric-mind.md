@@ -13,12 +13,12 @@ order: 20
 ## Overview <span class="when">Apr 2024 – Apr 2025</span>
 
 A year as Senior Data Analyst at Numeric Mind, after two and a half years as a Data Analyst there.
-The role meant leading a team and owning the pipeline that turns raw trial data into
-submission-ready packages for the FDA.
+The role meant leading a team and owning the pipeline that turns raw trial data into FDA
+submission packages.
 
 <div class="stats">
   <div><strong>12</strong><span>analysts led</span></div>
-  <div><strong>15+</strong><span>studies delivered submission-ready</span></div>
+  <div><strong>15+</strong><span>studies delivered</span></div>
   <div><strong>60%</strong><span>fewer validation findings</span></div>
 </div>
 
@@ -31,9 +31,9 @@ cut validation findings by 60%.
 
 ## Pipelines
 
-Owning the statistical programming pipeline end to end covered everything from raw data to SDTM,
-ADaM and TLFs, plus the Clinical Study Reports. Across 15+ studies, the submission-ready package
-went out within 3 weeks of database lock.
+I owned the statistical programming pipeline end to end: raw data to SDTM, ADaM and TLFs, then
+the Clinical Study Report. For each of more than 15 studies, the submission package was ready
+within 3 weeks of database lock.
 
 <ol class="flow">
   <li>Raw data</li>

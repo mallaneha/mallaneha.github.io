@@ -81,7 +81,7 @@ const MOCKUPS: Record<string, Mockup> = {
       { label: "Chart", note: "Jump to the medical benefits chart pages." },
       {
         label: "Ingest",
-        note: "Only those pages go into RAG. The chart is found and extracted in up to 90% of PDFs.",
+        note: "Only those pages go into RAG. Up to 90% of PDFs had their chart extracted.",
       },
     ],
   },
@@ -125,7 +125,7 @@ const MOCKUPS: Record<string, Mockup> = {
       },
       {
         label: "Patient",
-        note: "…to the records to fix, in 75% less time than manual lookups.",
+        note: "…to the records to fix. Each issue took 75% less time than a manual lookup.",
       },
     ],
   },

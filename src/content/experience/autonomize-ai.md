@@ -16,24 +16,24 @@ A summer internship at Autonomize AI, a healthcare AI company. The work came dow
 keeping patient data private, and getting reliable answers out of messy insurance documents.
 
 <div class="stats">
-  <div><strong>97.7%</strong><span>personal details caught (best of 3 tools)</span></div>
+  <div><strong>97.7%</strong><span>PII recall, best tool</span></div>
   <div><strong>100+</strong><span>Medicare PDFs</span></div>
-  <div><strong>90%</strong><span>of PDFs with the chart extracted, at best</span></div>
+  <div><strong>90%</strong><span>best-case extraction</span></div>
 </div>
 
 ## PII redaction
 
 For HIPAA compliance, I benchmarked Presidio, OpenMed and Private AI for PII redaction on healthcare
-datasets, across both text and multimodal pipelines. The best of the three caught 97.7% of the
-personal details in text (anonymization recall). Its pseudonymization is reversible, so customer
-data can be restored when it's needed.
+datasets, across both text and multimodal pipelines. On text, the best of the three caught 97.7%
+of personal details. The redaction is reversible: placeholders map back to the real values, so
+customer data can be restored when it's needed.
 
 ## Document RAG
 
 Medicare Evidence of Coverage PDFs cover the same ground, but every plan lays them out differently.
-The hardened RAG ingestion pipeline for over 100 of them uses each document's table of contents to
-find the medical benefits charts and pull them out on their own. The share of PDFs whose chart was
-found and extracted rose to as much as 90%, depending on the layout.
+I hardened the RAG ingestion pipeline for over 100 of them: it reads each document's table of
+contents to find the medical benefits charts and pulls out just those pages. Depending on the
+layout, up to 90% of PDFs had their chart extracted.
 
 ## Security
 
