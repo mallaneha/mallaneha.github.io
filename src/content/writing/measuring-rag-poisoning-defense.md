@@ -1,6 +1,6 @@
 ---
-title: "What 59% to 3% does and doesn't say about a RAG defense"
-description: "How I measured Vector Guard against poisoned documents, and why a static attack number isn't the end of the story."
+title: "Testing a RAG poisoning defense against static and adaptive attacks"
+description: "How I measured Vector Guard against PoisonedRAG, what that result covers, and how I'd test it against an attacker who adapts."
 date: 2026-11-23
 type: post
 tags: [security, rag, evals]
@@ -11,10 +11,10 @@ Vector Guard is a layered defense I built against poisoned documents in retrieva
 (RAG). On my threat-intelligence data, it cut attack success from 59% to 3%. On the Natural Questions
 benchmark, from 72% to 24%.
 
-Those are the numbers on my resume. This post is about what they measure: one kind of attack, run the
-same way every time. A paper published in October 2025 showed how much that leaves out, and I think
-anyone reporting a defense number, me included, should say so. I'll cover the attack, the four checks,
-how I measured them, and what I'd test next, but not the code.
+This post is about what those numbers measure: one kind of attack, run the same way every time. A paper
+published in October 2025 showed how much a setup like that leaves out, and I think anyone reporting a
+defense number, me included, should say so. I'll cover the attack, the four checks, how I measured them,
+and what I'd test next, but not the code.
 
 ## The attack
 
@@ -69,7 +69,7 @@ Here's what those numbers held fixed. The attack was PoisonedRAG as published, a
 with two poisoned documents per query. It wasn't written with the four checks in mind, and it didn't get
 another try after a document was rejected.
 
-## When the attacker moves second
+## Static and adaptive attacks on published defenses
 
 In October 2025, Milad Nasr, Nicholas Carlini, Florian Tramèr and 11 others published "The Attacker
 Moves Second" ([arXiv:2510.09023](https://arxiv.org/abs/2510.09023)). They took 12 published defenses
@@ -111,11 +111,11 @@ I'd report attack success as a curve against the attacker's effort, not as one n
 I'd also report the false positive rate. A filter that rejects poisoned documents and also 10% of good
 ones has a cost, and in a SOC that cost is missing context on a real alert.
 
-## What I'd say about the number now
+## How I'd report the result
 
 I'd still report 59% to 3%, worded like this: attack success against the published PoisonedRAG black-box
 attack, not tuned to the defense. The 72% to 24% on Natural Questions goes next to it, because the
-open-domain number is the honest one for anything outside a narrow, structured corpus.
+open-domain number is the more realistic one for anything outside a narrow, structured corpus.
 
 Simon Willison's conclusion from the paper is that until defenses like these can be relied on, the best
 practical protection is limiting what an agent can do. So a filter shouldn't be the only thing between
