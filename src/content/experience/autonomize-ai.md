@@ -23,7 +23,7 @@ keeping patient data private, and getting reliable answers out of messy insuranc
 
 ## PII redaction
 
-HIPAA compliance meant benchmarking Presidio, OpenMed and Private AI for PII redaction on healthcare
+For HIPAA compliance, I benchmarked Presidio, OpenMed and Private AI for PII redaction on healthcare
 datasets, across both text and multimodal pipelines. The resulting pipeline reached 97.7%
 anonymization recall. Its pseudonymization is reversible, so customer data can be restored when
 it's needed.
