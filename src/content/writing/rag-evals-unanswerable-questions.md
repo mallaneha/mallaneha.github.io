@@ -84,7 +84,7 @@ Three things to try:
 
 The scores in the toy overlap on purpose. "Is my dentist in network?" scores 0.71, higher than several
 real answers, because the document talks about networks a lot. No floor separates the two groups
-cleanly. [ADD: how much the scores overlapped on a real eval set]
+cleanly.
 
 ## How I build the no-answer questions
 
@@ -104,7 +104,7 @@ it isn't there. Yan also suggests mixing question types and varying where in the
 sits ([Yan, 2025](https://eugeneyan.com/writing/qa-evals/)).
 
 I don't have a tested ratio to recommend. The toy above makes 6 of 20 unanswerable, which is enough for
-the refusal numbers to move. [ADD: the ratio and set size used in a real eval, if there is one]
+the refusal numbers to move.
 
 ## What to report
 
