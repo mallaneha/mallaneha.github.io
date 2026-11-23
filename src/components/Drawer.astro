@@ -2,6 +2,7 @@
 // Bottom-sheet drawer (native <dialog>). Behavior lives in src/scripts/drawer.ts.
 // The slot is a case study rendered from Markdown; see docs/CONTENT.md for the format.
 import Icon from "./Icon.astro";
+import "../styles/story.css";
 import type { IconName } from "../data/icons";
 
 interface Props {
@@ -416,15 +417,6 @@ const linkAttrs = external
   }
   .case :global(blockquote p) {
     margin: 0;
-  }
-  /* Animated explainer (public/canvas/*.svg) under a project's Overview. Dark in both themes. */
-  .case :global(.canvas) {
-    display: block;
-    width: 100%;
-    height: auto;
-    margin: var(--space-6) 0;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-tile);
   }
   .case :global(.stats) {
     display: grid;

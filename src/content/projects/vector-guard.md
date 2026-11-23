@@ -15,7 +15,13 @@ Vector Guard is a layered defense for retrieval-augmented generation. I first at
 system built for a security operations center (SOC), then built filters that stop poisoned
 documents from steering its answers.
 
-<img class="canvas" src="/canvas/vector-guard.svg" width="480" height="300" loading="lazy" alt="Vector Guard in three steps. Attack: 2 of 5 retrieved documents are poisoned and the answer comes out wrong, 59% attack success. Four checks: structure, embedding, NLI contradiction and LLM score; poisoned documents stop at a check, clean ones pass. Defended: poisoned documents removed, the answer is right, 3% attack success.">
+<figure class="story" role="img" aria-label="Vector Guard in three steps. Attack: 2 of 5 retrieved documents are poisoned and the answer comes out wrong, 59% attack success. Four checks: structure, embedding, NLI contradiction and LLM score; poisoned documents stop at a check, clean ones pass. Defended: poisoned documents removed, the answer is right, 3% attack success.">
+<div class="story-steps">
+<div class="story-step"><div class="story-label">1 · <b>Attack</b></div><div class="story-scene"><span class="story-chip is-mono">Q: CVE severity?</span><span class="story-docs"><i class="story-doc"></i><i class="story-doc is-bad"></i><i class="story-doc"></i><i class="story-doc is-bad"></i><i class="story-doc"></i></span><span class="story-note">2 of 5 docs poisoned</span><span class="story-chip is-mono is-bad">A: Low <span class="story-mark is-bad">✗</span></span></div><div class="story-num is-bad"><strong>59%</strong>attack success</div></div>
+<div class="story-step"><div class="story-label">2 · <b>Four checks</b></div><div class="story-scene"><span class="story-gates"><span class="story-gate">Structure</span><span class="story-gate">Embedding</span><span class="story-gate">NLI contradiction</span><span class="story-gate">LLM score</span><i class="story-drop"></i><i class="story-drop"></i><i class="story-drop is-bad"></i><i class="story-drop is-bad is-late"></i></span></div><div class="story-num">cheap checks first, slower checks last</div></div>
+<div class="story-step"><div class="story-label">3 · <b>Defended</b></div><div class="story-scene"><span class="story-chip is-mono">Q: CVE severity?</span><span class="story-docs"><i class="story-doc"></i><i class="story-doc is-gone"></i><i class="story-doc"></i><i class="story-doc is-gone"></i><i class="story-doc"></i></span><span class="story-note">poisoned docs removed</span><span class="story-chip is-mono is-good">A: Critical <span class="story-mark is-good">✓</span></span></div><div class="story-num is-good"><strong>3%</strong>attack success</div></div>
+</div>
+</figure>
 
 <div class="stats">
   <div><strong>59% → 3%</strong><span>attack success, threat intel</span></div>
