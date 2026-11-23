@@ -13,7 +13,6 @@ const writing = await getWriting();
     <a href="/">← {site.name}</a>
   </p>
   <h1>Writing</h1>
-  <p class="muted blurb">{site.writingBlurb}</p>
   {writing.length > 0 ? (
     <RowList>
       {writing.map((w, i) => (
@@ -31,8 +30,7 @@ const writing = await getWriting();
 </Base>
 
 <style>
-  .back,
-  .blurb {
+  .back {
     font-size: var(--text-sm);
   }
   .back a {
@@ -41,8 +39,6 @@ const writing = await getWriting();
   }
   h1 {
     margin-top: var(--space-8);
-  }
-  .blurb {
-    margin: var(--space-1) 0 var(--space-6);
+    margin-bottom: var(--space-6);
   }
 </style>

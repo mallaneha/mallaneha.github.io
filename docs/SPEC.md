@@ -43,7 +43,7 @@ An addition to the paco.me layout, since she's job-hunting.
 
 ### Writing
 
-Heading line: "Notes on evaluating and observing AI systems." List 1–2 posts, then an "All writing" link.
+No heading line (removed 2026-11-23; "Notes on evaluating and observing AI systems." is now only the /writing/ meta description). List 1–2 posts, then an "All writing" link.
 
 Launch posts (recommended first):
 
