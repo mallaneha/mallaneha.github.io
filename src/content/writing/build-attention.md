@@ -23,8 +23,9 @@ I think attention is the one mechanism you should compute by hand at least once.
 a transformer a transformer, and it fits on a page. Once you've done it, the diagrams in every other
 explainer get much easier to read.
 
-[PERSONAL EXAMPLE: when attention stopped being a diagram for you, e.g. a course assignment or a model
-you had to debug]
+I spent 3.5 years validating clinical datasets, where a number doesn't count until you can trace it
+back to a record. I wanted the same for attention: pick one token, follow its numbers through every
+step, and check the output by hand. This post is that trace.
 
 ## Three vectors per token
 
@@ -80,12 +81,10 @@ attention to "down", a word it shouldn't know yet.
 ## Weighted sum of values
 
 The weights decide how much of each value vector to take. With the default settings "sat" outputs
-0.10 × value("The") + 0.68 × value("cat") + 0.22 × value("sat") = (0.32, 0.90). That output replaces
-"sat"'s vector for the next layer. It now carries information borrowed mostly from "cat".
-
-[GAP: in GPT-2 the head's output goes through the output projection and is added back to "sat"'s
-vector through a residual connection. "Replaces" skips that step. Explain it in a sentence, or soften
-the wording.]
+0.10 × value("The") + 0.68 × value("cat") + 0.22 × value("sat") = (0.32, 0.90). That output doesn't
+replace "sat"'s vector outright. In GPT-2 it goes through one more learned matrix, the output
+projection, and is then added to "sat"'s original vector. So "sat" keeps what it had and gains
+information borrowed mostly from "cat".
 
 ## All tokens at once
 
