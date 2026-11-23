@@ -99,7 +99,7 @@ What shipped differs from the plan above in these ways, all at Neha's request:
   in the bottom half). `SPEED 0.01`, about 4.5× slower than oddgrid: calm, a cell lit for several seconds.
 - **Oddgrid's look.** Cells touch (no gap). Markers on about 55% of lit cells, picked per cell from dot, ring, plus,
   cross, small square and dash.
-- **Fainter at rest.** Grays `#f8`/`#f5`/`#f2`, markers `#ed` (light); `#14`/`#16`/`#19`, markers `#1c` (dark).
+- **Fainter at rest.** Grays `#fb`/`#fa`/`#f8`, markers `#f4` (light); `#13`/`#14`/`#15`, markers `#18` (dark).
 - **Hover reveals color, only on clusters.** The source palette, read from the recording: pink `#ff87c3`, navy
   `#0d2a8b`, olive `#8d9a23`, blue `#1b4f9f`, orange `#fd5b1c` (patches from a second noise field cut for shares
   32/27/21/10/10%), maroon markers `#520000`. Only the lit cells of one pattern around the pointer's cell (8
