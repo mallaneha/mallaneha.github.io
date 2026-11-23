@@ -1,6 +1,6 @@
 // Click feedback modeled on ch.sh: a small spark burst on a canvas, a soft synthesized
-// "tick", and an 8ms vibration on phones. Only on pages whose <body> has data-effects (the home page),
-// and never for clicks inside a drawer. The toggle ([data-effects-toggle]) mutes the sound and vibration;
+// "tick", and an 8ms vibration on phones, on every page, for clicks on links and buttons (never inside a
+// drawer). The toggle ([data-effects-toggle]) mutes the sound and vibration;
 // the sparks stay. Also: theme toggle, [data-copy] buttons with a toast, and the footer's local time.
 
 const KEY = "effects-muted";
@@ -16,7 +16,6 @@ function readMuted() {
   }
 }
 let muted = readMuted();
-const effectsOn = document.body.hasAttribute("data-effects");
 
 // ---------- sparks (same parameters as ch.sh's ClickSpark defaults) ----------
 const SPARK = {
@@ -32,8 +31,8 @@ type Spark = { x: number; y: number; angle: number; start: number };
 const canvas = document.createElement("canvas");
 canvas.className = "spark-canvas";
 canvas.setAttribute("aria-hidden", "true");
-if (effectsOn) document.body.append(canvas);
-const ctx = effectsOn ? canvas.getContext("2d") : null;
+document.body.append(canvas);
+const ctx = canvas.getContext("2d");
 let sparks: Spark[] = [];
 let raf = 0;
 
@@ -43,10 +42,8 @@ function resize() {
   canvas.height = innerHeight * dpr;
   ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-if (effectsOn) {
-  resize();
-  addEventListener("resize", resize);
-}
+resize();
+addEventListener("resize", resize);
 
 const easeOut = (t: number) => t * (2 - t);
 
@@ -160,7 +157,7 @@ function tick() {
   else a.resume().then(play, () => {});
 }
 
-if (effectsOn) {
+{
   addEventListener(
     "click",
     (e) => {

@@ -6,11 +6,9 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title?: string;
   description?: string;
-  // Click sparks, sound and vibration (src/scripts/effects.ts). Home page only.
-  effects?: boolean;
 }
 
-const { title, description = site.tagline, effects = false } = Astro.props;
+const { title, description = site.tagline } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -42,11 +40,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary" />
   </head>
-  <body data-effects={effects ? "" : undefined}>
+  <body>
     <main>
       <slot />
     </main>
-    <Footer effects={effects} />
+    <Footer />
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script>
       import "../scripts/effects.ts";

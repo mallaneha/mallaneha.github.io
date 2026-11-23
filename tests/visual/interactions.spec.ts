@@ -157,16 +157,18 @@ test("click effects: spark canvas, mute toggle, copy email", async ({
   expect(await page.content()).not.toMatch(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i);
 });
 
-test("click effects are home-page only; footer shows local time", async ({
+test("click effects and the sound toggle are on every page; footer shows local time", async ({
   page,
 }) => {
   await expect(page.locator("[data-local-time] time")).toHaveText(
     /^\d{1,2}:\d{2}\s?(AM|PM)$/,
   );
-  await page.goto("/writing/");
-  await expect(page.locator("canvas.spark-canvas")).toHaveCount(0);
-  await expect(page.locator("[data-effects-toggle]")).toHaveCount(0);
-  await expect(page.locator("[data-local-time]")).toBeVisible();
+  for (const path of ["/writing/", "/writing/build-attention/", "/404"]) {
+    await page.goto(path);
+    await expect(page.locator("canvas.spark-canvas")).toHaveCount(1);
+    await expect(page.locator("[data-effects-toggle]")).toHaveCount(1);
+    await expect(page.locator("[data-local-time]")).toBeVisible();
+  }
 });
 
 test("theme toggle flips the theme and remembers it", async ({ page }) => {
