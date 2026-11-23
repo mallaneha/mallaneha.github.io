@@ -18,7 +18,7 @@ submission packages.
 
 <div class="stats">
   <div><strong>12</strong><span>analysts led</span></div>
-  <div><strong>15+</strong><span>studies at once, all on time</span></div>
+  <div><strong>15+</strong><span>simultaneous studies</span></div>
   <div><strong>60%</strong><span>fewer validation findings</span></div>
 </div>
 
