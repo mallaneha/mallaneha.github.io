@@ -4,16 +4,7 @@ description: "Work out how many users a model can serve from four numbers: weigh
 date: 2026-11-22
 type: post
 tags: [llm-systems]
-draft: true
 ---
-
-<!--
-TODO(Neha) before publishing. Part 3 of 3 in the "Build it" series. The voice pass is done: first person,
-written to an engineer a year or two behind you. Fill in every [PERSONAL EXAMPLE: ...] with something
-real or delete it, then delete the marker. Consider linking to your self-hosting draft
-(self-hosting-llms-vllm.md) once it's published.
-Every number below is what the widget computes. They match the reference tables within rounding.
--->
 
 This is the last part of my "Build it" series. Here you turn a model and some hardware into a budget:
 how many requests fit in memory, how long each generation step takes, and how many tokens per second
@@ -25,10 +16,9 @@ Two facts drive the whole budget. When a model generates text, each new token ne
 every weight is read from memory once per step. On top of that, every request in the batch reads its
 own KV cache, the keys and values saved from [part 1](/writing/build-attention/).
 
-At Autonomize AI I worked on PII redaction for healthcare data, keeping patient names out of what a
-model sees. For a healthcare client, whether a prompt can go to a hosted API is a compliance question
-before it's a technical one. If the answer is no, the team runs the model itself, and this budget is
-what that costs.
+Most of my work has been in healthcare, with data that has to stay private. For teams like that,
+whether a prompt can go to a hosted API is a compliance question before it's a technical one. If the
+answer is no, they run the model themselves, and this budget tells them what that costs.
 
 The running example is LLaMA 2-13B on eight TPU v5e chips (Google's AI accelerators), the worked
 example in Google's _How To Scale Your Model_. You can switch setups and change any number in the

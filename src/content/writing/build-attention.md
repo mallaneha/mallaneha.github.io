@@ -4,15 +4,7 @@ description: "Build one attention head by hand with four tokens and two-dimensio
 date: 2026-11-22
 type: post
 tags: [llm-systems]
-draft: true
 ---
-
-<!--
-TODO(Neha) before publishing. Part 1 of 3 in the "Build it" series. The voice pass is done: first person,
-written to an engineer a year or two behind you. Fill in every [PERSONAL EXAMPLE: ...] with something
-real or delete it, resolve every [GAP: ...], then delete both kinds of marker.
-The vectors are hand-picked toy values. Every number in the text matches what the widget computes.
--->
 
 This is part 1 of a three-part series where I build the pieces of a transformer small enough to check
 every number by hand. This part covers one attention head: four tokens, vectors with two numbers each,
