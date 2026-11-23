@@ -18,105 +18,117 @@ Before I worked on AI systems, I spent three and a half years preparing clinical
 submissions. I built more than 800 standardized datasets and reports, and every one of them was
 validated before it left the building.
 
-When I started evaluating LLM output, I expected a new discipline. Instead I kept finding problems
-that clinical data teams solved years ago. This post covers five habits from regulated data work
-that I now use for AI evals.
+When I started evaluating LLM output, I expected to learn a new discipline. I kept running into
+problems that clinical data teams had solved years ago. This post covers five habits from that work
+that I now use for AI evals. It doesn't cover eval tooling or how to set up a test harness, and you
+don't need to know anything about clinical trials to follow it.
 
 ## How validation works in a submission
 
-Clinical trial data goes to the FDA in standard formats defined by CDISC:
+Clinical trial data goes to the FDA in standard formats defined by CDISC, the standards body for
+clinical research data. Three of them matter here:
 
-- **SDTM** organizes the collected data in a standard structure. It is one of the standards
-  required for submission to the FDA and Japan's PMDA
+- SDTM organizes the collected data in a standard structure. It is one of the standards required
+  for submission to the FDA and Japan's PMDA
   ([CDISC SDTM](https://www.cdisc.org/standards/foundational/sdtm)).
-- **ADaM** defines the analysis datasets built from SDTM. A core principle is traceability between
+- ADaM defines the analysis datasets built from SDTM. A core principle is traceability between
   analysis results, analysis data and the SDTM source
   ([CDISC ADaM](https://www.cdisc.org/standards/foundational/adam)).
-- **Define-XML** is the metadata describing which datasets, variables and controlled terms were
-  used, and the FDA requires it for every study in a submission
+- Define-XML is the metadata describing which datasets, variables and controlled terms were used,
+  and the FDA requires it for every study in a submission
   ([CDISC Define-XML](https://www.cdisc.org/standards/data-exchange/define-xml)).
 
-Before anything is submitted, the data runs through a validator. The FDA publishes its own
-validator rules, used "to ensure data are standards compliant and support meaningful review and
-analysis" ([FDA study data standards](https://www.fda.gov/industry/fda-data-standards-advisory-board/study-data-standards-resources)).
+Before anything is submitted, the data runs through a validator. The FDA publishes its own validator
+rules, used "to ensure data are standards compliant and support meaningful review and analysis"
+([FDA study data standards](https://www.fda.gov/industry/fda-data-standards-advisory-board/study-data-standards-resources)).
 In industry, Pinnacle 21 is a widely used tool for running checks like these. Each finding has to be
 fixed, or explained to the reviewer in a reviewer's guide.
 
-None of this is glamorous. It is also why a regulator can trust a dataset built by a team they've
-never met.
+It's tedious work. It's also why a regulator can trust a dataset built by a team they've never met.
 
-## 1. Conformance is not correctness
+## 1. Passing the format checks doesn't make the answer right
 
-A clean validation report means the data is well-formed: the right variables, the right
-controlled terms, consistent dates. It doesn't mean the analysis is right. A dataset can pass every
-structural rule and still carry a wrong derivation.
+A clean validation report means the data is well formed: the right variables, the right controlled
+terms, consistent dates. It says nothing about whether the analysis is right. A dataset can pass
+every structural rule and still carry a wrong derivation, meaning a value computed from other values
+with the wrong logic.
 
-LLM evals have the same trap. A response can be valid JSON, use the right format, cite a source,
+[PERSONAL EXAMPLE: a dataset that passed Pinnacle 21 cleanly but had a wrong derivation, and how it
+was caught]
+
+LLM evals have the same trap. A response can be valid JSON, use the right format, cite a source and
 pass every assertion, and still be wrong.
 
-So I keep two layers apart:
+So I keep two layers of checks apart:
 
-- **Conformance checks**: cheap, deterministic, run on every change. Hamel Husain describes these
-  as unit tests for LLMs, assertions you'd write in pytest that run fast on every code change
-  ([Your AI Product Needs Evals](https://hamel.dev/blog/posts/evals/)).
-- **Correctness checks**: slower and more expensive. A human reviewer, or an LLM judge that has
-  been checked against human labels.
+- Conformance checks are cheap and deterministic, and they run on every change. Hamel Husain
+  describes these as unit tests for LLMs, assertions you'd write in pytest that run fast on every
+  code change ([Your AI Product Needs Evals](https://hamel.dev/blog/posts/evals/)).
+- Correctness checks are slower and more expensive. They need a human reviewer, or an LLM judge that
+  has been checked against human labels.
 
-Passing the first layer earns an output the right to be checked by the second. It doesn't replace
-it.
+An output has to pass the first layer before it's worth spending the second on. Don't let a green
+first layer stand in for the second.
 
-## 2. Every finding must trace back to a record
+## 2. Trace every finding back to a record
 
-The most useful thing I built at Numeric Mind wasn't a dataset. It was a debugging tool. A
-Pinnacle 21 finding tells you that a rule failed; it doesn't hand you the patient records behind
-it. Analysts were looking those up by hand. My tool traced each finding back to the exact records
-in the SDTM and ADaM datasets, and it cut our issue resolution time by 75%.
+The most useful thing I built at Numeric Mind was a debugging tool. A Pinnacle 21 finding tells you
+that a rule failed, but it doesn't hand you the patient records behind it. Analysts were looking
+those up by hand. My tool traced each finding back to the exact records in the SDTM and ADaM
+datasets, and it cut our issue resolution time by 75%.
 
 <!-- TODO(Neha): one sentence on what a typical finding looked like before and after the tool. -->
 
-ADaM bakes this idea into the standard: an analysis result should be traceable to the data it came
+ADaM builds this idea into the standard: an analysis result should be traceable to the data it came
 from.
 
 For AI systems the equivalent is the trace. When an eval fails, I want one click from the failing
-score to the exact input, retrieved documents, prompt version, intermediate steps and output. A
-pass rate without traces tells you something is wrong. It doesn't tell you what to fix.
+score to the exact input, retrieved documents, prompt version, intermediate steps and output. A pass
+rate on its own tells you something is wrong. You need the trace to know what to fix.
 
-## 3. Check independently
+## 3. Have someone else check it independently
 
-In clinical programming, important outputs are commonly checked by a second programmer who
-produces them independently. If two people derive the same number separately, you can trust it
-more than if one person checks their own work.
+In clinical programming, important outputs are commonly checked by a second programmer who produces
+them independently. If two people derive the same number separately, you can trust it more than if
+one person checks their own work.
 
 <!-- TODO(Neha): describe how QC worked on your team, e.g. whether you double-programmed key
 datasets and TLFs, and what happened when outputs didn't match. -->
 
-An LLM judge is a second programmer, but one you haven't hired yet. Before trusting it, you check
-its work against yours: label a sample by hand and measure how often the judge agrees. Hamel
-recommends precision and recall for this rather than raw agreement, because when failures are rare
-a judge that says "fine" every time looks accurate. A judge that never catches a failure is a rubber
-stamp, not a reviewer.
+An LLM judge is a second programmer you haven't vetted yet. Before you trust it, check its work
+against yours: label a sample by hand and measure how often the judge agrees. Hamel recommends
+precision and recall for this rather than raw agreement, because when failures are rare, a judge
+that says "fine" every time looks accurate. That judge would never catch a failure.
 
-## 4. Severity is a decision, not a default
+## 4. Decide what blocks a release before you see the results
 
 Not every validator finding blocks a submission. Some must be fixed. Others are acceptable if you
 explain them. Teams decide which is which, write it down, and justify it to the reviewer.
 
-AI evals need the same explicit triage. In Hamel's words, your pass rate is "a product decision."
-A formatting slip in an internal summary and a leaked patient identifier aren't the same failure,
-and they shouldn't share a threshold. I write down which checks are blocking, which are warnings,
-and why, before I look at the results. Then a bad number can't quietly become an acceptable one.
+[PERSONAL EXAMPLE: a finding your team chose to explain in the reviewer's guide instead of fixing,
+and why]
+
+AI evals need the same explicit triage. In Hamel's words, your pass rate is "a product decision." A
+formatting slip in an internal summary and a leaked patient identifier aren't the same failure, and
+they shouldn't share a threshold. I write down which checks are blocking, which are warnings, and
+why, before I look at the results. Otherwise it's too easy to decide a bad number is acceptable after
+you've seen it.
 
 ## 5. Document the evaluation like a submission
 
-A submission doesn't just include data. It includes metadata (Define-XML) and reviewer's guides
-explaining what was done and why. A reviewer can understand the package without calling the team.
+A submission includes metadata (Define-XML) and reviewer's guides along with the data, explaining
+what was done and why. A reviewer can understand the package without calling the team.
 
 AI governance frameworks are asking for the same thing. The NIST AI RMF Playbook's MEASURE function
 expects that the test sets, metrics and tools used during evaluation are documented
 ([NIST AI RMF Playbook: Measure](https://airc.nist.gov/airmf-resources/playbook/measure/)). In
-practice I keep a short eval card next to every reported number: dataset and where it came from,
-metric definitions, judge model and its agreement with humans, known gaps, and what changed since
-the last run.
+practice I keep a short eval card next to every reported number. It lists:
+
+- the dataset and where it came from
+- metric definitions
+- the judge model and its agreement with humans
+- known gaps
+- what changed since the last run
 
 ## Where the analogy breaks
 
@@ -124,18 +136,9 @@ Clinical validation has a fixed target. The standards say exactly what a conform
 like, and most checks are deterministic. Generated text has no single correct form. Two different
 answers can both be right, and the same prompt can produce different outputs on different runs.
 
-That means AI evals need things clinical validation mostly doesn't: sampling and repeated runs,
-human judgment on open-ended quality, and judges that are themselves models with error rates. The
-habits carry over. The certainty doesn't.
+So AI evals need things clinical validation mostly doesn't: sampling and repeated runs, human
+judgment on open-ended quality, and judges that are themselves models with error rates. The habits
+above still apply, but you won't get the same certainty from them.
 
-## Takeaways
-
-- Keep conformance checks and correctness checks separate, and require both.
-- Make every failing score traceable to the exact input and output behind it.
-- Validate your judge against human labels before trusting it.
-- Decide severity and thresholds before you see the results.
-- Document the eval so someone else could audit it without asking you.
-
-Regulated industries already know how to make data trustworthy to a skeptical reviewer. AI in
-healthcare, banking and insurance will be held to the same standard, and the playbook already
-exists.
+If you want one place to start, write the eval card for a number you already report. The gaps you
+find while filling it in are your next checks.
