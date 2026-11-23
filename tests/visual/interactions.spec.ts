@@ -97,6 +97,33 @@ test("deep link opens a drawer on load", async ({ page }) => {
   await expect(page.locator(`dialog#${id}`)).toHaveAttribute("open");
 });
 
+test("drawer dividers open interactive mockups", async ({ page }) => {
+  const id = await page
+    .locator("[data-drawer-open]")
+    .first()
+    .getAttribute("data-drawer-open");
+  await page.locator(`[data-drawer-open="${id}"]`).click();
+  const dialog = page.locator(`dialog#${id}`);
+  const toggles = dialog.locator(".mk-toggle");
+  await expect(toggles.first()).toBeVisible(); // mockups.ts loads lazily
+  const first = toggles.first();
+  await first.click();
+  await expect(first).toHaveAttribute("aria-expanded", "true");
+  const panel = dialog.locator(".mk-panel").first();
+  await expect(panel).toBeVisible();
+  await expect(panel.locator(".mk-note")).not.toBeEmpty();
+  // Every mockup opens without errors and fits the drawer width.
+  for (let i = 0; i < (await toggles.count()); i++) {
+    const t = toggles.nth(i);
+    if ((await t.getAttribute("aria-expanded")) !== "true") await t.click();
+  }
+  const overflow = await dialog.evaluate((d) => {
+    const body = d.querySelector(".body")!;
+    return body.scrollWidth - body.clientWidth;
+  });
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
 test("click effects: spark canvas, mute toggle, copy email", async ({
   page,
   context,

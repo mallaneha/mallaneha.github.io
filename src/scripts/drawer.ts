@@ -18,6 +18,7 @@ function setHash(id: string | null) {
 function open(d: HTMLDialogElement, animate = true) {
   if (current && current !== d) closeNow(current);
   if (!d.open) d.showModal();
+  import("./mockups").then((m) => m.enhance(d)); // "···" mockups; remove this line to turn them off
   current = d;
   d.querySelector(".body")?.scrollTo(0, 0);
   d.style.transform = "";

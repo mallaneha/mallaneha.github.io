@@ -40,6 +40,10 @@ show ↗ on hover (always on touch screens).
 - Close with ✕, Esc, a backdrop click, or by dragging the header down. ←/→ move between drawers.
   The URL hash (`#work-<slug>`, `#role-<slug>`) deep-links to a drawer.
 - Body: 30rem text column inside a 44rem header width. Case-study format: see `docs/CONTENT.md`.
+- Each `···` between sections is a "See how it works" button that opens a small interactive mockup of the
+  section above (`src/scripts/mockups.ts`, styles in `src/styles/mockups.css`, keyed by drawer id + heading id).
+  Numbers come only from the case-study text; sample text is tagged "Example". Sections without a mockup keep a
+  plain `···`. To remove: delete both files and the `import("./mockups")` line in `drawer.ts`.
 
 ## Click effects (`src/scripts/effects.ts`)
 
