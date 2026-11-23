@@ -105,6 +105,19 @@
   --chart-3: #1a7f37;
   --chart-4: #a65300;
   --chart-5: #6f6f6f;
+  /* Post widget palette: ink and red pencil, the colors of a marked-up notebook (and of the Nepali flag).
+     Ink (= --color-accent) is the measured series and what went right; red is what went wrong or is dangerous,
+     and nothing else; graphite is neutral (a refusal, "other"); brass is a third, warm category with no verdict
+     in it. Each has a softer step for a second series of the same kind. Contrast on white / --color-surface:
+     ink 6.7/6.2, red 6.5/6.0, graphite 4.7/4.4, brass 5.3/4.9 (all usable for text or as a background under
+     white text); the soft steps are ≥ 3:1 on white, for marks only, never text. */
+  --chart-ink: #0b5cad;
+  --chart-ink-soft: #5b8bd0;
+  --chart-red: #b4233c;
+  --chart-red-soft: #d9667a;
+  --chart-graphite: #737373;
+  --chart-brass: #8f6412;
+  --chart-brass-soft: #ad8536;
   /* Header cat (src/components/header-cat.js): outline and shelf line. Decorative. */
   --color-cat-line: #22201f;
   --color-cat-ledge: #bfc3c8;
@@ -143,6 +156,14 @@
     --chart-3: #3fb950;
     --chart-4: #f0a35c;
     --chart-5: #a0a0a0;
+    /* Widget palette, dark: on --color-bg all ≥ 4.3:1, soft steps included; under --color-bg text ≥ 4.6:1. */
+    --chart-ink: #8ab8ff;
+    --chart-ink-soft: #4f7fc4;
+    --chart-red: #ff7a8d;
+    --chart-red-soft: #c4566a;
+    --chart-graphite: #8a8a8a;
+    --chart-brass: #dba84f;
+    --chart-brass-soft: #9c7a3c;
     --color-cat-line: #8d8880;
     --color-cat-ledge: #50545a;
   }
@@ -180,6 +201,13 @@
   --chart-3: #3fb950;
   --chart-4: #f0a35c;
   --chart-5: #a0a0a0;
+  --chart-ink: #8ab8ff;
+  --chart-ink-soft: #4f7fc4;
+  --chart-red: #ff7a8d;
+  --chart-red-soft: #c4566a;
+  --chart-graphite: #8a8a8a;
+  --chart-brass: #dba84f;
+  --chart-brass-soft: #9c7a3c;
   --color-cat-line: #8d8880;
   --color-cat-ledge: #50545a;
 }

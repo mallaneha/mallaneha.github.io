@@ -9,6 +9,16 @@ export function getStaticPaths() {
 }
 
 // Every widget, with the post it lives in. effects.ts loads the widget scripts because the tags are on the page.
+const palette = [
+  ["ink", "measured series, right answer, a check that stops it"],
+  ["ink-soft", "second series of the same kind, right refusal"],
+  ["red", "made up, danger, over the limit, invalid input"],
+  ["red-soft", "a lesser error (wrong chunk)"],
+  ["graphite", "neutral: wrong refusal, layer norms"],
+  ["brass", "a third category: keys, KV cache, attention"],
+  ["brass-soft", "second series of brass (MLP)"],
+];
+
 const widgets = [
   { tag: "attention-lab", post: "build-attention", series: "LLMs by hand" },
   { tag: "scale-lab", post: "build-attention", series: "LLMs by hand" },
@@ -49,6 +59,23 @@ const widgets = [
       isn't in the production build.
     </p>
   </header>
+  <section class="palette" aria-labelledby="palette">
+    <h2 id="palette">Palette</h2>
+    <p class="muted">
+      Ink and red pencil: ink for the measured series and what went right, red
+      only for what went wrong, graphite for neutral, brass for a third
+      category. Tokens in <code>src/styles/tokens.css</code>.
+    </p>
+    <ul>
+      {palette.map(([name, use]) => (
+        <li>
+          <span class="chip" style={`background: var(--chart-${name})`} />
+          <code>--chart-{name}</code>
+          <span class="muted">{use}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
   <nav aria-label="Widgets">
     <ul>
       {widgets.map((w) => (
@@ -101,6 +128,32 @@ const widgets = [
       background: var(--color-hover);
       color: var(--color-text);
     }
+  }
+  .palette ul {
+    display: grid;
+    gap: var(--space-2);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+  .palette li {
+    display: grid;
+    grid-template-columns: 2.5rem max-content 1fr;
+    gap: var(--space-3);
+    align-items: center;
+  }
+  @media (max-width: 30rem) {
+    .palette li {
+      grid-template-columns: 2.5rem 1fr;
+    }
+    .palette li .muted {
+      grid-column: 2;
+    }
+  }
+  .chip {
+    height: 1rem;
+    border-radius: var(--radius);
   }
   section {
     margin: var(--space-12) 0;

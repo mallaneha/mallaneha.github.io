@@ -66,8 +66,12 @@ monochrome and drawn, not native: sliders are a thin track filled in `--color-te
 fill with `--color-text`, the segmented control is a sunken track with the selected segment raised
 (`--color-raised`, `--shadow-raised`). Chart labels render at a true 11px whatever the chart's width.
 All widgets on one page, dev server only: http://localhost:4321/dev/widgets/ (`src/pages/dev/[page].astro`). Tables scroll inside the panel instead of the page.
-Charts and bars use `--chart-1` to `--chart-5`; weights are bars next to the number, never colored cell
-backgrounds, so text contrast doesn't depend on the data. Bar transitions only run without
+Colors are "ink and red pencil", the marks on a corrected notebook page (and the two colors of the Nepali
+flag): `--chart-ink` (= the accent) for the measured series and what went right, `--chart-red` only for what went
+wrong or is dangerous, `--chart-graphite` for neutral, `--chart-brass` for a third category with no verdict, each
+with a `-soft` step. Never green, purple or orange. The abstain lab colors each dot by its outcome at the current
+floor, so dots, bar and legend agree. Weights are bars next to the number, never colored cell backgrounds, so text
+contrast doesn't depend on the data. Hover, tap or arrow keys show a dot's question in a tooltip (toast colors). Bar transitions only run without
 `prefers-reduced-motion`.
 
 ## Tokens (`src/styles/tokens.css`)
@@ -76,7 +80,8 @@ backgrounds, so text contrast doesn't depend on the data. Bar transitions only r
 - Sizes: rows and drawers at `--text-sm` (14px); post bodies at `--text-base`.
 - Colors: text, body, muted, faint, subtle (dotted rules), border, surface, hover, overlay. Each has
   a dark-mode value; contrast ratios are noted in the file.
-- Chart series: `--chart-1` to `--chart-5`, for the explainer widgets.
+- Chart series: `--chart-ink`, `-red`, `-graphite`, `-brass` (+ `-soft` steps) for the post widgets;
+  `--chart-1` to `--chart-5` for the drawer figures (`mockups.css`, `story.css`).
 - Motion: `--ease-drawer`, `--drawer-in`, `--drawer-out`, `--transition`.
 
 ## Voice
