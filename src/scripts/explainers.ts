@@ -66,6 +66,12 @@ function softmax(xs: number[]): number[] {
 const dot = (a: number[], b: number[]) =>
   a.reduce((acc, x, i) => acc + x * b[i]!, 0);
 
+// Motion. While you drag or type, everything follows your hand with no easing. After a discrete change (a
+// token, checkbox, preset or button) bars ease over --duration-state so you can see what moved. The
+// .is-instant class on the widget switches the transitions off for the drag/type case.
+const motion = (root: HTMLElement) => (animate: boolean) =>
+  root.classList.toggle("is-instant", !animate);
+
 function slider(
   label: string,
   min: number,
@@ -94,26 +100,81 @@ function slider(
   return { wrap, input, out, fmt };
 }
 
+/** Accept what people type ("50,257", "8k", "16 GB"), return NaN for anything else. */
+export function parseLoose(raw: string, allowK = false): number {
+  let t = raw
+    .trim()
+    .toLowerCase()
+    .replace(/[\s,_]/g, "");
+  let mult = 1;
+  if (allowK && /\dk$/.test(t)) {
+    mult = 1e3;
+    t = t.slice(0, -1);
+  } else {
+    t = t.replace(/[a-z/]+$/, ""); // a trailing unit: "16gb", "820gb/s"
+  }
+  if (!/^(\d+\.?\d*|\.\d+)(e\d+)?$/.test(t)) return NaN;
+  return Number(t) * mult;
+}
+
+// A text field that is liberal in what it accepts and strict in what it shows: it parses loosely while you
+// type, keeps the last valid value when the text isn't a number, and rewrites the text cleanly on blur.
 function numberField(
   label: string,
   value: number,
-  attrs: Record<string, string> = {},
+  opts: { min: number; integer?: boolean; allowK?: boolean },
 ) {
   const id = nextId("xp");
+  const show = (v: number) => (opts.integer ? int(v) : String(v));
   const input = h("input", {
-    type: "number",
+    type: "text",
     id,
-    value: String(value),
-    inputmode: "decimal",
-    ...attrs,
+    value: show(value),
+    inputmode: opts.integer ? "numeric" : "decimal",
+    autocomplete: "off",
+    spellcheck: "false",
+  });
+  const hint = h(
+    "span",
+    { class: "xp-hint", id: `${id}-hint`, hidden: true },
+    `Enter a number of at least ${opts.min}${opts.allowK ? ", like 8192 or 8k" : ""}.`,
+  );
+  let last = value;
+  const valid = (ok: boolean) => {
+    input.setAttribute("aria-invalid", String(!ok));
+    hint.hidden = ok;
+    if (ok) input.removeAttribute("aria-describedby");
+    else input.setAttribute("aria-describedby", hint.id);
+  };
+  const parse = () => {
+    let v = parseLoose(input.value, opts.allowK);
+    if (opts.integer) v = Math.round(v);
+    const ok = Number.isFinite(v) && v >= opts.min;
+    valid(ok);
+    if (ok) last = v;
+    return ok;
+  };
+  input.addEventListener("input", parse);
+  input.addEventListener("blur", () => {
+    if (parse()) input.value = show(last);
   });
   const wrap = h(
     "div",
     { class: "xp-field xp-field-number" },
     h("label", { for: id }, label),
     input,
+    hint,
   );
-  return { wrap, input };
+  return {
+    wrap,
+    input,
+    value: () => last,
+    set: (v: number) => {
+      last = v;
+      input.value = show(v);
+      valid(true);
+    },
+  };
 }
 
 function checkbox(label: string, checked: boolean) {
@@ -140,6 +201,25 @@ function select(label: string, options: string[], value = 0) {
   return { wrap, input };
 }
 
+/** Radio buttons drawn as one segmented control: few options, all visible, one tap each. */
+function choice(legend: string, options: string[], value: number) {
+  const name = nextId("choice");
+  const inputs = options.map((_, i) =>
+    h("input", { type: "radio", name, value: String(i), checked: i === value }),
+  );
+  const wrap = h(
+    "fieldset",
+    { class: "xp-choice" },
+    h("legend", {}, legend),
+    h(
+      "div",
+      { class: "xp-tabs" },
+      ...options.map((o, i) => h("label", {}, inputs[i]!, h("span", {}, o))),
+    ),
+  );
+  return { wrap, inputs };
+}
+
 function bar(): { el: HTMLSpanElement; set: (f: number) => void } {
   const fill = h("span", { class: "xp-bar-fill" });
   const el = h("span", { class: "xp-bar", "aria-hidden": "true" }, fill);
@@ -150,10 +230,47 @@ function bar(): { el: HTMLSpanElement; set: (f: number) => void } {
   };
 }
 
+/** A table cell holding a percentage over a small bar. Built once, updated in place so the bar can ease. */
+function weightCell() {
+  const share = h("span");
+  const b = bar();
+  const td = h("td", { class: "xp-weight" }, share, b.el);
+  return {
+    td,
+    set: (f: number, zero = pct(f)) => {
+      share.textContent = f === 0 ? zero : pct(f);
+      b.set(f);
+    },
+  };
+}
+
 const num = (input: HTMLInputElement | HTMLSelectElement, fallback: number) => {
   const v = Number(input.value);
   return Number.isFinite(v) ? v : fallback;
 };
+
+const head = (title: string, ...extra: Node[]) =>
+  h(
+    "div",
+    { class: "xp-head" },
+    h("p", { class: "xp-title" }, title),
+    ...extra,
+  );
+
+const tableHead = (cols: (string | [string, string])[]) =>
+  h(
+    "thead",
+    {},
+    h(
+      "tr",
+      {},
+      ...cols.map((c) =>
+        typeof c === "string"
+          ? h("th", { scope: "col" }, c)
+          : h("th", { scope: "col", class: c[1] }, c[0]),
+      ),
+    ),
+  );
 
 /* ------------------------------------------------------------------ */
 /* Part 1: attention                                                   */
@@ -179,6 +296,12 @@ const VALUES: V2[] = [
   [-1, 0.5],
 ];
 
+const PLOT = 240; // viewBox size of the attention plot
+const px = (v: number) => PLOT / 2 + v * 50;
+const py = (v: number) => PLOT / 2 - v * 50;
+const tenth = (v: number) =>
+  Math.max(-2, Math.min(2, Math.round(v * 10) / 10)) + 0; // + 0 turns -0 into 0
+
 class AttentionLab extends HTMLElement {
   private q: V2[] = QUERIES.map((v) => [...v] as V2);
   private row = 2;
@@ -187,22 +310,7 @@ class AttentionLab extends HTMLElement {
     if (this.dataset.ready) return;
     this.dataset.ready = "1";
 
-    const radios = h(
-      "fieldset",
-      { class: "xp-radios" },
-      h("legend", {}, "Query token"),
-    );
-    const name = nextId("tok");
-    const radioInputs = TOKENS.map((t, i) => {
-      const input = h("input", {
-        type: "radio",
-        name,
-        value: String(i),
-        checked: i === this.row,
-      });
-      radios.append(h("label", {}, input, t));
-      return input;
-    });
+    const tok = choice("Query token", TOKENS, this.row);
     const qx = slider("q₁", -2, 2, 0.1, this.q[this.row]![0], (v) =>
       fixed(v, 1),
     );
@@ -214,43 +322,60 @@ class AttentionLab extends HTMLElement {
       true,
     );
     const scale = checkbox("Divide scores by √d_k (here √2)", true);
-    const reset = h("button", { type: "button", class: "xp-button" }, "Reset");
+    const reset = h("button", { type: "button", class: "xp-ghost" }, "Reset");
 
+    // The plot, with an HTML handle over the arrowhead: a 44px drag target you can grab with a thumb.
     const plot = s("svg", {
-      viewBox: "0 0 240 240",
+      viewBox: `0 0 ${PLOT} ${PLOT}`,
       class: "xp-plot",
       role: "img",
     });
     const plotTitle = s("title");
-    plot.append(plotTitle);
-
-    const pipeHead = h(
-      "tr",
-      {},
-      ...["Key", "k", "q·k", "scaled", "masked", "weight"].map((c) =>
-        h("th", { scope: "col" }, c),
-      ),
+    const handle = h("span", { class: "xp-handle", "aria-hidden": "true" });
+    const plotWrap = h("div", { class: "xp-plot-wrap" }, plot, handle);
+    const figure = h(
+      "div",
+      { class: "xp-figure" },
+      plotWrap,
+      h("p", { class: "xp-note" }, "Drag the arrowhead, or use the sliders."),
     );
-    const pipeRows = TOKENS.map(() => h("tr"));
+
     const pipeCaption = h("caption");
-    const pipe = h(
+    const pipe = TOKENS.map((t) => {
+      const cells = [0, 1, 2, 3].map(() => h("td"));
+      cells[0]!.className = "xp-wide-only";
+      const weight = weightCell();
+      const tr = h("tr", {}, h("th", { scope: "row" }, t), ...cells, weight.td);
+      return { tr, cells, weight };
+    });
+    const pipeTable = h(
       "table",
       { class: "xp-table" },
       pipeCaption,
-      h("thead", {}, pipeHead),
-      h("tbody", {}, ...pipeRows),
+      tableHead([
+        "Key",
+        ["k", "xp-wide-only"],
+        "q·k",
+        "scaled",
+        "masked",
+        "weight",
+      ]),
+      h("tbody", {}, ...pipe.map((r) => r.tr)),
     );
 
     const summary = h("p", { class: "xp-summary", "aria-live": "polite" });
 
-    const matHead = h(
-      "tr",
-      {},
-      h("td"),
-      ...TOKENS.map((t) => h("th", { scope: "col" }, t)),
-    );
-    const matRows = TOKENS.map(() => h("tr"));
-    const mat = h(
+    const mat = TOKENS.map((t) => {
+      const cells = TOKENS.map(() => weightCell());
+      const tr = h(
+        "tr",
+        {},
+        h("th", { scope: "row" }, t),
+        ...cells.map((c) => c.td),
+      );
+      return { tr, cells };
+    });
+    const matTable = h(
       "table",
       { class: "xp-table xp-matrix" },
       h(
@@ -258,31 +383,39 @@ class AttentionLab extends HTMLElement {
         {},
         "Every token at once: each row is one query, each column one key. Rows sum to 100%.",
       ),
-      h("thead", {}, matHead),
-      h("tbody", {}, ...matRows),
+      h(
+        "thead",
+        {},
+        h(
+          "tr",
+          {},
+          h("td"),
+          ...TOKENS.map((t) => h("th", { scope: "col" }, t)),
+        ),
+      ),
+      h("tbody", {}, ...mat.map((r) => r.tr)),
     );
 
     const controls = h(
       "div",
       { class: "xp-controls" },
-      radios,
+      tok.wrap,
       qx.wrap,
       qy.wrap,
       causal.wrap,
       scale.wrap,
-      reset,
     );
-    this.replaceChildren(
-      h(
-        "div",
-        { class: "xp" },
-        h("p", { class: "xp-title" }, "Attention lab"),
-        h("div", { class: "xp-split" }, controls, plot),
-        h("div", { class: "xp-scroll" }, pipe),
-        summary,
-        h("div", { class: "xp-scroll" }, mat),
-      ),
+    const root = h(
+      "div",
+      { class: "xp" },
+      head("Attention lab", reset),
+      h("div", { class: "xp-split" }, figure, controls),
+      summary,
+      h("div", { class: "xp-scroll" }, pipeTable),
+      h("div", { class: "xp-scroll" }, matTable),
     );
+    this.replaceChildren(root);
+    const setMotion = motion(root);
 
     const weightsFor = (i: number) => {
       const raw = KEYS.map((k) => dot(this.q[i]!, k));
@@ -293,7 +426,8 @@ class AttentionLab extends HTMLElement {
       return { raw, scaled, masked, w: softmax(masked) };
     };
 
-    const render = () => {
+    const render = (animate = false) => {
+      setMotion(animate);
       const i = this.row;
       const [x, y] = this.q[i]!;
       qx.input.value = String(x);
@@ -303,19 +437,15 @@ class AttentionLab extends HTMLElement {
 
       const { raw, scaled, masked, w } = weightsFor(i);
       pipeCaption.textContent = `How "${TOKENS[i]}" (q = ${fixed(x, 1)}, ${fixed(y, 1)}) scores each key`;
-      pipeRows.forEach((tr, j) => {
-        const b = bar();
-        b.set(w[j]!);
+      pipe.forEach(({ tr, cells, weight }, j) => {
         const k = KEYS[j]!;
-        tr.className = Number.isFinite(masked[j]!) ? "" : "is-masked";
-        tr.replaceChildren(
-          h("th", { scope: "row" }, TOKENS[j]!),
-          h("td", {}, `${fixed(k[0], 1)}, ${fixed(k[1], 1)}`),
-          h("td", {}, fixed(raw[j]!)),
-          h("td", {}, fixed(scaled[j]!)),
-          h("td", {}, Number.isFinite(masked[j]!) ? fixed(masked[j]!) : "−∞"),
-          h("td", { class: "xp-weight" }, h("span", {}, pct(w[j]!)), b.el),
-        );
+        const seen = Number.isFinite(masked[j]!);
+        tr.className = seen ? "" : "is-masked";
+        cells[0]!.textContent = `${fixed(k[0], 1)}, ${fixed(k[1], 1)}`;
+        cells[1]!.textContent = fixed(raw[j]!);
+        cells[2]!.textContent = fixed(scaled[j]!);
+        cells[3]!.textContent = seen ? fixed(masked[j]!) : "−∞";
+        weight.set(w[j]!);
       });
 
       const out = VALUES.reduce<V2>(
@@ -325,27 +455,13 @@ class AttentionLab extends HTMLElement {
       const top = w.indexOf(Math.max(...w));
       summary.textContent = `"${TOKENS[i]}" puts ${pct(w[top]!)} of its attention on "${TOKENS[top]}". Its output is the weighted sum of the value vectors: (${fixed(out[0])}, ${fixed(out[1])}).`;
 
-      matRows.forEach((tr, r) => {
+      mat.forEach(({ tr, cells }, r) => {
         const wr = weightsFor(r).w;
         tr.className = r === i ? "is-selected" : "";
-        tr.replaceChildren(
-          h("th", { scope: "row" }, TOKENS[r]!),
-          ...wr.map((v) => {
-            const b = bar();
-            b.set(v);
-            return h(
-              "td",
-              { class: "xp-weight" },
-              h("span", {}, v === 0 ? "0" : pct(v)),
-              b.el,
-            );
-          }),
-        );
+        cells.forEach((c, j) => c.set(wr[j]!, "0"));
       });
 
       // Plot: keys as points, the query as an arrow. Dot product = how far the key lies along the arrow.
-      const px = (v: number) => 120 + v * 50;
-      const py = (v: number) => 120 - v * 50;
       plotTitle.textContent = `Query for "${TOKENS[i]}" drawn as an arrow; keys as points. Larger dot product means the key lies further along the arrow.`;
       const parts: SVGElement[] = [
         s("line", { x1: 10, y1: 120, x2: 230, y2: 120, class: "xp-axis" }),
@@ -386,12 +502,48 @@ class AttentionLab extends HTMLElement {
         s("text", { x: 14, y: 22, class: "xp-label" }, `q for "${TOKENS[i]}"`),
       );
       plot.replaceChildren(plotTitle, ...parts);
+      handle.style.left = `${(hx / PLOT) * 100}%`;
+      handle.style.top = `${(hy / PLOT) * 100}%`;
     };
 
-    radioInputs.forEach((r) =>
+    // Dragging: the handle (any pointer) or anywhere on the plot (mouse only, so touch can still scroll).
+    let dragging = false;
+    const moveTo = (e: PointerEvent) => {
+      const r = plotWrap.getBoundingClientRect();
+      const vx = ((e.clientX - r.left) / r.width) * PLOT;
+      const vy = ((e.clientY - r.top) / r.height) * PLOT;
+      this.q[this.row] = [
+        tenth((vx - PLOT / 2) / 50),
+        tenth((PLOT / 2 - vy) / 50),
+      ];
+      render();
+    };
+    const start = (e: PointerEvent) => {
+      dragging = true;
+      handle.setPointerCapture(e.pointerId);
+      plotWrap.classList.add("is-dragging");
+      e.preventDefault();
+    };
+    const end = () => {
+      dragging = false;
+      plotWrap.classList.remove("is-dragging");
+    };
+    handle.addEventListener("pointerdown", start);
+    plot.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      start(e);
+      moveTo(e);
+    });
+    handle.addEventListener("pointermove", (e) => {
+      if (dragging) moveTo(e);
+    });
+    handle.addEventListener("pointerup", end);
+    handle.addEventListener("pointercancel", end);
+
+    tok.inputs.forEach((r) =>
       r.addEventListener("change", () => {
         this.row = Number(r.value);
-        render();
+        render(true);
       }),
     );
     qx.input.addEventListener("input", () => {
@@ -402,13 +554,13 @@ class AttentionLab extends HTMLElement {
       this.q[this.row]![1] = Number(qy.input.value);
       render();
     });
-    causal.input.addEventListener("change", render);
-    scale.input.addEventListener("change", render);
+    causal.input.addEventListener("change", () => render(true));
+    scale.input.addEventListener("change", () => render(true));
     reset.addEventListener("click", () => {
       this.q = QUERIES.map((v) => [...v] as V2);
       causal.input.checked = true;
       scale.input.checked = true;
-      render();
+      render(true);
     });
     render();
   }
@@ -450,38 +602,42 @@ class ScaleLab extends HTMLElement {
       { type: "button", class: "xp-button" },
       "New random vectors",
     );
-    const rows = Array.from({ length: 8 }, () => h("tr"));
+    const rows = Array.from({ length: 8 }, (_, j) => {
+      const score = h("td");
+      const raw = weightCell();
+      const scaled = weightCell();
+      const tr = h(
+        "tr",
+        {},
+        h("th", { scope: "row" }, String(j + 1)),
+        score,
+        raw.td,
+        scaled.td,
+      );
+      return { tr, score, raw, scaled };
+    });
     const table = h(
       "table",
       { class: "xp-table" },
       h("caption", {}, "One random query against eight random keys"),
-      h(
-        "thead",
-        {},
-        h(
-          "tr",
-          {},
-          ...["Key", "q·k", "weight, raw", "weight, ÷√d_k"].map((c) =>
-            h("th", { scope: "col" }, c),
-          ),
-        ),
-      ),
-      h("tbody", {}, ...rows),
+      tableHead(["Key", "q·k", "weight, raw", "weight, ÷√d_k"]),
+      h("tbody", {}, ...rows.map((r) => r.tr)),
     );
     const summary = h("p", { class: "xp-summary", "aria-live": "polite" });
 
-    this.replaceChildren(
-      h(
-        "div",
-        { class: "xp" },
-        h("p", { class: "xp-title" }, "Why scale by √d_k"),
-        h("div", { class: "xp-controls xp-row" }, dim.wrap, again),
-        h("div", { class: "xp-scroll" }, table),
-        summary,
-      ),
+    const root = h(
+      "div",
+      { class: "xp" },
+      head("Why scale by √d_k"),
+      h("div", { class: "xp-controls xp-row" }, dim.wrap, again),
+      summary,
+      h("div", { class: "xp-scroll" }, table),
     );
+    this.replaceChildren(root);
+    const setMotion = motion(root);
 
-    const render = () => {
+    const render = (animate = false) => {
+      setMotion(animate);
       const d = DIMS[Number(dim.input.value)]!;
       dim.out.textContent = String(d);
       const rand = mulberry32(seed * 1000 + d);
@@ -490,17 +646,10 @@ class ScaleLab extends HTMLElement {
       const scores = keys.map((k) => dot(q, k));
       const raw = softmax(scores);
       const scaled = softmax(scores.map((x) => x / Math.sqrt(d)));
-      rows.forEach((tr, j) => {
-        const a = bar();
-        const b = bar();
-        a.set(raw[j]!);
-        b.set(scaled[j]!);
-        tr.replaceChildren(
-          h("th", { scope: "row" }, String(j + 1)),
-          h("td", {}, fixed(scores[j]!, 1)),
-          h("td", { class: "xp-weight" }, h("span", {}, pct(raw[j]!)), a.el),
-          h("td", { class: "xp-weight" }, h("span", {}, pct(scaled[j]!)), b.el),
-        );
+      rows.forEach((r, j) => {
+        r.score.textContent = fixed(scores[j]!, 1);
+        r.raw.set(raw[j]!);
+        r.scaled.set(scaled[j]!);
       });
       const spread = Math.sqrt(
         scores.reduce((acc, x) => acc + x * x, 0) / scores.length,
@@ -508,10 +657,10 @@ class ScaleLab extends HTMLElement {
       summary.textContent = `At d_k = ${d}, the scores spread out to about ±${fixed(spread, 1)} (theory: √${d} ≈ ${fixed(Math.sqrt(d), 1)}). Without scaling, the top key gets ${pct(Math.max(...raw))} of the attention. With it, ${pct(Math.max(...scaled))}.`;
     };
 
-    dim.input.addEventListener("input", render);
+    dim.input.addEventListener("input", () => render());
     again.addEventListener("click", () => {
       seed += 1;
-      render();
+      render(true);
     });
     render();
   }
@@ -566,54 +715,16 @@ class GptShape extends HTMLElement {
     const d = slider("d_model", 64, 2048, 64, 768);
     const layers = slider("Layers", 1, 64, 1, 12);
     const heads = slider("Heads", 1, 32, 1, 12);
-    const vocab = numberField("Vocabulary", 50257, { min: "1", step: "1" });
-    const ctx = numberField("Context length", 1024, { min: "1", step: "1" });
-
-    const total = h("p", { class: "xp-big", "aria-live": "polite" });
-    const stack = h("div", { class: "xp-stack", "aria-hidden": "true" });
-    const legend = h("ul", { class: "xp-legend" });
-    const notes = h("p", { class: "xp-summary" });
-    const shapes = h("tbody");
-    const shapeTable = h(
-      "table",
-      { class: "xp-table" },
-      h("caption", {}, "The weight matrices in one block"),
-      h(
-        "thead",
-        {},
-        h(
-          "tr",
-          {},
-          ...["Matrix", "Shape", "Parameters"].map((c) =>
-            h("th", { scope: "col" }, c),
-          ),
-        ),
-      ),
-      shapes,
-    );
-
-    this.replaceChildren(
-      h(
-        "div",
-        { class: "xp" },
-        h("p", { class: "xp-title" }, "Parameter counter"),
-        h(
-          "div",
-          { class: "xp-controls xp-grid" },
-          preset.wrap,
-          d.wrap,
-          layers.wrap,
-          heads.wrap,
-          vocab.wrap,
-          ctx.wrap,
-        ),
-        total,
-        stack,
-        legend,
-        notes,
-        h("div", { class: "xp-scroll" }, shapeTable),
-      ),
-    );
+    const vocab = numberField("Vocabulary", 50257, {
+      min: 1,
+      integer: true,
+      allowK: true,
+    });
+    const ctx = numberField("Context length", 1024, {
+      min: 1,
+      integer: true,
+      allowK: true,
+    });
 
     const parts = [
       { key: "tokenEmb", label: "Token embeddings", cls: "c1" },
@@ -623,12 +734,57 @@ class GptShape extends HTMLElement {
       { key: "norms", label: "Layer norms", cls: "c5" },
     ] as const;
 
-    const render = () => {
+    // The answer sits above the controls so it stays in view while you drag on a phone.
+    const total = h("p", { class: "xp-big", "aria-live": "polite" });
+    const segs = parts.map((part) =>
+      h("span", { class: `xp-seg ${part.cls}` }),
+    );
+    const stack = h(
+      "div",
+      { class: "xp-stack", "aria-hidden": "true" },
+      ...segs,
+    );
+    const legend = h("ul", { class: "xp-legend" });
+    const notes = h("p", { class: "xp-summary" });
+    const shapes = h("tbody");
+    const shapeTable = h(
+      "table",
+      { class: "xp-table" },
+      h("caption", {}, "The weight matrices in one block"),
+      tableHead(["Matrix", "Shape", "Parameters"]),
+      shapes,
+    );
+
+    const root = h(
+      "div",
+      { class: "xp" },
+      head("Parameter counter"),
+      total,
+      stack,
+      legend,
+      h(
+        "div",
+        { class: "xp-controls xp-grid" },
+        preset.wrap,
+        d.wrap,
+        layers.wrap,
+        heads.wrap,
+        vocab.wrap,
+        ctx.wrap,
+      ),
+      notes,
+      h("div", { class: "xp-scroll" }, shapeTable),
+    );
+    this.replaceChildren(root);
+    const setMotion = motion(root);
+
+    const render = (animate = false) => {
+      setMotion(animate);
       const D = num(d.input, 768);
       const L = num(layers.input, 12);
       const H = num(heads.input, 12);
-      const V = Math.max(1, num(vocab.input, 50257));
-      const C = Math.max(1, num(ctx.input, 1024));
+      const V = vocab.value();
+      const C = ctx.value();
       d.out.textContent = String(D);
       layers.out.textContent = String(L);
       heads.out.textContent = String(H);
@@ -641,13 +797,9 @@ class GptShape extends HTMLElement {
 
       const p = gpt2Params(V, C, D, L);
       total.textContent = `${int(p.total)} parameters (${params(p.total)})`;
-      stack.replaceChildren(
-        ...parts.map((part) => {
-          const seg = h("span", { class: `xp-seg ${part.cls}` });
-          seg.style.width = `${(p[part.key] / p.total) * 100}%`;
-          return seg;
-        }),
-      );
+      segs.forEach((seg, i) => {
+        seg.style.width = `${(p[parts[i]!.key] / p.total) * 100}%`;
+      });
       legend.replaceChildren(
         ...parts.map((part) =>
           h(
@@ -661,10 +813,12 @@ class GptShape extends HTMLElement {
           ),
         ),
       );
-      const headNote =
-        D % H === 0
-          ? `${H} heads of ${D / H} dimensions each. Change the head count and the total stays the same: heads split d_model, they don't add weights.`
-          : `${D} doesn't divide evenly into ${H} heads, so this shape wouldn't build. Pick a head count that divides d_model.`;
+      const splits = D % H === 0;
+      heads.wrap.classList.toggle("is-invalid", !splits);
+      heads.input.setAttribute("aria-invalid", String(!splits));
+      const headNote = splits
+        ? `${H} heads of ${D / H} dimensions each. Change the head count and the total stays the same: heads split d_model, they don't add weights.`
+        : `${D} doesn't divide evenly into ${H} heads, so this shape wouldn't build. Pick a head count that divides d_model.`;
       notes.textContent = `${headNote} In 16-bit floats the weights take ${bytes(2 * p.total)}, and generating one token costs about 2 × ${params(p.total)} = ${params(2 * p.total)} FLOPs.`;
       const row = (name: string, shape: string, n: number) =>
         h(
@@ -693,9 +847,9 @@ class GptShape extends HTMLElement {
       d.input.value = String(g.d);
       layers.input.value = String(g.layers);
       heads.input.value = String(g.heads);
-      vocab.input.value = "50257";
-      ctx.input.value = "1024";
-      render();
+      vocab.set(50257);
+      ctx.set(1024);
+      render(true);
     });
     for (const el of [
       d.input,
@@ -704,7 +858,7 @@ class GptShape extends HTMLElement {
       vocab.input,
       ctx.input,
     ])
-      el.addEventListener("input", render);
+      el.addEventListener("input", () => render());
     render();
   }
 }
@@ -805,6 +959,9 @@ export function servingBudget(c: Setup, batch: number) {
   };
 }
 
+// Throughput chart geometry (viewBox 320 × 190).
+const CH = { L: 44, R: 310, T: 14, B: 160 };
+
 class ServingBudget extends HTMLElement {
   connectedCallback() {
     if (this.dataset.ready) return;
@@ -812,30 +969,19 @@ class ServingBudget extends HTMLElement {
 
     const preset = select("Setup", [...SETUPS.map((x) => x.name), "Custom"], 0);
     const f = {
-      paramsB: numberField("Parameters (billions)", 13, {
-        min: "0.1",
-        step: "0.1",
-      }),
-      layers: numberField("Layers", 40, { min: "1", step: "1" }),
-      kvHeads: numberField("KV heads", 40, { min: "1", step: "1" }),
-      headDim: numberField("Head dimension", 128, { min: "1", step: "1" }),
+      paramsB: numberField("Parameters (billions)", 13, { min: 0.1 }),
+      layers: numberField("Layers", 40, { min: 1, integer: true }),
+      kvHeads: numberField("KV heads", 40, { min: 1, integer: true }),
+      headDim: numberField("Head dimension", 128, { min: 1, integer: true }),
       context: numberField("Tokens per sequence", 8192, {
-        min: "1",
-        step: "1",
+        min: 1,
+        integer: true,
+        allowK: true,
       }),
-      chips: numberField("Chips", 8, { min: "1", step: "1" }),
-      memGB: numberField("Memory per chip (GB)", 17.18, {
-        min: "1",
-        step: "0.01",
-      }),
-      bwGBs: numberField("Memory bandwidth per chip (GB/s)", 820, {
-        min: "1",
-        step: "1",
-      }),
-      tflops: numberField("Compute per chip (TFLOP/s)", 197, {
-        min: "1",
-        step: "1",
-      }),
+      chips: numberField("Chips", 8, { min: 1, integer: true }),
+      memGB: numberField("Memory per chip (GB)", 17.18, { min: 1 }),
+      bwGBs: numberField("Memory bandwidth per chip (GB/s)", 820, { min: 1 }),
+      tflops: numberField("Compute per chip (TFLOP/s)", 197, { min: 1 }),
     };
     const wBytes = select("Weights", ["bf16 (2 bytes)", "int8 (1 byte)"], 0);
     const kvBytes = select("KV cache", ["bf16 (2 bytes)", "int8 (1 byte)"], 0);
@@ -843,7 +989,14 @@ class ServingBudget extends HTMLElement {
     const toBatch = (v: number) => Math.max(1, Math.round(2 ** (v / 10)));
     const batch = slider("Batch size", 0, 100, 1, 0, (v) => String(toBatch(v)));
 
-    const memBar = h("div", { class: "xp-stack", "aria-hidden": "true" });
+    const memSegs = ["c1", "c3", "c0"].map((cls) =>
+      h("span", { class: `xp-seg ${cls}` }),
+    );
+    const memBar = h(
+      "div",
+      { class: "xp-stack", "aria-hidden": "true" },
+      ...memSegs,
+    );
     const memLegend = h("ul", { class: "xp-legend" });
     const facts = h("dl", { class: "xp-facts" });
     const summary = h("p", { class: "xp-summary", "aria-live": "polite" });
@@ -853,88 +1006,108 @@ class ServingBudget extends HTMLElement {
       role: "img",
     });
 
-    this.replaceChildren(
+    // Hick's law: the three choices that drive the post come first; the nine raw numbers wait behind a
+    // disclosure for readers who want a custom setup.
+    const more = h(
+      "details",
+      { class: "xp-more" },
+      h("summary", {}, "Model and hardware numbers"),
       h(
         "div",
-        { class: "xp" },
-        h("p", { class: "xp-title" }, "Serving budget"),
-        h("div", { class: "xp-controls" }, preset.wrap),
-        h(
-          "div",
-          { class: "xp-controls xp-grid" },
-          ...Object.values(f).map((x) => x.wrap),
-          wBytes.wrap,
-          kvBytes.wrap,
-        ),
-        h("div", { class: "xp-controls" }, batch.wrap),
-        memBar,
-        memLegend,
-        facts,
-        summary,
-        chart,
+        { class: "xp-controls xp-grid" },
+        ...Object.values(f).map((x) => x.wrap),
       ),
     );
 
+    const root = h(
+      "div",
+      { class: "xp" },
+      head("Serving budget"),
+      h(
+        "div",
+        { class: "xp-controls" },
+        preset.wrap,
+        h("div", { class: "xp-grid xp-pair" }, wBytes.wrap, kvBytes.wrap),
+        batch.wrap,
+      ),
+      memBar,
+      memLegend,
+      summary,
+      h(
+        "div",
+        { class: "xp-figure" },
+        chart,
+        h(
+          "p",
+          { class: "xp-note" },
+          "Drag across the chart to change the batch size.",
+        ),
+      ),
+      facts,
+      more,
+    );
+    this.replaceChildren(root);
+    const setMotion = motion(root);
+
     const read = (): Setup => ({
       name: "",
-      paramsB: Math.max(0.1, num(f.paramsB.input, 13)),
-      layers: Math.max(1, num(f.layers.input, 40)),
-      kvHeads: Math.max(1, num(f.kvHeads.input, 40)),
-      headDim: Math.max(1, num(f.headDim.input, 128)),
-      context: Math.max(1, num(f.context.input, 8192)),
-      chips: Math.max(1, num(f.chips.input, 8)),
-      memGB: Math.max(1, num(f.memGB.input, 16)),
-      bwGBs: Math.max(1, num(f.bwGBs.input, 820)),
-      tflops: Math.max(1, num(f.tflops.input, 197)),
+      paramsB: f.paramsB.value(),
+      layers: f.layers.value(),
+      kvHeads: f.kvHeads.value(),
+      headDim: f.headDim.value(),
+      context: f.context.value(),
+      chips: f.chips.value(),
+      memGB: f.memGB.value(),
+      bwGBs: f.bwGBs.value(),
+      tflops: f.tflops.value(),
       wBytes: wBytes.input.value === "1" ? 1 : 2,
       kvBytes: kvBytes.input.value === "1" ? 1 : 2,
     });
 
     const load = (c: Setup) => {
       for (const [k, field] of Object.entries(f))
-        field.input.value = String(c[k as keyof typeof f]);
+        field.set(c[k as keyof typeof f]);
       wBytes.input.value = c.wBytes === 1 ? "1" : "0";
       kvBytes.input.value = c.kvBytes === 1 ? "1" : "0";
     };
 
     const fact = (dt: string, dd: string) => [h("dt", {}, dt), h("dd", {}, dd)];
+    let xMax = 16; // the chart's x range, kept for scrubbing
 
-    const render = (fromInput = false) => {
+    const render = (animate = false, custom = false) => {
+      setMotion(animate);
       const c = read();
-      if (fromInput) preset.input.value = String(SETUPS.length);
+      if (custom) preset.input.value = String(SETUPS.length);
       const B = toBatch(Number(batch.input.value));
       batch.out.textContent = String(B);
       const r = servingBudget(c, B);
 
       // Memory bar: weights, KV for this batch, what's left.
       const used = Math.min(r.memory, r.weights + B * r.kvPerSeq);
-      const segs: [string, number, string][] = [
-        ["c1", Math.min(r.weights, r.memory), `Weights ${bytes(r.weights)}`],
+      const segs: [number, string][] = [
+        [Math.min(r.weights, r.memory), `Weights ${bytes(r.weights)}`],
         [
-          "c3",
           Math.max(0, used - Math.min(r.weights, r.memory)),
           `KV cache for ${B} × ${int(c.context)} tokens: ${bytes(B * r.kvPerSeq)}`,
         ],
         [
-          "c0",
           Math.max(0, r.memory - used),
           `Free ${bytes(Math.max(0, r.memory - r.weights - B * r.kvPerSeq))}`,
         ],
       ];
       memBar.classList.toggle("is-over", !r.fits);
-      memBar.replaceChildren(
-        ...segs.map(([cls, v]) => {
-          const seg = h("span", { class: `xp-seg ${cls}` });
-          seg.style.width = `${(v / r.memory) * 100}%`;
-          return seg;
-        }),
-      );
+      memSegs.forEach((seg, i) => {
+        seg.style.width = `${(segs[i]![0] / r.memory) * 100}%`;
+      });
       memLegend.replaceChildren(
-        ...segs.map(([cls, , label]) =>
+        ...segs.map(([, label], i) =>
           h(
             "li",
             {},
-            h("span", { class: `xp-swatch ${cls}`, "aria-hidden": "true" }),
+            h("span", {
+              class: `xp-swatch ${memSegs[i]!.classList[1]}`,
+              "aria-hidden": "true",
+            }),
             label,
           ),
         ),
@@ -982,7 +1155,8 @@ class ServingBudget extends HTMLElement {
       critical: number,
       current: number,
     ) => {
-      const xMax = Math.min(
+      const { L, R, T, B: Bm } = CH;
+      xMax = Math.min(
         1024,
         Math.max(16, Math.ceil(Math.max(maxBatch * 1.3, critical * 1.3))),
       );
@@ -992,10 +1166,6 @@ class ServingBudget extends HTMLElement {
         pts.push([b, r.tokensPerSec, r.fits]);
       }
       const yMax = Math.max(...pts.map((p) => p[1])) * 1.1 || 1;
-      const L = 44;
-      const R = 310;
-      const T = 14;
-      const Bm = 160;
       const x = (b: number) => L + ((b - 1) / Math.max(1, xMax - 1)) * (R - L);
       const y = (v: number) => Bm - (v / yMax) * (Bm - T);
       const path = (sel: (p: [number, number, boolean]) => boolean) =>
@@ -1006,6 +1176,11 @@ class ServingBudget extends HTMLElement {
               `${i ? "L" : "M"}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`,
           )
           .join(" ");
+      // A guide's label sits on whichever side of its line has room.
+      const guideLabel = (gx: number, gy: number, text: string) =>
+        gx > (L + R) / 2
+          ? s("text", { x: gx - 4, y: gy, class: "xp-label xp-end" }, text)
+          : s("text", { x: gx + 4, y: gy, class: "xp-label" }, text);
       const cur = servingBudget(c, current);
       const els: SVGElement[] = [
         s(
@@ -1024,7 +1199,7 @@ class ServingBudget extends HTMLElement {
           { x: (L + R) / 2, y: Bm + 26, class: "xp-label xp-middle" },
           "batch size",
         ),
-        s("text", { x: L + 4, y: T + 4, class: "xp-label" }, "tokens/s"),
+        s("text", { x: R, y: T + 4, class: "xp-label xp-end" }, "tokens/s"),
         s("path", { d: path((p) => p[2]), class: "xp-line" }),
         s("path", { d: path((p) => !p[2]), class: "xp-line is-over" }),
       ];
@@ -1037,11 +1212,7 @@ class ServingBudget extends HTMLElement {
             y2: Bm,
             class: "xp-guide",
           }),
-          s(
-            "text",
-            { x: x(critical) + 3, y: Bm - 6, class: "xp-label" },
-            "critical",
-          ),
+          guideLabel(x(critical), Bm - 6, "critical"),
         );
       }
       if (maxBatch >= 1 && maxBatch <= xMax) {
@@ -1053,15 +1224,18 @@ class ServingBudget extends HTMLElement {
             y2: Bm,
             class: "xp-guide is-limit",
           }),
-          s(
-            "text",
-            { x: x(maxBatch) + 3, y: T + 18, class: "xp-label" },
-            "memory full",
-          ),
+          guideLabel(x(maxBatch), Bm - 22, "memory full"),
         );
       }
       if (current <= xMax) {
         els.push(
+          s("line", {
+            x1: x(current),
+            y1: y(cur.tokensPerSec),
+            x2: x(current),
+            y2: Bm,
+            class: "xp-cursor",
+          }),
           s("circle", {
             cx: x(current),
             cy: y(cur.tokensPerSec),
@@ -1073,15 +1247,41 @@ class ServingBudget extends HTMLElement {
       chart.replaceChildren(...els);
     };
 
+    // Scrubbing the chart sets the batch. A mouse acts on press; touch waits for a sideways move or a tap,
+    // so a vertical swipe still scrolls the page (touch-action: pan-y) without changing anything.
+    let scrubbing = false;
+    const scrubTo = (e: PointerEvent) => {
+      const r = chart.getBoundingClientRect();
+      const vx = ((e.clientX - r.left) / r.width) * 320;
+      const b = 1 + ((vx - CH.L) / (CH.R - CH.L)) * (xMax - 1);
+      const clamped = Math.max(1, Math.min(xMax, b));
+      batch.input.value = String(Math.round(10 * Math.log2(clamped)));
+      render();
+    };
+    chart.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      scrubbing = true;
+      chart.setPointerCapture(e.pointerId);
+      if (e.pointerType === "mouse") scrubTo(e);
+    });
+    chart.addEventListener("pointermove", (e) => {
+      if (scrubbing) scrubTo(e);
+    });
+    chart.addEventListener("pointerup", (e) => {
+      if (scrubbing) scrubTo(e);
+      scrubbing = false;
+    });
+    chart.addEventListener("pointercancel", () => (scrubbing = false));
+
     preset.input.addEventListener("change", () => {
       const c = SETUPS[Number(preset.input.value)];
       if (c) load(c);
-      render();
+      render(true);
     });
     for (const field of Object.values(f))
-      field.input.addEventListener("input", () => render(true));
-    wBytes.input.addEventListener("change", () => render(true));
-    kvBytes.input.addEventListener("change", () => render(true));
+      field.input.addEventListener("input", () => render(false, true));
+    wBytes.input.addEventListener("change", () => render(true, true));
+    kvBytes.input.addEventListener("change", () => render(true, true));
     batch.input.addEventListener("input", () => render());
     load(SETUPS[0]!);
     render();

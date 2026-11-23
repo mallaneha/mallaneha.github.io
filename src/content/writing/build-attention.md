@@ -40,8 +40,8 @@ To decide where "sat" should look, you take its query and compute a dot product 
 that points the same way as the query gets a large score. One at a right angle gets zero, and one
 pointing away gets a negative score.
 
-Try it below. The arrow is the query and the dots are keys. Drag the sliders to move the query and
-watch which key grows.
+Try it below. The arrow is the query and the dots are keys. Drag the arrowhead (or use the sliders) to move
+the query and watch which key grows.
 
 <attention-lab>
 <div class="xp-fallback"><p>This is an interactive attention head. With JavaScript on, you can move each token's query and toggle scaling and the causal mask.</p><p>With the default settings, "sat" (query 1.2, 0.8) scores the keys at −0.56 for "The", 2.16 for "cat" and 0.56 for itself. After scaling, masking and softmax it puts 68% of its attention on "cat", 22% on itself and 10% on "The". It can't see "down", which comes later.</p></div>

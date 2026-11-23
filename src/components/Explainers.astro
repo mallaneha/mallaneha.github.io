@@ -5,6 +5,8 @@
 ---
 
 <style is:global>
+  /* Built to the ui-guides skill (.claude/skills/ui-guides). Results sit next to the control that changes them, values
+     follow drags with no easing, discrete changes ease over --duration-state, 44px targets on touch. */
   attention-lab,
   scale-lab,
   gpt-shape,
@@ -16,7 +18,7 @@
   .xp-fallback {
     padding: var(--space-4);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-row);
+    border-radius: var(--radius-tile);
     color: var(--color-body);
     font-size: var(--text-sm);
   }
@@ -24,15 +26,28 @@
   .xp {
     padding: var(--space-4);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-row);
+    border-radius: var(--radius-tile);
     background: var(--color-surface);
     font-size: var(--text-sm);
   }
 
+  .xp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin: calc(-1 * var(--space-1)) 0 var(--space-3);
+  }
   .xp-title {
-    margin: 0 0 var(--space-3);
+    margin: 0;
     font-weight: var(--weight-medium);
     color: var(--color-text);
+  }
+  .xp-note {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    text-align: center;
   }
 
   .xp-controls {
@@ -46,11 +61,19 @@
     flex-wrap: wrap;
     align-items: end;
   }
+  .xp-row > .xp-field {
+    flex: 1 1 14rem;
+  }
   .xp-grid {
     display: grid;
+    gap: var(--space-3);
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   }
+  .xp-pair {
+    grid-template-columns: 1fr 1fr;
+  }
 
+  /* Attention lab: the plot comes first on phones so it stays in view while you move the query. */
   .xp-split {
     display: grid;
     gap: var(--space-4);
@@ -61,8 +84,15 @@
       grid-template-columns: 1fr 13rem;
       align-items: start;
     }
+    .xp-split > .xp-figure {
+      order: 1;
+    }
+  }
+  .xp-split > .xp-controls {
+    margin-bottom: 0;
   }
 
+  /* Fields */
   .xp-field {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -80,83 +110,226 @@
     min-height: 44px;
     margin: 0;
     accent-color: var(--color-accent);
+    cursor: pointer;
   }
   .xp-field output {
     font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums slashed-zero;
     color: var(--color-text);
   }
   .xp-field-number,
   .xp-field-select {
     grid-template-columns: 1fr;
   }
-  .xp-field input[type="number"],
+  .xp-field input[type="text"],
   .xp-field select {
     width: 100%;
     min-height: 44px;
-    padding: 0 var(--space-2);
+    padding: 0 var(--space-3);
     border: 1px solid var(--color-subtle);
-    border-radius: var(--radius);
+    border-radius: var(--radius-row);
     background: var(--color-bg);
     color: var(--color-text);
     font: inherit;
-    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    transition: border-color var(--transition);
+  }
+  .xp-field input[type="text"]:hover,
+  .xp-field select:hover {
+    border-color: var(--color-muted);
+  }
+  .xp-field input[aria-invalid="true"] {
+    border-color: var(--chart-4);
+  }
+  .xp-hint {
+    font-size: var(--text-xs);
+    color: var(--chart-4);
+  }
+  .xp-field.is-invalid output {
+    color: var(--chart-4);
   }
 
-  .xp-radios {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-1) var(--space-4);
+  /* Segmented control (radio buttons). 2px inset, so the inner radius is the outer one minus 2px. */
+  .xp-choice {
     margin: 0;
     padding: 0;
     border: 0;
+    min-width: 0;
   }
-  .xp-radios legend {
-    width: 100%;
+  .xp-choice legend {
     margin-bottom: var(--space-1);
     padding: 0;
     color: var(--color-body);
   }
-  .xp-radios label,
+  .xp-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-row);
+    background: var(--color-bg);
+  }
+  .xp-tabs label {
+    position: relative;
+    flex: 1;
+    display: grid;
+    place-items: center;
+    min-height: 36px;
+    border-radius: var(--radius);
+    color: var(--color-muted);
+    cursor: pointer;
+    transition:
+      background-color var(--transition),
+      color var(--transition);
+  }
+  .xp-tabs input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .xp-tabs label:hover {
+    color: var(--color-text);
+  }
+  .xp-tabs label:has(input:checked) {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+  }
+  .xp-tabs label:has(input:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
   .xp-check {
     display: inline-flex;
     gap: var(--space-2);
     align-items: center;
     min-height: 44px;
     color: var(--color-text);
+    cursor: pointer;
   }
-  .xp-radios input,
   .xp-check input {
+    flex: none;
     width: 1.1rem;
     height: 1.1rem;
     margin: 0;
     accent-color: var(--color-accent);
+    cursor: pointer;
   }
 
-  .xp-button {
-    align-self: flex-start;
+  .xp-button,
+  .xp-ghost {
     min-height: 44px;
     padding: 0 var(--space-4);
     border: 1px solid var(--color-subtle);
-    border-radius: var(--radius);
+    border-radius: var(--radius-row);
     background: var(--color-bg);
     color: var(--color-text);
     font: inherit;
     cursor: pointer;
-    transition: background var(--transition);
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--transition),
+      color var(--transition),
+      transform var(--transition);
+  }
+  .xp-button {
+    align-self: flex-end;
   }
   .xp-button:hover {
     background: var(--color-surface-hover);
   }
+  /* A secondary action: quiet until you look at it. */
+  .xp-ghost {
+    position: relative;
+    min-height: 32px;
+    padding: 0 var(--space-2);
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    font-size: var(--text-xs);
+  }
+  .xp-ghost::before {
+    /* 44px tall hit area without a bigger-looking button */
+    content: "";
+    position: absolute;
+    inset: -6px -4px;
+  }
+  .xp-ghost:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+  .xp-button:active,
+  .xp-ghost:active {
+    transform: scale(0.97);
+  }
 
+  /* Progressive disclosure for the serving budget's raw numbers. */
+  .xp-more {
+    margin-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+  .xp-more summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    color: var(--color-body);
+    cursor: pointer;
+    list-style: none;
+  }
+  .xp-more summary::-webkit-details-marker {
+    display: none;
+  }
+  .xp-more summary::before {
+    content: "";
+    width: 0.4rem;
+    height: 0.4rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--transition);
+  }
+  .xp-more[open] summary::before {
+    transform: rotate(45deg);
+  }
+  .xp-more summary:hover {
+    color: var(--color-text);
+  }
+  .xp-more > .xp-controls {
+    margin: var(--space-2) 0 0;
+  }
+
+  /* Tables: shadows at the edges show when there's more to scroll to. */
   .xp-scroll {
     overflow-x: auto;
     margin: var(--space-4) 0;
+    background:
+      linear-gradient(to right, var(--color-surface) 30%, transparent) left /
+        2rem 100% no-repeat local,
+      linear-gradient(to left, var(--color-surface) 30%, transparent) right /
+        2rem 100% no-repeat local,
+      radial-gradient(
+          farthest-side at 0 50%,
+          color-mix(in srgb, var(--color-text) 14%, transparent),
+          transparent
+        )
+        left / 0.75rem 100% no-repeat scroll,
+      radial-gradient(
+          farthest-side at 100% 50%,
+          color-mix(in srgb, var(--color-text) 14%, transparent),
+          transparent
+        )
+        right / 0.75rem 100% no-repeat scroll;
   }
   .xp-table {
     width: 100%;
     border-collapse: collapse;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums slashed-zero;
   }
   .xp-table caption {
     margin-bottom: var(--space-2);
@@ -164,6 +337,7 @@
     font-family: var(--font-sans);
     font-size: var(--text-sm);
     color: var(--color-body);
+    text-wrap: pretty;
   }
   .xp-table th,
   .xp-table td {
@@ -176,8 +350,14 @@
     font-weight: var(--weight-medium);
     color: var(--color-text);
   }
-  .xp-table th[scope="row"] {
+  .xp-table th[scope="row"],
+  .xp-table thead th:first-child {
     text-align: left;
+  }
+  /* Long row names wrap instead of pushing the numbers off-screen. */
+  .xp-table th[scope="row"] {
+    white-space: normal;
+    min-width: 6ch;
   }
   .xp-table td {
     color: var(--color-body);
@@ -190,9 +370,19 @@
   .xp-table tr.is-selected td {
     background: var(--color-surface-hover);
   }
+  /* Phones: drop the key-vector column (the plot shows it) so the scores fit without scrolling. */
+  @media (max-width: 30rem) {
+    .xp-table th,
+    .xp-table td {
+      padding-inline: var(--space-1);
+    }
+    .xp-wide-only {
+      display: none;
+    }
+  }
 
   .xp-weight {
-    min-width: 5rem;
+    min-width: 3.5rem;
   }
   .xp-weight > span:first-child {
     display: block;
@@ -207,8 +397,8 @@
   }
   .xp-bar-fill {
     display: block;
-    height: 100%;
     width: 100%;
+    height: 100%;
     background: var(--color-accent);
     transform: scaleX(0);
     transform-origin: left;
@@ -217,11 +407,13 @@
   .xp-summary {
     margin: var(--space-3) 0;
     color: var(--color-text);
+    text-wrap: pretty;
   }
   .xp-big {
     margin: 0 0 var(--space-3);
     font-family: var(--font-mono);
     font-size: var(--text-lg);
+    font-variant-numeric: tabular-nums;
     color: var(--color-text);
   }
 
@@ -241,6 +433,9 @@
   .xp-swatch {
     display: block;
     background: var(--color-border);
+  }
+  .xp-seg {
+    min-width: 0;
   }
   .xp-swatch {
     flex: none;
@@ -273,10 +468,14 @@
   }
 
   .xp-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 0 var(--space-4);
     margin: 0 0 var(--space-3);
     padding: 0;
     list-style: none;
     color: var(--color-body);
+    font-variant-numeric: tabular-nums;
   }
   .xp-legend li {
     display: flex;
@@ -284,11 +483,22 @@
     align-items: center;
   }
 
+  /* Facts: label and value side by side when there's room, so the eye can scan one column of numbers. */
   .xp-facts {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0 var(--space-4);
-    margin: var(--space-3) 0;
+    margin: var(--space-3) 0 0;
+  }
+  @media (min-width: 34rem) {
+    .xp-facts {
+      grid-template-columns: max-content 1fr;
+    }
+    .xp-facts dt,
+    .xp-facts dd {
+      padding: var(--space-1) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
   }
   .xp-facts dt {
     color: var(--color-body);
@@ -297,20 +507,76 @@
     margin: 0 0 var(--space-2);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
     color: var(--color-text);
     overflow-wrap: anywhere;
   }
+  @media (min-width: 34rem) {
+    .xp-facts dd {
+      margin: 0;
+    }
+  }
 
+  /* Plots */
+  .xp-figure {
+    margin: var(--space-3) 0;
+  }
+  .xp-split > .xp-figure {
+    margin: 0;
+  }
+  .xp-plot-wrap {
+    position: relative;
+    max-width: 16rem;
+    margin: 0 auto;
+  }
   .xp-plot,
   .xp-chart {
     display: block;
     width: 100%;
     height: auto;
     max-width: 100%;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .xp-plot {
-    max-width: 16rem;
+    cursor: crosshair;
+  }
+  .xp-chart {
+    max-width: 30rem;
     margin: 0 auto;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  /* The arrowhead's drag handle: 44px to hit, a small ring to see. */
+  .xp-handle {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+  }
+  .xp-handle::before {
+    content: "";
+    position: absolute;
+    inset: 11px;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    opacity: 0.45;
+    transition:
+      opacity var(--transition),
+      transform var(--transition);
+  }
+  .xp-handle:hover::before,
+  .is-dragging > .xp-handle::before {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  .is-dragging,
+  .is-dragging .xp-plot,
+  .is-dragging > .xp-handle {
+    cursor: grabbing;
   }
   .xp-axis {
     stroke: var(--color-subtle);
@@ -324,10 +590,16 @@
   .xp-guide.is-limit {
     stroke: var(--chart-4);
   }
+  .xp-cursor {
+    stroke: var(--chart-1);
+    stroke-width: 1;
+    stroke-opacity: 0.4;
+  }
   .xp-label {
     fill: var(--color-body);
     font-family: var(--font-sans);
     font-size: 11px;
+    font-variant-numeric: tabular-nums;
   }
   .xp-label.is-masked {
     fill: var(--color-faint);
@@ -370,13 +642,34 @@
     stroke: var(--chart-4);
   }
 
+  /* Motion: only after discrete changes (.is-instant is set while dragging or typing). */
   @media (prefers-reduced-motion: no-preference) {
     .xp-bar-fill {
-      transition: transform var(--transition);
+      transition: transform var(--duration-state) var(--ease-out);
     }
     /* Segments share one stacked bar, so their widths have to reflow together. */
     .xp-seg {
-      transition: width var(--transition);
+      transition: width var(--duration-state) var(--ease-out);
+    }
+    .xp.is-instant .xp-bar-fill,
+    .xp.is-instant .xp-seg {
+      transition: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .xp-button:active,
+    .xp-ghost:active,
+    .xp-handle:hover::before,
+    .is-dragging > .xp-handle::before {
+      transform: none;
+    }
+    .xp-more summary::before {
+      transition: none;
+    }
+  }
+  @media (pointer: coarse) {
+    .xp-tabs label {
+      min-height: 44px;
     }
   }
 </style>

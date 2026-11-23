@@ -63,6 +63,9 @@
     1,
     1
   ); /* exits speed up as they leave */
+  /* Small state changes (a value updates after a click): 180–260 ms, ease-out. */
+  --duration-state: 200ms;
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
   --drawer-in: 500ms;
   --drawer-out: 300ms;
 
