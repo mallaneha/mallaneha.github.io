@@ -4,7 +4,7 @@ role: "Data Analyst"
 start: 2021
 end: 2024
 location: "Kathmandu, Nepal"
-summary: "Data Analyst · 2021–2024"
+summary: "Data Analyst"
 icon: table
 logo: /logos/numeric-mind.jpg
 order: 30

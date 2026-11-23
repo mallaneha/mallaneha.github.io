@@ -5,21 +5,24 @@ import Section from "../components/Section.astro";
 import RowList from "../components/RowList.astro";
 import Row from "../components/Row.astro";
 import Drawer from "../components/Drawer.astro";
+import SectionColumns from "../components/SectionColumns.astro";
 import Icon from "../components/Icon.astro";
 import { site } from "../data/site";
 import {
   getWriting,
   getProjects,
   getExperience,
+  getEducation,
   projectHref,
   years,
   formatDate,
   resumeHref,
 } from "../lib/content";
 
-const [projects, experience, writing] = await Promise.all([
+const [projects, experience, education, writing] = await Promise.all([
   getProjects(),
   getExperience(),
+  getEducation(),
   getWriting(),
 ]);
 const published = new Set(writing.map((w) => w.id));
@@ -38,6 +41,13 @@ const experienceDrawers = await Promise.all(
   experience.map(async (e) => ({
     entry: e,
     id: `role-${e.id}`,
+    Content: (await render(e)).Content,
+  })),
+);
+const educationDrawers = await Promise.all(
+  education.map(async (e) => ({
+    entry: e,
+    id: `school-${e.id}`,
     Content: (await render(e)).Content,
   })),
 );
@@ -87,19 +97,35 @@ const experienceDrawers = await Promise.all(
     </p>
   </header>
 
-  <Section id="experience" title="Experience">
-    <RowList>
-      {experienceDrawers.map(({ entry, id }) => (
-        <Row
-          icon={entry.data.icon}
-          logo={entry.data.logo}
-          name={entry.data.company}
-          desc={entry.data.summary}
-          drawer={id}
-        />
-      ))}
-    </RowList>
-  </Section>
+  <SectionColumns>
+    <Section id="experience" title="Experience">
+      <RowList>
+        {experienceDrawers.map(({ entry, id }) => (
+          <Row
+            icon={entry.data.icon}
+            logo={entry.data.logo}
+            name={entry.data.company}
+            desc={entry.data.summary}
+            drawer={id}
+          />
+        ))}
+      </RowList>
+    </Section>
+
+    <Section id="education" title="Education">
+      <RowList>
+        {educationDrawers.map(({ entry, id }) => (
+          <Row
+            icon={entry.data.icon}
+            logo={entry.data.logo}
+            name={entry.data.school}
+            desc={entry.data.summary}
+            drawer={id}
+          />
+        ))}
+      </RowList>
+    </Section>
+  </SectionColumns>
 
   <Section id="projects" title="Projects">
     <RowList columns={2}>
@@ -167,6 +193,18 @@ const experienceDrawers = await Promise.all(
       logo={entry.data.logo}
       name={entry.data.company}
       desc={`${entry.data.role} · ${years(entry.data.start, entry.data.end)}`}
+      href={entry.data.url}
+    >
+      <Content />
+    </Drawer>
+  ))}
+  {educationDrawers.map(({ entry, id, Content }) => (
+    <Drawer
+      id={id}
+      icon={entry.data.icon}
+      logo={entry.data.logo}
+      name={entry.data.school}
+      desc={`${entry.data.degree} · ${years(entry.data.start, entry.data.end)}`}
       href={entry.data.url}
     >
       <Content />

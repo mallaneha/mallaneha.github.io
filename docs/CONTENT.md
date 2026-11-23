@@ -75,7 +75,7 @@ role: "AI/ML Intern"
 start: 2026
 end: 2026 # omit if current
 location: "Austin, TX" # optional, city only
-summary: "AI/ML Intern · 2026" # ≤ 60 chars, shown under the name
+summary: "AI/ML Intern" # role only, fits a half-width column; dates show in the drawer
 icon: pulse # fallback when there's no logo
 logo: /logos/autonomize-ai.png # optional, the company's logo under public/logos/ (square, ~80px)
 url: https://... # optional, becomes the drawer's "Visit" pill
@@ -83,7 +83,26 @@ order: 10
 ---
 ```
 
-## Drawer case study (body of featured projects and experience)
+## Education: `src/content/education/<slug>.md`
+
+Shown in a column next to Experience on the home page. Same fields as experience, with `school` and `degree`
+in place of `company` and `role`. The body (overview, relevant courses) is the drawer.
+
+```yaml
+---
+school: "Carnegie Mellon University"
+degree: "M.S. in AI Engineering (Information Security)" # shown in the drawer header with the years
+start: 2025
+end: 2026
+location: "Pittsburgh, PA"
+summary: "M.S. AI Engineering" # short degree, fits a half-width column
+icon: school # fallback when there's no logo
+logo: /logos/cmu.png
+order: 10
+---
+```
+
+## Drawer case study (body of featured projects, experience and education)
 
 Modeled on ch.sh. Sections run top to bottom, separated automatically by `···`.
 

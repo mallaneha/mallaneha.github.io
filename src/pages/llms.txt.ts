@@ -5,15 +5,17 @@ import {
   getWriting,
   getProjects,
   getExperience,
+  getEducation,
   projectHref,
   years,
   resumeHref,
 } from "../lib/content";
 
 export const GET: APIRoute = async () => {
-  const [projects, experience, writing] = await Promise.all([
+  const [projects, experience, education, writing] = await Promise.all([
     getProjects(),
     getExperience(),
+    getEducation(),
     getWriting(),
   ]);
   const abs = (path: string) => new URL(path, site.url).toString();
@@ -40,6 +42,12 @@ export const GET: APIRoute = async () => {
     ...experience.map(
       (e) =>
         `- ${e.data.company}, ${e.data.role} (${years(e.data.start, e.data.end)})${e.data.location ? `, ${e.data.location}` : ""}`,
+    ),
+    "",
+    "## Education",
+    ...education.map(
+      (e) =>
+        `- ${e.data.school}, ${e.data.degree} (${years(e.data.start, e.data.end)})${e.data.location ? `, ${e.data.location}` : ""}`,
     ),
     "",
     "## Writing",

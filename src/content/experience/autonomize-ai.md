@@ -4,7 +4,7 @@ role: "AI/ML Intern"
 start: 2026
 end: 2026
 location: "Austin, TX"
-summary: "AI/ML Intern · 2026"
+summary: "AI/ML Intern"
 icon: pulse
 logo: /logos/autonomize-ai.png
 order: 10
