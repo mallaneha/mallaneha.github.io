@@ -12,8 +12,9 @@ order: 10
 
 ## Overview <span class="when">May – Jul 2026</span>
 
-A summer internship at a healthcare AI company. I worked on keeping patient
-data private and on getting reliable answers out of messy insurance documents.
+I spent the summer as an AI/ML intern at Autonomize AI, a healthcare AI company. My work came down
+to two problems: keeping patient data private, and getting reliable answers out of messy insurance
+documents.
 
 <div class="stats">
   <div><strong>97.7%</strong><span>anonymization recall</span></div>
@@ -23,22 +24,26 @@ data private and on getting reliable answers out of messy insurance documents.
 
 ## PII redaction
 
-I benchmarked Presidio, OpenMed and Private AI on healthcare datasets for PII redaction, across
-text and multimodal pipelines, for HIPAA compliance. The pipeline reached 97.7% anonymization
-recall, with reversible pseudonymization so customer data can be restored when needed.
+The pipelines had to meet HIPAA, so I benchmarked Presidio, OpenMed and Private AI for PII redaction
+on healthcare datasets, on both text and multimodal pipelines. The pipeline reached 97.7%
+anonymization recall. Its pseudonymization is reversible, so customer data can be restored when
+it's needed.
 
 ## Document RAG
 
-I hardened a RAG ingestion pipeline for over 100 Medicare Evidence of Coverage PDFs. The layouts
-vary from plan to plan, so I used the table of contents to find and isolate the medical benefits
-charts. Extraction success rose to as much as 90%.
+Medicare Evidence of Coverage PDFs cover the same ground, but every plan lays them out differently.
+I hardened the RAG ingestion pipeline for over 100 of them. It uses each document's table of
+contents to find the medical benefits charts and pull them out on their own. Extraction success
+went up to as much as 90%.
 
 ## Security
 
-I configured Wiz cloud security tools and aligned generative AI architectures with the OWASP Top
-10, using red- and blue-teaming agents.
+I configured Wiz cloud security tools. I also brought our generative AI architectures in line with
+the OWASP Top 10, using red- and blue-teaming agents.
 
 ## Takeaways
 
-Healthcare AI is mostly a data problem. Getting the right section out of a PDF, and keeping a
-patient's name out of the output, mattered more than which model answered.
+Healthcare AI turned out to be mostly a data problem. Getting the right section out of a PDF, and
+keeping a patient's name out of the output, mattered more than which model answered.
+
+Tools: Presidio, OpenMed, Private AI, Wiz.
