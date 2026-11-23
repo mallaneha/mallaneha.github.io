@@ -112,7 +112,13 @@ const educationDrawers = await Promise.all(
       </span>
     </div>
     {site.intro.map((line) => (
-      <p>{line}</p>
+      <p>
+        {line
+          .split("==")
+          .map((part, i) =>
+            i % 2 ? <mark class="intro-mark">{part}</mark> : part,
+          )}
+      </p>
     ))}
   </header>
 
@@ -349,6 +355,22 @@ const educationDrawers = await Promise.all(
     font-weight: var(--weight-medium);
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
+  }
+  /* A highlighted phrase in the intro (==…== in site.intro): same marker as the availability line. */
+  .intro-mark {
+    padding: 0 0.15em;
+    margin: 0 -0.15em;
+    border-radius: var(--radius);
+    background: linear-gradient(var(--color-highlight), var(--color-highlight))
+      no-repeat 0 0 / 100% 100%;
+    color: inherit;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .intro-mark {
+      animation: sweep 700ms 200ms var(--ease-drawer) backwards;
+    }
   }
   .availability .dot {
     flex: none;
