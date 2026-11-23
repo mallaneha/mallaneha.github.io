@@ -17,7 +17,8 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
    or the icon when there's no logo.
 3. Projects: projects with `featured: true`, three in one line (stacked on phones), no icon tile, an open-link arrow on each. Each row opens a drawer.
 4. Writing: latest 3 published posts, then an "All writing · N posts →" pill button.
-5. Connect: two columns. Email (copies, toast) | Resume (when the PDF exists), then LinkedIn | GitHub.
+5. Connect: two columns. Email (copies, toast) | Resume (when `site.resume` is set and the PDF exists), then
+   LinkedIn | GitHub. Without a resume, Email takes its own row. The resume is currently hidden (`site.resume: null`).
    On phones the email address wraps after the "@".
 6. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound
    toggle (home page only) and the light/dark theme toggle.
