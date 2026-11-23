@@ -161,7 +161,7 @@ test("click effects and the sound toggle are on every page; footer shows local t
   page,
 }) => {
   await expect(page.locator("[data-local-time] time")).toHaveText(
-    /^\d{1,2}:\d{2}\s?(AM|PM)$/,
+    /^\d{1,2}:\d{2}:\d{2}\s?(AM|PM)$/,
   );
   for (const path of ["/writing/", "/writing/build-attention/", "/404"]) {
     await page.goto(path);
