@@ -61,6 +61,8 @@
   /* Small state changes (a value updates after a click): 180–260 ms, ease-out. */
   --duration-state: 200ms;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Something already on screen moving or turning in place. */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   /* Press feedback (:active scale): starts moving at once. */
   --transition-press: 160ms var(--ease-out);
   /* User-initiated motion stays within 300 ms (userinterface.wiki duration-max-300ms). */
