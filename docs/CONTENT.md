@@ -78,6 +78,7 @@ location: "Austin, TX" # optional, city only
 summary: "AI/ML Intern" # role only, fits a half-width column; dates show in the drawer
 icon: pulse # fallback when there's no logo
 logo: /logos/autonomize-ai.png # optional, the company's logo under public/logos/ (square, ~80px)
+logoFull: false # optional, true when the logo is a filled square that should cover the whole tile
 url: https://... # optional, becomes the drawer's "Visit" pill
 order: 10
 ---
@@ -98,6 +99,7 @@ location: "Pittsburgh, PA"
 summary: "M.S. AI Engineering" # short degree, fits a half-width column
 icon: school # fallback when there's no logo
 logo: /logos/cmu.png
+logoFull: true # the red square fills the tile
 order: 10
 ---
 ```

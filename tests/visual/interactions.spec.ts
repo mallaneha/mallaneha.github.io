@@ -149,7 +149,12 @@ test("click effects: spark canvas, mute toggle, copy email", async ({
       .locator('section[aria-labelledby="connect"] [data-copy]')
       .click();
     await expect(page.locator("#toast")).toHaveText("Email copied");
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+      "nehamalla99@gmail.com",
+    );
   }
+  // The address is spelled out in the HTML so scrapers miss it.
+  expect(await page.content()).not.toMatch(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i);
 });
 
 test("click effects are home-page only; footer shows local time", async ({

@@ -18,7 +18,9 @@ export const site = {
   summary:
     "I build applied AI systems where data is sensitive and mistakes are costly. M.S. in AI Engineering (Information Security) at Carnegie Mellon. Previously at Autonomize AI on HIPAA-grade PII redaction and RAG, and 3.5 years shipping FDA clinical data submissions. Looking for full-time roles in healthcare, banking and insurance from January 2027.",
   writingBlurb: "Notes on evaluating and observing AI systems.",
-  email: "nehamalla99@gmail.com",
+  // Spelled out so scrapers looking for "@" don't harvest it. The page shows it like this, and clicking it
+  // copies the real address (effects.ts decodes it). Never write the plain address anywhere in src/ or public/.
+  email: "nehamalla99 at gmail dot com",
   links: {
     linkedin: "https://www.linkedin.com/in/mallaneha",
     github: "https://github.com/mallaneha",

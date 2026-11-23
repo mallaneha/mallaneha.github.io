@@ -101,8 +101,8 @@ const educationDrawers = await Promise.all(
         type="button"
         class="inline-copy"
         data-copy={site.email}
+        data-copy-email
         data-copy-label="Email copied"
-        data-copy-fallback={`mailto:${site.email}`}
       >
         {site.email}
       </button>
@@ -123,6 +123,7 @@ const educationDrawers = await Promise.all(
           <Row
             icon={entry.data.icon}
             logo={entry.data.logo}
+            logoSize={20}
             name={entry.data.company}
             desc={entry.data.summary}
             drawer={id}
@@ -137,6 +138,7 @@ const educationDrawers = await Promise.all(
           <Row
             icon={entry.data.icon}
             logo={entry.data.logo}
+            logoFull={entry.data.logoFull}
             name={entry.data.school}
             desc={entry.data.summary}
             drawer={id}
@@ -190,20 +192,20 @@ const educationDrawers = await Promise.all(
         name={site.email}
         desc="Email"
         copy={site.email}
+        copyEmail
         copyLabel="Email copied"
-        href={`mailto:${site.email}`}
       />
       {resumeHref && (
         <Row icon="file" name="Resume" desc="PDF" href={resumeHref} />
       )}
       <Row
-        icon="link"
+        icon="linkedin"
         name="mallaneha"
         desc="LinkedIn"
         href={site.links.linkedin}
       />
       <Row
-        icon="code"
+        icon="github"
         name="mallaneha"
         desc="GitHub"
         href={site.links.github}
@@ -228,6 +230,7 @@ const educationDrawers = await Promise.all(
       id={id}
       icon={entry.data.icon}
       logo={entry.data.logo}
+      logoFull={entry.data.logoFull}
       name={entry.data.school}
       desc={`${entry.data.degree} · ${years(entry.data.start, entry.data.end)}`}
       href={entry.data.url}

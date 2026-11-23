@@ -1,5 +1,5 @@
 ---
-import { icons, type IconName } from "../data/icons";
+import { icons, brandIcons, isBrandIcon, type IconName } from "../data/icons";
 
 interface Props {
   name: IconName;
@@ -10,18 +10,32 @@ interface Props {
 const { name, size = 16, class: className } = Astro.props;
 ---
 
-<svg
-  class={className}
-  width={size}
-  height={size}
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="1.75"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  aria-hidden="true"
-  focusable="false"
->
-  <path d={icons[name]}></path>
-</svg>
+{isBrandIcon(name) ? (
+  <svg
+    class={className}
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d={brandIcons[name]} />
+  </svg>
+) : (
+  <svg
+    class={className}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d={icons[name]} />
+  </svg>
+)}
