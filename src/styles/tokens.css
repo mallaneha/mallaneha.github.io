@@ -49,6 +49,7 @@
   --measure: 34rem;
   --drawer-width: 44rem;
   --drawer-text: 30rem;
+  --figure-wide: 56rem; /* project story figures break out of the text column up to this */
   --radius: 4px;
   --radius-row: 6px;
   --radius-tile: 10px;

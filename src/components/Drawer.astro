@@ -335,6 +335,8 @@ const linkAttrs = external
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 0 var(--space-5);
+    /* Lets wide figures (src/styles/story.css) size themselves to the drawer, not the text column. */
+    container-type: inline-size;
   }
   .case {
     max-width: var(--drawer-text);
