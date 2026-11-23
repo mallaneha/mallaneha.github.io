@@ -1,0 +1,132 @@
+---
+title: "What 59% to 3% does and doesn't say about a RAG defense"
+description: "How I measured Vector Guard against poisoned documents, and why a static attack number isn't the end of the story."
+date: 2026-11-23
+type: post
+tags: [security, rag, evals]
+draft: true
+---
+
+Vector Guard is a layered defense I built against poisoned documents in retrieval-augmented generation
+(RAG). On my threat-intelligence data, it cut attack success from 59% to 3%. On the Natural Questions
+benchmark, from 72% to 24%.
+
+Those are the numbers I'd put on a resume. This post is about what they measure. One kind of attack, run
+the same way every time. A paper published in October 2025 showed how much that leaves out, and I think
+anyone reporting a defense number, me included, should say so. The post covers the attack, the four
+checks, how I measured them, and what I'd test next. It doesn't cover the code.
+[ADD: repo link once public]
+
+## The attack
+
+RAG systems trust whatever the retriever returns. If someone can add documents to the index, they can
+steer the answers. PoisonedRAG is a published version of this attack: craft a few documents per target
+question so they get retrieved and push the model toward the attacker's answer
+([Zou et al., 2024](https://arxiv.org/abs/2402.07867)).
+
+My target was an assistant for a security operations center (SOC), answering questions about CVEs and
+MITRE ATT&CK techniques from a corpus of 1,063 documents. That's a good target. Change a CVE's severity
+from Critical to Low, and an analyst deprioritizes a real vulnerability.
+
+I adapted the black-box version of PoisonedRAG to that corpus. With two poisoned documents per query,
+the attack succeeded 59% of the time. It changed answers about CVE severity, ATT&CK tactics and which
+platforms a technique targets.
+
+I measured the attack before writing any defense. That turned out to be the most useful decision in the
+project: every layer had to earn its place against that number.
+
+## Four checks, cheapest first
+
+Every retrieved document goes through four checks before it reaches the model:
+
+1. **Structure**: does it look like the other documents in the corpus?
+2. **Embedding anomaly**: does its embedding sit where documents like it usually sit?
+3. **NLI contradiction**: does it contradict a trusted source? NLI (natural language inference) is a
+   model that labels whether one text supports, contradicts or is unrelated to another.
+4. **LLM score**: an LLM rates how trustworthy the document is.
+
+The first two are cheap and catch documents that look or sit unlike the rest. The last two are slower
+and catch documents that read normally but disagree with what the corpus already says. Pick a kind of
+poisoned document below and see where it stops.
+
+<poison-layers>
+<div class="xp-fallback"><p>With JavaScript on, this shows which of the four checks (structure, embedding, NLI contradiction, LLM score) each kind of poisoned document is built to be caught by.</p><p>A document that looks wrong stops at the structure check. One whose embedding sits wrong stops at the embedding check. One that contradicts a trusted source stops at the NLI check. One that reads normally, sits with similar documents and makes a claim no trusted document covers passes the first three, and only the LLM score might flag it.</p></div>
+</poison-layers>
+
+The last option is the one that worries me. A poisoned document about a CVE that no trusted document
+covers yet has nothing to contradict. The NLI check has no source to compare against, so only the LLM
+score stands in the way. That's also the newest kind of CVE, which is the kind an analyst is most likely
+to ask about.
+
+These are what each check is designed to catch, not measured rates for each layer.
+[ADD: per-layer results, if measured: attack success with each check turned off]
+
+## The result, and what it's measured against
+
+With all four checks, attack success fell from 59% to 3% on the threat-intelligence data, and from 72%
+to 24% on Natural Questions. I read the gap as a sign that a narrow, structured domain is easier to
+defend. CVE entries have a fixed shape, so there's a trusted source to contradict. Open-domain
+questions don't.
+
+Here's what those numbers hold fixed, as far as I can describe the setup. The attack was PoisonedRAG as published, adapted to my corpus,
+with the same number of poisoned documents per query. The attacker didn't know the four checks existed,
+and didn't get to try again after a document was rejected.
+
+[GAP: confirm whether any test varied the attack, for example more poisoned documents per query or
+documents written to pass a specific check]
+
+## When the attacker moves second
+
+In October 2025, Milad Nasr, Nicholas Carlini, Florian Tramèr and 11 others published "The Attacker
+Moves Second" ([arXiv:2510.09023](https://arxiv.org/abs/2510.09023)). They took 12 published defenses
+against prompt injection and jailbreaks and attacked them with adaptive attacks: gradient-based search,
+reinforcement learning, LLM-guided search, and human red-teamers. All of these try again and again, and
+learn from each rejection.
+
+Toggle between the two kinds of attack:
+
+<attack-gap>
+<div class="xp-fallback"><p>With JavaScript on, this compares attack success against 12 published defenses under static and adaptive attacks, from Nasr et al. 2025 as reported by Simon Willison.</p><p>With static attacks, 7 of 12 defenses hold attack success under 10%. With adaptive attacks, 9 of 12 are at 90% or higher, and the best one still lets 71% through. Human red-teamers reached 100% against all of them.</p></div>
+</attack-gap>
+
+With static attacks, 7 of the 12 defenses keep attack success under 10%. With adaptive attacks, 9 of 12
+are at 90% or higher, and the best one still lets 71% through. A human red-team of 500 people reached
+100% against every defense. (The per-defense numbers come from
+[Simon Willison's summary](https://simonwillison.net/2025/Nov/2/new-prompt-injection-papers/) of the
+paper's chart.)
+
+These are prompt-injection and jailbreak defenses, not poisoning defenses, so they're not directly
+comparable to Vector Guard. The lesson carries over anyway. A static number tells you how a defense
+does against attacks that don't know it's there. It doesn't tell you how it does against someone
+trying to get past it.
+
+## What an adaptive test of Vector Guard would look like
+
+If I were testing Vector Guard again, I'd give the attacker what an attacker would eventually have:
+
+- **Knowledge of the checks.** Write poisoned documents in the corpus's own format, so the structure
+  check passes.
+- **Feedback.** Let the attacker see which documents got rejected and rewrite them. Count attempts, not
+  just success.
+- **Gap targeting.** Aim at facts that no trusted document covers, so there's nothing for the NLI check
+  to compare against.
+- **A judge to fool.** Tune documents against an LLM scorer like the one in check 4, since that's the
+  last line.
+
+I'd report attack success as a curve against the attacker's effort, not as one number.
+
+I'd also report something I left out the first time: the false positive rate. A filter that rejects
+poisoned documents and also 10% of good ones has a cost, and in a SOC that cost is missing context on
+a real alert. [ADD: how many clean documents the four checks rejected]
+
+## What I'd say about the number now
+
+59% to 3% is real, and I'd still report it. I'd report it like this: attack success against the
+published PoisonedRAG black-box attack, with the attacker unaware of the defense. The 72% to 24% on
+Natural Questions goes next to it, because the open-domain number is the honest one for anything
+outside a narrow, structured corpus.
+
+The broader point is the one Simon Willison draws from the paper: filters lower the odds, and none of
+them should be the only thing between an attacker and a bad outcome. That's why I think about what the
+assistant can do if a poisoned document gets through. That's the subject of
+[the Rule of Two post](/writing/rule-of-two-healthcare-rag/).

@@ -44,8 +44,12 @@ JS off:
 </gpt-shape>
 ```
 
-Any number the text quotes must match what the widget computes; `tests/visual/explainers.spec.ts` checks the main ones.
-Widget logic lives in `src/scripts/explainers.ts`, styles in `src/components/Explainers.astro`.
+The RAG posts use `<abstain-lab>`, `<code-search>`, `<rule-of-two>`, `<poison-layers>` and `<attack-gap>` the same way.
+
+Any number the text quotes must match what the widget computes; `tests/visual/explainers.spec.ts` and
+`tests/visual/rag-explainers.spec.ts` check the main ones. Widget logic lives in `src/scripts/explainers.ts` and
+`src/scripts/rag-explainers.ts` (shared helpers in `src/scripts/explainer-kit.ts`), styles in
+`src/components/Explainers.astro`.
 
 ## Project: `src/content/projects/<slug>.md`
 

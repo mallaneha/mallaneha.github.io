@@ -35,8 +35,9 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 - Home page: `src/pages/index.astro`. Components: `Row`, `RowList`, `Drawer`, `Section`, `Icon`, `Footer`,
   `Explainers` (styles for the interactive widgets in posts).
 - Client scripts: `src/scripts/drawer.ts` (bottom-sheet drawers) and `src/scripts/effects.ts` (click spark, sound,
-  vibration, mute toggle, theme toggle, copy-email toast). `effects.ts` also lazy-loads `src/scripts/explainers.ts`,
-  the interactive widgets for the "LLMs by hand" posts, only on pages that use one. Icons: `src/data/icons.ts` (generic glyphs, plus the LinkedIn and GitHub marks for the Connect rows).
+  vibration, mute toggle, theme toggle, copy-email toast). `effects.ts` also lazy-loads `src/scripts/explainers.ts`
+  (widgets for the "LLMs by hand" posts) and `src/scripts/rag-explainers.ts` (widgets for the RAG posts), only on pages
+  that use one. Shared widget helpers: `src/scripts/explainer-kit.ts`. Icons: `src/data/icons.ts` (generic glyphs, plus the LinkedIn and GitHub marks for the Connect rows).
 - `/llms.txt` is generated from the same content by `src/pages/llms.txt.ts`.
 - Background research and the source resume: `docs/research/`, `docs/reference/` (not published).
 
