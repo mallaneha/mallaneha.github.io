@@ -59,8 +59,13 @@ clicks or with `prefers-reduced-motion`; sound starts muted with `prefers-reduce
 
 ## Explainer widgets (`src/components/Explainers.astro`, `src/scripts/explainers.ts`)
 
-Interactive figures inside posts: a bordered `--color-surface` panel at `--text-sm`, controls stacked on
-phones, 44px tap targets, numbers in the mono font. Tables scroll inside the panel instead of the page.
+Interactive figures inside posts, styled as figures in the notebook: a white (`--color-bg`) card with a hairline
+border, a header strip (a mono "Interactive" kicker with the green status dot, then the title) and a footnote under
+a dotted rule. `--text-sm`, controls stacked on phones, 44px tap targets, numbers in the mono font. Controls are
+monochrome and drawn, not native: sliders are a thin track filled in `--color-text` with a raised thumb, checkboxes
+fill with `--color-text`, the segmented control is a sunken track with the selected segment raised
+(`--color-raised`, `--shadow-raised`). Chart labels render at a true 11px whatever the chart's width.
+All widgets on one page, dev server only: http://localhost:4321/dev/widgets/ (`src/pages/dev/[page].astro`). Tables scroll inside the panel instead of the page.
 Charts and bars use `--chart-1` to `--chart-5`; weights are bars next to the number, never colored cell
 backgrounds, so text contrast doesn't depend on the data. Bar transitions only run without
 `prefers-reduced-motion`.

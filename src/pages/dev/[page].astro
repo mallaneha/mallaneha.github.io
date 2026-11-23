@@ -1,0 +1,121 @@
+---
+// Dev-only gallery of every post widget, for working on their design side by side: http://localhost:4321/dev/widgets/
+// getStaticPaths returns nothing in a production build, so this page never reaches dist/ or the live site.
+import Base from "../../layouts/Base.astro";
+import Explainers from "../../components/Explainers.astro";
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { page: "widgets" } }] : [];
+}
+
+// Every widget, with the post it lives in. effects.ts loads the widget scripts because the tags are on the page.
+const widgets = [
+  { tag: "attention-lab", post: "build-attention", series: "LLMs by hand" },
+  { tag: "scale-lab", post: "build-attention", series: "LLMs by hand" },
+  {
+    tag: "gpt-shape",
+    post: "build-gpt2-parameter-count",
+    series: "LLMs by hand",
+  },
+  {
+    tag: "serving-budget",
+    post: "build-a-serving-budget",
+    series: "LLMs by hand",
+  },
+  {
+    tag: "abstain-lab",
+    post: "rag-evals-unanswerable-questions",
+    series: "RAG",
+  },
+  { tag: "code-search", post: "vector-search-medical-codes", series: "RAG" },
+  { tag: "rule-of-two", post: "rule-of-two-healthcare-rag", series: "RAG" },
+  {
+    tag: "poison-layers",
+    post: "measuring-rag-poisoning-defense",
+    series: "RAG",
+  },
+  { tag: "attack-gap", post: "measuring-rag-poisoning-defense", series: "RAG" },
+];
+---
+
+<Base title="Widgets" description="Every post widget on one page (dev only).">
+  <p>
+    <a href="/">← Home</a>
+  </p>
+  <header>
+    <h1>Widgets</h1>
+    <p class="muted">
+      All {widgets.length} post widgets on one page. Dev builds only; this page
+      isn't in the production build.
+    </p>
+  </header>
+  <nav aria-label="Widgets">
+    <ul>
+      {widgets.map((w) => (
+        <li>
+          <a href={`#${w.tag}`}>{w.tag}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  {widgets.map((w) => (
+    <section id={w.tag}>
+      <h2>
+        <code>&lt;{w.tag}&gt;</code>
+      </h2>
+      <p class="muted">
+        {w.series} · <a href={`/writing/${w.post}/`}>{w.post}</a>
+      </p>
+      <Fragment set:html={`<${w.tag}></${w.tag}>`} />
+    </section>
+  ))}
+  <Explainers />
+</Base>
+
+<style>
+  header {
+    margin: var(--space-8) 0 var(--space-4);
+  }
+  nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-8);
+    padding: 0;
+    list-style: none;
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-body);
+    text-decoration: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    nav a:hover {
+      background: var(--color-hover);
+      color: var(--color-text);
+    }
+  }
+  section {
+    margin: var(--space-12) 0;
+    scroll-margin-top: var(--space-6);
+  }
+  h2 {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+  }
+  h2 code {
+    font-size: inherit;
+  }
+  section > p {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+  }
+</style>

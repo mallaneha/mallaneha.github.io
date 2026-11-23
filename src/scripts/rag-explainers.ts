@@ -2,6 +2,7 @@
 // element in a Markdown post with static fallback content inside, and every number shown is computed here.
 
 import {
+  mount,
   checkbox,
   choice,
   fixed,
@@ -128,8 +129,12 @@ class AbstainLab extends HTMLElement {
       },
       shade,
       s("line", { class: "xp-axis", x1: sx(0), x2: sx(1), y1: 86, y2: 86 }),
-      s("text", { class: "xp-label", x: sx(0), y: 12 }, "answerable"),
-      s("text", { class: "xp-label", x: sx(0), y: 52 }, "not in the documents"),
+      s("text", { class: "xp-label", x: sx(0) + 5, y: 12 }, "answerable"),
+      s(
+        "text",
+        { class: "xp-label", x: sx(0) + 5, y: 52 },
+        "not in the documents",
+      ),
       ...dots.map((d) => d.c),
       line,
       ...ticks,
@@ -186,7 +191,7 @@ class AbstainLab extends HTMLElement {
         "A toy eval set of 20 questions about one plan document. Hover or tap a dot to see the question.",
       ),
     );
-    this.replaceChildren(root);
+    mount(this, root);
     const setMotion = motion(root);
 
     const render = (animate = false) => {
@@ -380,7 +385,7 @@ class CodeSearch extends HTMLElement {
         "Keyword and hybrid scores are computed live. Vector similarities are set by hand to show the pattern; they don't come from a real model.",
       ),
     );
-    this.replaceChildren(root);
+    mount(this, root);
 
     const render = () => {
       const qi = query.inputs.findIndex((i) => i.checked);
@@ -547,7 +552,7 @@ class RuleOfTwo extends HTMLElement {
         approval.wrap,
       ),
     );
-    this.replaceChildren(root);
+    mount(this, root);
 
     const render = () => {
       const r = ruleOfTwo(
@@ -647,7 +652,7 @@ class PoisonLayers extends HTMLElement {
         "What each check is built to catch, not measured per-layer rates.",
       ),
     );
-    this.replaceChildren(root);
+    mount(this, root);
 
     const render = () => {
       const p = POISONS[pick.inputs.findIndex((i) => i.checked)]!;
@@ -739,7 +744,7 @@ class AttackGap extends HTMLElement {
         "Nasr et al. 2025 (arXiv:2510.09023), as reported by Simon Willison.",
       ),
     );
-    this.replaceChildren(root);
+    mount(this, root);
     const setMotion = motion(root);
 
     const render = (animate = false) => {
