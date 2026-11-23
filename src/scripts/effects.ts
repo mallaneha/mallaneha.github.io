@@ -354,13 +354,14 @@ for (const el of document.querySelectorAll<HTMLElement>("[data-local-time]")) {
       timeZone: el.dataset.localTime,
       hour: "numeric",
       minute: "2-digit",
+      second: "2-digit",
     });
   } catch {
     continue; // unknown time zone: leave it hidden
   }
   const update = () => {
     out.textContent = fmt.format(new Date());
-    window.setTimeout(update, 60_000 - (Date.now() % 60_000) + 50);
+    window.setTimeout(update, 1000 - (Date.now() % 1000) + 20);
   };
   update();
   out.setAttribute("aria-label", "Local time");
