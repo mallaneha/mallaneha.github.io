@@ -1,31 +1,23 @@
-// Interactive mockups behind the "···" dividers in drawer case studies.
-// Each divider becomes a "See how it works" button that opens a small widget explaining the section above it.
-// Self-contained and easy to remove: drawer.ts lazily imports this file (one line), the styles are in
-// src/styles/mockups.css, and the Markdown content is untouched. Without this file the plain "···" dividers return.
+// "How it works" cards in drawer case studies: a closed disclosure at the end of a few sections that opens
+// one line of context (what the term means, why it matters) plus a small interactive widget.
+// Only sections where a reader may lack context get one; the rest have none.
 //
-// Every number here comes from the case-study text in src/content/. Sample text (a patient note, a question)
-// is illustrative and is marked "Example" in the UI.
+// Self-contained and easy to remove: drawer.ts lazily imports this file (one line), the styles are in
+// src/styles/mockups.css, and the Markdown is untouched. Without this file the plain "···" dividers return.
+//
+// Facts about Neha's work come only from the case-study text in src/content/. `context` lines explain
+// general terms (SDTM, RMSE, PoisonedRAG…). Sample text is illustrative and tagged "Example" in the UI.
 
 import "../styles/mockups.css";
 
 type Steps = { kind: "steps"; items: { label: string; note: string }[] };
 type Compare = {
   kind: "compare";
-  // [[text]] is highlighted.
-  tabs: { label: string; body: string; note: string }[];
+  tabs: { label: string; body: string; note: string }[]; // [[x]] is highlighted
 };
 type Bars = {
   kind: "bars";
-  states?: [string, string]; // toggle between value[0] and value[1]
-  stateNotes?: [string, string];
-  lowerIsBetter?: boolean;
-  items: {
-    label: string;
-    value: number | [number, number];
-    max: number;
-    suffix?: string;
-    note: string;
-  }[];
+  items: { label: string; value: number; max: number; note: string }[];
 };
 type Route = {
   kind: "route";
@@ -37,10 +29,6 @@ type Route = {
     note: string;
   }[];
 };
-type Trace = {
-  kind: "trace";
-  items: { label: string; meta?: string; detail: string }[];
-};
 type Filter = {
   kind: "filter";
   toggle: string;
@@ -48,424 +36,195 @@ type Filter = {
   noteOff: string;
   noteOn: string;
 };
-type Mockup = { title: string; example?: boolean } & (
-  Steps | Compare | Bars | Route | Trace | Filter
+type Mockup = { title: string; context: string; example?: boolean } & (
+  Steps | Compare | Bars | Route | Filter
 );
 
-// Key: "<drawer id>:<id of the section heading above the divider>".
+// Key: "<drawer id>:<id of the section heading>". The card goes at the end of that section.
 const MOCKUPS: Record<string, Mockup> = {
   // ---------- Autonomize AI ----------
-  "role-autonomize-ai:overview": {
-    title: "What the numbers measure",
-    kind: "bars",
-    items: [
-      {
-        label: "Anonymization recall",
-        value: 97.7,
-        max: 100,
-        suffix: "%",
-        note: "Share of the personal details in the test data that the redaction pipeline caught. In redaction, a miss is a leak.",
-      },
-      {
-        label: "Extraction success",
-        value: 90,
-        max: 100,
-        suffix: "%",
-        note: "Extraction success on 100+ Medicare Evidence of Coverage PDFs rose to as much as 90%.",
-      },
-    ],
-  },
   "role-autonomize-ai:pii-redaction": {
-    title: "Reversible pseudonymization",
+    title: "Reversible redaction",
+    context:
+      "Redaction swaps personal details for placeholders. Recall is the share it catches, and every miss is a leak.",
     example: true,
     kind: "compare",
     tabs: [
       {
         label: "Original",
         body: "[[Jane Roe]], born [[03/14/1961]], called about claim [[4471-22]].",
-        note: "Patient text as it arrives. The highlighted spans are personal details.",
+        note: "Three personal details.",
       },
       {
         label: "Redacted",
         body: "[[<PERSON_1>]], born [[<DATE_1>]], called about claim [[<ID_1>]].",
-        note: "Each detail is swapped for a placeholder before the text goes anywhere else.",
+        note: "Safe to pass on.",
       },
       {
         label: "Restored",
         body: "[[Jane Roe]], born [[03/14/1961]], called about claim [[4471-22]].",
-        note: "The mapping is kept, so customer data can be restored when needed.",
+        note: "A stored mapping turns placeholders back into the real values.",
       },
     ],
   },
   "role-autonomize-ai:document-rag": {
     title: "Finding the benefits chart",
+    context:
+      "An Evidence of Coverage (EOC) is a Medicare plan's yearly document of benefits and costs. Each plan lays it out differently.",
     kind: "steps",
     items: [
+      { label: "PDF", note: "Layout varies by plan, so page rules break." },
       {
-        label: "EOC PDF",
-        note: "A Medicare Evidence of Coverage document. The layout varies from plan to plan.",
+        label: "Contents",
+        note: "The table of contents says where things are.",
       },
-      {
-        label: "Table of contents",
-        note: "Read the table of contents first, instead of guessing from page layout.",
-      },
-      {
-        label: "Benefits chart",
-        note: "Use it to locate the medical benefits chart pages.",
-      },
+      { label: "Chart", note: "Jump to the medical benefits chart pages." },
       {
         label: "Ingest",
-        note: "Isolate just those pages for the RAG pipeline. Extraction success rose to as much as 90%.",
-      },
-    ],
-  },
-  "role-autonomize-ai:security": {
-    title: "Testing from both sides",
-    kind: "steps",
-    items: [
-      {
-        label: "Red team",
-        note: "Red-teaming agents play the attacker.",
-      },
-      {
-        label: "Blue team",
-        note: "Blue-teaming agents play the defender.",
-      },
-      {
-        label: "OWASP Top 10",
-        note: "Generative AI architectures aligned with the OWASP Top 10.",
-      },
-      {
-        label: "Cloud",
-        note: "I configured Wiz cloud security tools.",
+        note: "Only those pages go into RAG: up to 90% extracted.",
       },
     ],
   },
 
   // ---------- Numeric Mind ----------
-  "role-numeric-mind:overview": {
-    title: "3.5 years",
-    kind: "steps",
-    items: [
-      {
-        label: "Oct 2021",
-        note: "Joined as a Data Analyst, turning raw trial data into datasets and reports for the FDA.",
-      },
-      {
-        label: "Apr 2024",
-        note: "Became a Senior Data Analyst, leading 12 analysts.",
-      },
-      {
-        label: "Apr 2025",
-        note: "End of the role. In total: 800+ CDISC datasets and reports, 15+ FDA submission packages.",
-      },
-    ],
-  },
   "role-numeric-mind:pipelines": {
-    title: "From raw data to the FDA",
+    title: "CDISC, step by step",
+    context:
+      "CDISC standards are the formats the FDA expects trial data in. Each step is built from the one before, so every number traces back.",
     kind: "steps",
     items: [
-      {
-        label: "Raw data",
-        note: "Data as collected in the clinical trial.",
-      },
+      { label: "Raw", note: "Trial data as collected." },
       {
         label: "SDTM",
-        note: "Standardized into CDISC SDTM tabulation datasets.",
+        note: "Study Data Tabulation Model: the same data in standard domains, such as demographics and adverse events.",
       },
       {
         label: "ADaM",
-        note: "Derived into ADaM analysis datasets.",
+        note: "Analysis Data Model: analysis-ready datasets derived from SDTM.",
       },
       {
         label: "TLFs",
-        note: "Tables, listings and figures, built in SAS and R.",
+        note: "Tables, listings and figures for statisticians.",
       },
       {
         label: "CSR",
-        note: "Clinical Study Reports for FDA submissions, for more than 10 pharmaceutical clients.",
+        note: "Clinical Study Report: the trial's results, written up for the FDA.",
       },
     ],
   },
   "role-numeric-mind:validation": {
-    title: "Tracing a finding to the record",
-    kind: "trace",
-    items: [
-      {
-        label: "Pinnacle 21 finding",
-        meta: "start",
-        detail:
-          "A validation check fails. On its own it doesn't say which patient records are wrong.",
-      },
-      {
-        label: "SDTM and ADaM datasets",
-        meta: "trace",
-        detail:
-          "The debugging tool follows the finding through the SDTM and ADaM datasets.",
-      },
-      {
-        label: "Patient records",
-        meta: "fix",
-        detail:
-          "It ends at the patient records to fix. This replaced manual lookups and cut issue resolution time by 75%.",
-      },
-    ],
-  },
-  "role-numeric-mind:leading": {
-    title: "What leading looked like",
+    title: "From finding to record",
+    context:
+      "Pinnacle 21 checks datasets against CDISC and FDA rules. A finding names a rule and a dataset, not the patient record behind it.",
     kind: "steps",
     items: [
+      { label: "Finding", note: "A rule fails somewhere in a dataset." },
       {
-        label: "12 analysts",
-        note: "Across concurrent clinical projects.",
+        label: "SDTM / ADaM",
+        note: "The tool follows it through both datasets.",
       },
       {
-        label: "Cross-team",
-        note: "Working with statisticians and data managers.",
-      },
-      {
-        label: "Mentoring",
-        note: "One-on-one mentoring on pipeline improvements raised data validation accuracy by 60%.",
-      },
-      {
-        label: "3 weeks",
-        note: "FDA submission packages delivered within 3 weeks, across 15+ studies.",
+        label: "Patient",
+        note: "…to the records to fix. 75% faster than manual lookups.",
       },
     ],
   },
 
   // ---------- Vector Guard ----------
-  "work-vector-guard:overview": {
-    title: "Attack success, before and after",
-    kind: "bars",
-    states: ["No defense", "Vector Guard"],
-    stateNotes: [
-      "Attack success with no defense. Tap a bar for details.",
-      "Attack success with the four checks in place. Tap a bar for details.",
-    ],
-    lowerIsBetter: true,
-    items: [
-      {
-        label: "Threat intel (SOC)",
-        value: [59, 3],
-        max: 100,
-        suffix: "%",
-        note: "1,063 CVE and ATT&CK documents.",
-      },
-      {
-        label: "NQ benchmark",
-        value: [72, 24],
-        max: 100,
-        suffix: "%",
-        note: "The public Natural Questions benchmark: open-domain questions are harder to defend.",
-      },
-    ],
-  },
-  "work-vector-guard:approach": {
-    title: "Order of work",
-    kind: "steps",
-    items: [
-      {
-        label: "Attack",
-        note: "Attack first, so the defense is measured against a real number.",
-      },
-      {
-        label: "Layer",
-        note: "Several cheap checks in layers, not one expensive one.",
-      },
-      {
-        label: "Benchmark",
-        note: "Report attack success on a public benchmark too, not just my own data.",
-      },
-    ],
-  },
   "work-vector-guard:attack": {
     title: "Two poisoned documents",
+    context:
+      "PoisonedRAG plants text written to be retrieved for one question and to push a chosen answer. Black-box: the attacker never touches the model.",
     example: true,
     kind: "compare",
     tabs: [
       {
         label: "Clean",
-        body: "Q: How severe is CVE-YYYY-NNNN?\nRetrieved: CVE doc · CVE doc · ATT&CK doc\nA: [[the severity the trusted sources give]]",
-        note: "The retriever returns trusted documents and the answer follows them.",
+        body: "Q: How severe is CVE-YYYY-NNNN?\nRetrieved: CVE doc · CVE doc · ATT&CK doc\nA: [[what the sources say]]",
+        note: "Trusted documents, right answer.",
       },
       {
         label: "Poisoned",
-        body: "Q: How severe is CVE-YYYY-NNNN?\nRetrieved: [[poisoned doc]] · [[poisoned doc]] · CVE doc\nA: [[the severity the attacker wrote]]",
-        note: "2 poisoned documents per query, out of more than a thousand, changed the answer 59% of the time.",
+        body: "Q: How severe is CVE-YYYY-NNNN?\nRetrieved: [[poisoned]] · [[poisoned]] · CVE doc\nA: [[what the attacker wrote]]",
+        note: "2 planted documents out of 1,063 flipped the answer 59% of the time.",
       },
     ],
   },
   "work-vector-guard:defense": {
     title: "Where a document gets stopped",
+    context:
+      "Cheap checks run first, so the slow ones only see documents that already look normal. NLI (natural language inference) asks whether one text contradicts another.",
     kind: "route",
-    stages: ["Structural", "Embedding", "NLI", "LLM score", "Model"],
+    stages: ["Structure", "Embedding", "NLI", "LLM score", "Model"],
     cases: [
       {
         label: "Odd format",
         path: [0],
         end: "caught",
-        note: "Looks unlike the rest of the corpus: the cheap structural filter catches it.",
+        note: "Doesn't look like the corpus.",
       },
       {
         label: "Odd embedding",
         path: [0, 1],
         end: "caught",
-        note: "Sits unlike the rest of the corpus in embedding space: anomaly detection catches it.",
+        note: "Sits unlike the rest of the corpus in embedding space.",
       },
       {
-        label: "Reads normal, contradicts",
+        label: "Contradicts sources",
         path: [0, 1, 2],
         end: "caught",
-        note: "Reads normally but contradicts trusted sources: the slower NLI and LLM checks are for these.",
+        note: "Reads normally, but disagrees with trusted documents.",
       },
       {
         label: "Clean",
         path: [0, 1, 2, 3, 4],
         end: "pass",
-        note: "Passes all four checks and reaches the model.",
+        note: "Passes all four checks.",
       },
     ],
   },
 
   // ---------- Research Assistant Agent ----------
-  "work-research-assistant-agent:overview": {
-    title: "Checking before answering",
-    example: true,
-    kind: "compare",
-    tabs: [
-      {
-        label: "Plain RAG",
-        body: "Retrieve → generate → [[return, supported or not]]",
-        note: "Answers confidently even when the documents don't support the answer.",
-      },
-      {
-        label: "With reflection",
-        body: "Retrieve → generate → [[is it grounded?]] → return or try again",
-        note: "The self-reflection step reduced hallucinations by 80%.",
-      },
-    ],
-  },
-  "work-research-assistant-agent:approach": {
-    title: "Three rules",
-    kind: "steps",
-    items: [
-      { label: "Ground", note: "Every answer rests on retrieved documents." },
-      {
-        label: "Check",
-        note: "The answer is checked before the user sees it.",
-      },
-      {
-        label: "Trace",
-        note: "Everything is traced, so failures can be explained.",
-      },
-    ],
-  },
   "work-research-assistant-agent:self-reflection": {
     title: "The reflection loop",
+    context:
+      "Grounded means every claim is backed by a retrieved document. Reflection is an extra model call that checks this before anyone sees the answer.",
     kind: "route",
     stages: ["Retrieve", "Generate", "Reflect", "Return"],
     cases: [
       {
-        label: "Grounded draft",
+        label: "Grounded",
         path: [0, 1, 2, 3],
         end: "pass",
-        note: "The draft is supported by the retrieved documents, so it's returned.",
+        note: "Supported, so it's returned.",
       },
       {
-        label: "Unsupported draft",
+        label: "Unsupported",
         path: [0, 1, 2],
         end: "loop",
-        note: "Reflection finds a claim the documents don't support, so the agent tries again instead of answering.",
+        note: "A claim isn't backed, so the agent tries again. 80% fewer hallucinations.",
       },
     ],
   },
   "work-research-assistant-agent:observability": {
-    title: "A traced run",
+    title: "One traced run",
+    context:
+      "A trace records every step of a single run, so a wrong answer can be followed back to the step that caused it.",
     example: true,
-    kind: "trace",
-    items: [
-      {
-        label: "route",
-        meta: "LangGraph",
-        detail:
-          "Which path the agent chose. Traces are used to evaluate its routing.",
-      },
-      {
-        label: "retrieve",
-        meta: "Milvus",
-        detail:
-          "Which documents came back, to keep improving retrieval accuracy.",
-      },
-      {
-        label: "generate",
-        meta: "LLM",
-        detail: "The draft answer and its inputs.",
-      },
-      {
-        label: "reflect",
-        meta: "LLM",
-        detail: "Whether the draft was judged grounded, and why.",
-      },
-    ],
-  },
-  "work-research-assistant-agent:deployment": {
-    title: "Services on GKE",
     kind: "steps",
     items: [
-      { label: "Streamlit", note: "The UI on top." },
-      { label: "LangGraph", note: "The agent backend, its own microservice." },
-      { label: "Milvus", note: "The vector store, its own microservice." },
-      {
-        label: "MCP",
-        note: "MCP services, with Google Translate wired in through FastMCP for multilingual questions.",
-      },
-      {
-        label: "GKE",
-        note: "All of it on GKE, built with Docker and Terraform.",
-      },
+      { label: "route", note: "Which path the agent took." },
+      { label: "retrieve", note: "Which documents Milvus returned." },
+      { label: "generate", note: "The draft and its inputs." },
+      { label: "reflect", note: "Grounded or not, and why." },
     ],
   },
 
   // ---------- SysToolChain ----------
-  "work-systoolchain:overview": {
-    title: "Three parts",
-    kind: "steps",
-    items: [
-      {
-        label: "Batch",
-        note: "144K+ FIFA player records loaded with PySpark.",
-      },
-      {
-        label: "Streaming",
-        note: "Live World Cup comments through Kafka.",
-      },
-      {
-        label: "Models",
-        note: "Player rating prediction: 0.98 R² with a Random Forest.",
-      },
-    ],
-  },
-  "work-systoolchain:batch": {
-    title: "The batch path",
-    kind: "steps",
-    items: [
-      {
-        label: "Cloud Storage",
-        note: "Raw player files land in Cloud Storage.",
-      },
-      {
-        label: "Dataproc",
-        note: "PySpark on GCP Dataproc processes 144K+ records.",
-      },
-      {
-        label: "PostgreSQL",
-        note: "Written over JDBC to a self-hosted PostgreSQL Docker container.",
-      },
-    ],
-  },
   "work-systoolchain:streaming": {
-    title: "Filtering ambiguous names",
+    title: "Ambiguous names",
+    context:
+      "Mentions are counted by matching player names in comments. A name that's also a common word matches far too much.",
     example: true,
     kind: "filter",
     toggle: "Filter ambiguous names",
@@ -476,27 +235,21 @@ const MOCKUPS: Record<string, Mockup> = {
       { text: "King of the midfield? Not today", flagged: true },
       { text: "Great pass from King to Moreno" },
     ],
-    noteOff:
-      "Say one player is called King. Without a filter, every “king” counts as a mention.",
-    noteOn:
-      "Ambiguous names are filtered out to reduce false matches. Only real mentions are tracked.",
+    noteOff: "Say a player is called King: every “king” counts.",
+    noteOn: "Filtered: only real mentions count.",
   },
   "work-systoolchain:models": {
-    title: "Prediction error (RMSE, lower is better)",
+    title: "Prediction error",
+    context:
+      "RMSE is the typical error in rating points, so lower is better. R² is the share of rating variation explained (1.0 is all of it).",
     kind: "bars",
-    lowerIsBetter: true,
     items: [
-      {
-        label: "Linear baseline",
-        value: 1.94,
-        max: 2,
-        note: "1.94 RMSE.",
-      },
+      { label: "Linear", value: 1.94, max: 2, note: "Baseline: 1.94 RMSE." },
       {
         label: "Random Forest",
         value: 0.97,
         max: 2,
-        note: "0.97 RMSE and 0.98 R²: roughly half the baseline's error.",
+        note: "0.97 RMSE, 0.98 R²: about half the error.",
       },
     ],
   },
@@ -516,8 +269,6 @@ function h<K extends keyof HTMLElementTagNameMap>(
   el.append(...children);
   return el;
 }
-const button = (label: string, cls = "mk-chip") =>
-  h("button", { type: "button", class: cls }, label);
 
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -535,11 +286,14 @@ function rich(text: string) {
 }
 
 // A row of buttons where exactly one is pressed.
-function choices(labels: string[], onPick: (i: number) => void) {
-  const row = h("div", { class: "mk-choices", role: "group" });
+function choices(labels: string[], onPick: (i: number) => void, cls = "") {
+  const row = h("div", { class: `mk-choices ${cls}`.trim(), role: "group" });
   const btns = labels.map((l, i) => {
-    const b = button(l);
-    b.setAttribute("aria-pressed", "false");
+    const b = h(
+      "button",
+      { type: "button", class: "mk-chip", "aria-pressed": "false" },
+      l,
+    );
     b.addEventListener("click", () => pick(i));
     return b;
   });
@@ -553,28 +307,16 @@ function choices(labels: string[], onPick: (i: number) => void) {
 
 // ---------- widgets ----------
 function renderSteps(m: Steps, note: HTMLElement) {
-  const wrap = h("div");
   const { row, pick } = choices(
-    m.items.map((s, i) => `${i + 1}. ${s.label}`),
-    (i) => {
-      note.textContent = m.items[i].note;
-      next.disabled = i === m.items.length - 1;
-      idx = i;
-    },
+    m.items.map((s) => s.label),
+    (i) => (note.textContent = m.items[i].note),
+    "mk-steps",
   );
-  row.classList.add("mk-steps");
-  let idx = 0;
-  const next = button("Next →", "mk-button");
-  next.addEventListener("click", () =>
-    pick(Math.min(idx + 1, m.items.length - 1)),
-  );
-  wrap.append(row, next);
   pick(0);
-  return wrap;
+  return row;
 }
 
 function renderCompare(m: Compare, note: HTMLElement) {
-  const wrap = h("div");
   const view = h("div", { class: "mk-view" });
   const { row, pick } = choices(
     m.tabs.map((t) => t.label),
@@ -583,55 +325,32 @@ function renderCompare(m: Compare, note: HTMLElement) {
       note.textContent = m.tabs[i].note;
     },
   );
-  wrap.append(row, view);
   pick(0);
-  return wrap;
+  return h("div", {}, row, view);
 }
 
 function renderBars(m: Bars, note: HTMLElement) {
-  const wrap = h("div");
-  let state = 0;
   const rows = m.items.map((item) => {
     const fill = h("span", { class: "mk-fill" });
-    const val = h("span", { class: "mk-val" });
+    fill.style.width = `${(item.value / item.max) * 100}%`;
     const r = h(
       "button",
-      { type: "button", class: "mk-bar" },
-      h("span", { class: "mk-bar-label" }, item.label),
+      { type: "button", class: "mk-bar", "aria-pressed": "false" },
+      h("span", {}, item.label),
       h("span", { class: "mk-track" }, fill),
-      val,
+      h("span", { class: "mk-val" }, String(item.value)),
     );
     r.addEventListener("click", () => {
+      rows.forEach((x) => x.setAttribute("aria-pressed", String(x === r)));
       note.textContent = item.note;
     });
-    return { item, fill, val };
+    return r;
   });
-  function draw() {
-    for (const { item, fill, val } of rows) {
-      const v = Array.isArray(item.value) ? item.value[state] : item.value;
-      fill.style.width = `${(v / item.max) * 100}%`;
-      val.textContent = `${v}${item.suffix ?? ""}`;
-    }
-  }
-  if (m.states) {
-    const { row, pick } = choices(m.states, (i) => {
-      state = i;
-      draw();
-      note.textContent = m.stateNotes?.[i] ?? "Tap a bar for details.";
-    });
-    wrap.append(row);
-    wrap.append(...rows.map((r) => r.fill.closest(".mk-bar")!));
-    pick(0);
-  } else {
-    wrap.append(...rows.map((r) => r.fill.closest(".mk-bar")!));
-    draw();
-    note.textContent = `Tap a bar for details.${m.lowerIsBetter ? " Shorter is better." : ""}`;
-  }
-  return wrap;
+  rows.at(-1)?.click();
+  return h("div", { class: "mk-bars" }, ...rows);
 }
 
 function renderRoute(m: Route, note: HTMLElement) {
-  const wrap = h("div");
   const stages = m.stages.map((s) => h("li", { class: "mk-stage" }, s));
   const list = h("ol", { class: "mk-route" }, ...stages);
   let timers: number[] = [];
@@ -643,7 +362,7 @@ function renderRoute(m: Route, note: HTMLElement) {
       timers = [];
       stages.forEach((s) => (s.className = "mk-stage"));
       note.textContent = "";
-      const step = reduceMotion.matches ? 0 : 280;
+      const step = reduceMotion.matches ? 0 : 240;
       c.path.forEach((idx, k) => {
         timers.push(
           window.setTimeout(() => {
@@ -657,33 +376,20 @@ function renderRoute(m: Route, note: HTMLElement) {
       });
     },
   );
-  wrap.append(row, list);
   pick(0);
-  return wrap;
-}
-
-function renderTrace(m: Trace, note: HTMLElement) {
-  const wrap = h("div");
-  const { row, pick } = choices(
-    m.items.map((t) => (t.meta ? `${t.label} · ${t.meta}` : t.label)),
-    (i) => {
-      note.textContent = m.items[i].detail;
-    },
-  );
-  row.classList.add("mk-trace");
-  wrap.append(row);
-  pick(0);
-  return wrap;
+  return h("div", {}, row, list);
 }
 
 function renderFilter(m: Filter, note: HTMLElement) {
-  const wrap = h("div");
   const items = m.items.map((it) =>
     h("li", { class: it.flagged ? "mk-item is-flagged" : "mk-item" }, it.text),
   );
   const list = h("ul", { class: "mk-list" }, ...items);
-  const toggle = button(m.toggle);
-  toggle.setAttribute("aria-pressed", "false");
+  const toggle = h(
+    "button",
+    { type: "button", class: "mk-chip", "aria-pressed": "false" },
+    m.toggle,
+  );
   const set = (on: boolean) => {
     toggle.setAttribute("aria-pressed", String(on));
     list.classList.toggle("is-filtered", on);
@@ -692,14 +398,13 @@ function renderFilter(m: Filter, note: HTMLElement) {
   toggle.addEventListener("click", () =>
     set(toggle.getAttribute("aria-pressed") !== "true"),
   );
-  wrap.append(h("div", { class: "mk-choices" }, toggle), list);
   set(false);
-  return wrap;
+  return h("div", {}, h("div", { class: "mk-choices" }, toggle), list);
 }
 
-function render(m: Mockup) {
+function renderBody(m: Mockup) {
   const note = h("p", { class: "mk-note", "aria-live": "polite" });
-  const body =
+  const widget =
     m.kind === "steps"
       ? renderSteps(m, note)
       : m.kind === "compare"
@@ -708,55 +413,49 @@ function render(m: Mockup) {
           ? renderBars(m, note)
           : m.kind === "route"
             ? renderRoute(m, note)
-            : m.kind === "trace"
-              ? renderTrace(m, note)
-              : renderFilter(m, note);
-  const head = h("p", { class: "mk-title" }, m.title);
-  if (m.example) head.append(h("span", { class: "mk-tag" }, "Example"));
-  return [head, body, note];
+            : renderFilter(m, note);
+  return [
+    h("p", { class: "mk-context" }, m.context),
+    h("div", { class: "mk-widget" }, widget, note),
+  ];
 }
 
-// ---------- wire up the dividers in one drawer ----------
-let counter = 0;
+const chevron = () => {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("width", "14");
+  s.setAttribute("height", "14");
+  s.setAttribute("aria-hidden", "true");
+  s.classList.add("mk-chevron");
+  s.innerHTML =
+    '<path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>';
+  return s;
+};
+
+// ---------- add the cards to one drawer ----------
 export function enhance(dialog: HTMLDialogElement) {
   const caseEl = dialog.querySelector<HTMLElement>(".case");
   if (!caseEl || caseEl.classList.contains("has-mockups")) return;
   const heads = [...caseEl.querySelectorAll<HTMLHeadingElement>(":scope > h2")];
   heads.forEach((h2, i) => {
-    if (i === 0) return;
-    const above = heads[i - 1];
-    const m = MOCKUPS[`${dialog.id}:${above.id}`];
-    const box = h("div", { class: "mk" });
-    if (!m) {
-      box.append(h("span", { class: "mk-dots", "aria-hidden": "true" }, "···"));
-      h2.before(box);
-      return;
-    }
-    const id = `mk-${++counter}`;
-    const toggle = h(
-      "button",
-      {
-        type: "button",
-        class: "mk-toggle",
-        "aria-expanded": "false",
-        "aria-controls": id,
-      },
-      h("span", { "aria-hidden": "true" }, "···"),
-      h(
-        "span",
-        { class: "mk-toggle-label" },
-        `See how it works: ${above.textContent}`,
-      ),
+    const m = MOCKUPS[`${dialog.id}:${h2.id}`];
+    if (!m) return;
+    const summary = h(
+      "summary",
+      { class: "mk-summary" },
+      h("span", { class: "mk-kicker" }, "How it works"),
+      h("span", { class: "mk-title" }, m.title),
     );
-    const panel = h("div", { class: "mk-panel", id, hidden: "" });
-    toggle.addEventListener("click", () => {
-      const open = toggle.getAttribute("aria-expanded") !== "true";
-      if (open && !panel.childElementCount) panel.append(...render(m));
-      toggle.setAttribute("aria-expanded", String(open));
-      panel.hidden = !open;
+    if (m.example) summary.append(h("span", { class: "mk-tag" }, "Example"));
+    summary.append(chevron());
+    const body = h("div", { class: "mk-body" });
+    const card = h("details", { class: "mk" }, summary, body);
+    card.addEventListener("toggle", () => {
+      if (card.open && !body.childElementCount) body.append(...renderBody(m));
     });
-    box.append(toggle, panel);
-    h2.before(box);
+    const next = heads[i + 1];
+    if (next) next.before(card);
+    else caseEl.append(card);
   });
   caseEl.classList.add("has-mockups");
 }

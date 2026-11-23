@@ -97,25 +97,27 @@ test("deep link opens a drawer on load", async ({ page }) => {
   await expect(page.locator(`dialog#${id}`)).toHaveAttribute("open");
 });
 
-test("drawer dividers open interactive mockups", async ({ page }) => {
+test("drawer 'How it works' cards open and fit", async ({ page }) => {
   const id = await page
     .locator("[data-drawer-open]")
     .first()
     .getAttribute("data-drawer-open");
   await page.locator(`[data-drawer-open="${id}"]`).click();
   const dialog = page.locator(`dialog#${id}`);
-  const toggles = dialog.locator(".mk-toggle");
-  await expect(toggles.first()).toBeVisible(); // mockups.ts loads lazily
-  const first = toggles.first();
-  await first.click();
-  await expect(first).toHaveAttribute("aria-expanded", "true");
-  const panel = dialog.locator(".mk-panel").first();
-  await expect(panel).toBeVisible();
-  await expect(panel.locator(".mk-note")).not.toBeEmpty();
-  // Every mockup opens without errors and fits the drawer width.
-  for (let i = 0; i < (await toggles.count()); i++) {
-    const t = toggles.nth(i);
-    if ((await t.getAttribute("aria-expanded")) !== "true") await t.click();
+  const cards = dialog.locator("details.mk");
+  await expect(cards.first()).toBeVisible(); // mockups.ts loads lazily
+  // No "···" dividers once the cards are in.
+  const dots = await dialog
+    .locator(".case > h2")
+    .nth(1)
+    .evaluate((h) => getComputedStyle(h, "::before").content);
+  expect(dots === "none" || dots === "normal").toBeTruthy();
+  for (let i = 0; i < (await cards.count()); i++) {
+    const card = cards.nth(i);
+    await card.locator("summary").click();
+    await expect(card).toHaveAttribute("open", "");
+    await expect(card.locator(".mk-context")).not.toBeEmpty();
+    await expect(card.locator(".mk-note")).not.toBeEmpty();
   }
   const overflow = await dialog.evaluate((d) => {
     const body = d.querySelector(".body")!;
