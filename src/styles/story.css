@@ -1,0 +1,470 @@
+/* Three-step animated story under a project drawer's Overview: problem → what it does → result.
+   Raw HTML in src/content/projects/<slug>.md (`<figure class="story">`), styled only with tokens so it follows
+   the theme toggle. Each step is highlighted in turn on a 12 s loop. Text is never dimmed, so contrast holds
+   in every frame; with prefers-reduced-motion nothing moves and every step shows in full. */
+
+.story {
+  container-type: inline-size;
+  margin: var(--space-6) 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-tile);
+  background: var(--color-surface);
+  font-size: var(--text-xs);
+  line-height: 1rem;
+  color: var(--color-body);
+}
+.story-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.story-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-row);
+  animation: story-spot 12s var(--ease-out) infinite;
+}
+.story-step:nth-child(2) {
+  animation-delay: -8s;
+}
+.story-step:nth-child(3) {
+  animation-delay: -4s;
+}
+@keyframes story-spot {
+  0%,
+  34%,
+  100% {
+    border-color: transparent;
+    background-color: transparent;
+  }
+  3%,
+  31% {
+    border-color: var(--color-border);
+    background-color: var(--color-bg);
+  }
+}
+.story-label {
+  color: var(--color-faint);
+}
+.story-label b {
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+.story-scene {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.story-note {
+  color: var(--color-muted);
+}
+.story-num {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+  color: var(--color-muted);
+}
+.story-num strong {
+  font-size: var(--text-lg);
+  line-height: 1.5rem;
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+.story .is-bad strong,
+.story-mark.is-bad {
+  color: var(--chart-4);
+}
+.story .is-good strong,
+.story-mark.is-good {
+  color: var(--chart-3);
+}
+
+/* A boxed line of text: a question, an answer, a pipeline stage. */
+.story-chip {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+.story-chip.is-mono,
+.story-card {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+.story-chip.is-center {
+  justify-content: center;
+  text-align: center;
+}
+.story-chip.is-bad {
+  border-color: var(--chart-4);
+}
+.story-chip.is-good {
+  border-color: var(--chart-3);
+}
+
+/* Retrieved documents as small tiles. */
+.story-docs {
+  display: flex;
+  gap: var(--space-1);
+}
+.story-doc {
+  flex: 1;
+  height: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background:
+    linear-gradient(var(--color-subtle), var(--color-subtle)) 4px 7px / 55% 2px
+      no-repeat,
+    linear-gradient(var(--color-subtle), var(--color-subtle)) 4px 13px / 35% 2px
+      no-repeat,
+    var(--color-bg);
+}
+.story-doc.is-bad {
+  border-color: var(--chart-4);
+  background:
+    linear-gradient(var(--chart-4), var(--chart-4)) 4px 7px / 55% 2px no-repeat,
+    linear-gradient(var(--chart-4), var(--chart-4)) 4px 13px / 35% 2px no-repeat,
+    color-mix(in srgb, var(--chart-4) 12%, var(--color-bg));
+  animation: story-pulse 1.6s ease-in-out infinite;
+}
+.story-doc.is-gone {
+  border: 1px dashed var(--color-subtle);
+  background: transparent;
+}
+@keyframes story-pulse {
+  50% {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--chart-4) 30%, transparent);
+  }
+}
+
+/* Vector Guard: documents drop through four checks. */
+.story-gates {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding-right: 1.125rem;
+}
+.story-gates::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0.375rem;
+  border-left: 1px dashed var(--color-subtle);
+}
+.story-gate {
+  display: flex;
+  align-items: center;
+  height: 1.5rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+.story-drop {
+  position: absolute;
+  z-index: 1;
+  top: -0.25rem;
+  right: 0.125rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--chart-3);
+  opacity: 0;
+  animation: story-pass 3s linear infinite;
+}
+.story-drop + .story-drop {
+  animation-delay: -1.5s;
+}
+.story-drop.is-bad {
+  background: var(--chart-4);
+  animation: story-stop-1 3s var(--ease-out) infinite -0.7s;
+}
+.story-drop.is-bad.is-late {
+  animation-name: story-stop-3;
+  animation-delay: -2.2s;
+}
+@keyframes story-pass {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  8%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(7.375rem);
+    opacity: 0;
+  }
+}
+@keyframes story-stop-1 {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  8%,
+  30% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    transform: translateY(1rem);
+  }
+  45%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes story-stop-3 {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  8%,
+  60% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    transform: translateY(4.75rem);
+  }
+  75%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Research assistant: retrieved sources arrive one by one; a draft gets checked. */
+.story-in {
+  animation: story-in 4s var(--ease-out) infinite;
+}
+.story-in:nth-child(3) {
+  animation-delay: 0.25s;
+}
+.story-in:nth-child(4) {
+  animation-delay: 0.5s;
+}
+@keyframes story-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  12%,
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.story-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.story-card.is-good {
+  border-color: var(--chart-3);
+}
+.story-card .story-note {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+}
+.story-line {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+  padding: 2px 4px;
+  margin: 0 -4px;
+  border-radius: 3px;
+}
+.story-line.is-flag {
+  background: color-mix(in srgb, var(--chart-4) 14%, transparent);
+  animation: story-flag 1.4s ease-in-out infinite;
+}
+@keyframes story-flag {
+  50% {
+    background: color-mix(in srgb, var(--chart-4) 4%, transparent);
+  }
+}
+.story-loop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-muted);
+}
+.story-spin {
+  display: inline-block;
+  font-size: var(--text-base);
+  color: var(--chart-4);
+  animation: story-spin 2.4s linear infinite;
+}
+@keyframes story-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* SysToolChain: records flow down a pipeline; comments scroll through a feed; error bars. */
+.story-pipe {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.story-pipe::before {
+  content: "";
+  position: absolute;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 50%;
+  border-left: 1px solid var(--color-subtle);
+}
+.story-pipe .story-chip {
+  position: relative;
+  z-index: 1;
+}
+.story-flow {
+  position: absolute;
+  top: 0.5rem;
+  left: calc(50% - 0.1875rem);
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: var(--chart-1);
+  animation: story-flow 1.8s linear infinite;
+}
+.story-flow:nth-child(2) {
+  animation-delay: -0.6s;
+}
+.story-flow:nth-child(3) {
+  animation-delay: -1.2s;
+}
+@keyframes story-flow {
+  to {
+    transform: translateY(5.5rem);
+  }
+}
+.story-feed {
+  height: 6.75rem;
+  overflow: hidden;
+  mask-image: linear-gradient(transparent, black 12%, black 88%, transparent);
+}
+.story-track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  animation: story-scroll 8s linear infinite;
+}
+@keyframes story-scroll {
+  to {
+    transform: translateY(calc(-50% - var(--space-1) / 2));
+  }
+}
+.story-bubble {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-row);
+  background: var(--color-bg);
+  color: var(--color-text);
+  white-space: nowrap;
+}
+.story-bubble b {
+  font-weight: var(--weight-semibold);
+  color: var(--chart-1);
+}
+.story-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.story-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 1rem;
+  padding: 0 4px;
+  margin-bottom: var(--space-1);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--chart-5) 30%, var(--color-bg));
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text);
+  transform-origin: left center;
+  animation: story-grow 12s var(--ease-out) infinite;
+}
+.story-bar.is-good {
+  background: color-mix(in srgb, var(--chart-3) 30%, var(--color-bg));
+}
+@keyframes story-grow {
+  0%,
+  64%,
+  76%,
+  100% {
+    transform: scaleX(1);
+  }
+  66% {
+    transform: scaleX(0);
+  }
+}
+
+/* Narrow drawers (phones): one step per row, label and number left, scene right. */
+@container (width < 26rem) {
+  .story-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .story-step {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: var(--space-3);
+    row-gap: var(--space-2);
+  }
+  .story-label {
+    grid-area: 1 / 1;
+  }
+  .story-num {
+    grid-area: 2 / 1;
+    margin-top: 0;
+  }
+  .story-scene {
+    grid-area: 1 / 2 / 3 / 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story *,
+  .story-step {
+    animation: none !important;
+  }
+  .story-step {
+    border-color: var(--color-border);
+    background: var(--color-bg);
+  }
+  .story-drop,
+  .story-flow {
+    display: none;
+  }
+}

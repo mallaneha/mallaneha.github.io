@@ -17,7 +17,13 @@ A research assistant built to keep answers grounded in its sources. It uses an a
 workflow in LangGraph over a Milvus vector store, then checks its own answers before returning
 them.
 
-<img class="canvas" src="/canvas/research-assistant-agent.svg" width="480" height="300" loading="lazy" alt="RAG Research Assistant in three steps. Retrieve: a question goes to the Milvus vector store and the top documents come back. Reflect: the draft answer is checked claim by claim; a claim with no source is flagged and the agent drafts again. Grounded: only sourced claims are returned, with citations, giving 80% fewer hallucinations.">
+<figure class="story" role="img" aria-label="RAG Research Assistant in three steps. Retrieve: a question goes to the Milvus vector store and the top documents come back. Reflect: the draft is checked claim by claim; a claim with no source is dropped and the agent drafts again. Grounded: only sourced claims are returned, with citations, for 80% fewer hallucinations.">
+<div class="story-steps">
+<div class="story-step"><div class="story-label">1 · <b>Retrieve</b></div><div class="story-scene"><span class="story-chip is-mono">Q: When did the Transformer appear?</span><span class="story-chip is-center">Milvus vector store</span><span class="story-chip is-mono story-in">[1] paper · 2017</span><span class="story-chip is-mono story-in">[2] survey</span><span class="story-chip is-mono story-in">[3] lecture notes</span></div><div class="story-num">top documents for the question</div></div>
+<div class="story-step"><div class="story-label">2 · <b>Reflect</b></div><div class="story-scene"><span class="story-card"><span class="story-note">Draft</span><span class="story-line">Introduced in 2017 [1] <span class="story-mark is-good">✓</span></span><span class="story-line is-flag">Replaced all RNNs <span class="story-mark is-bad">✗</span></span></span><span class="story-loop"><span class="story-spin" aria-hidden="true">↻</span>no source: drop it, draft again</span></div><div class="story-num">is every claim in the documents?</div></div>
+<div class="story-step"><div class="story-label">3 · <b>Grounded</b></div><div class="story-scene"><span class="story-card is-good"><span class="story-note">Answer</span><span class="story-line">Introduced in 2017 [1] <span class="story-mark is-good">✓</span></span></span><span class="story-chip is-mono">source: [1] paper</span></div><div class="story-num is-good"><strong>80%</strong>fewer hallucinations</div></div>
+</div>
+</figure>
 
 <div class="stats">
   <div><strong>80%</strong><span>fewer hallucinations</span></div>
