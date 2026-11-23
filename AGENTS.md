@@ -5,6 +5,9 @@ Full product spec: `docs/SPEC.md`. Design reference: ch.sh (layout, rows, drawer
 Stack: Astro 7, TypeScript, Markdown content collections, plain CSS with design tokens, two small vanilla TS scripts.
 Hosted on GitHub Pages at https://mallaneha.github.io; `.github/workflows/deploy.yml` deploys on push to `main`.
 
+**Every change happens in its own git worktree, then merges into local `main`.** Never edit the main checkout:
+parallel agents share it. Steps are under "Parallel work" below.
+
 ## Commands
 
 Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` first if `node -v` is older.
