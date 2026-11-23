@@ -7,6 +7,7 @@ import Row from "../components/Row.astro";
 import Drawer from "../components/Drawer.astro";
 import SectionColumns from "../components/SectionColumns.astro";
 import Icon from "../components/Icon.astro";
+import HeaderCat from "../components/HeaderCat.astro";
 import { site } from "../data/site";
 import {
   getWriting,
@@ -68,7 +69,10 @@ const educationDrawers = await Promise.all(
       </p>
     )}
     <div class="top">
-      <h1>{site.name}</h1>
+      <div class="name">
+        <h1>{site.name}</h1>
+        <HeaderCat />
+      </div>
       <span class="social">
         <a
           href={site.links.linkedin}
@@ -245,7 +249,15 @@ const educationDrawers = await Promise.all(
     color: var(--color-body);
   }
   h1 {
+    display: inline;
     color: var(--color-text);
+  }
+  /* Follow the site's theme toggle, not only the system setting. */
+  .name :global(header-cat) {
+    --cat-size: 2.5rem;
+    --cat-line: var(--color-cat-line);
+    --cat-ledge: var(--color-cat-ledge);
+    margin-left: var(--space-1);
   }
   .tagline {
     margin: 0 0 var(--space-6);
