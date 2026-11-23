@@ -14,21 +14,10 @@ order: 10
 ## Overview <span class="when">Aug 2025 – Dec 2026</span>
 
 A master's in AI engineering at Carnegie Mellon in Pittsburgh, with a concentration in information
-security. Three projects so far: a data pipeline on GCP, a research agent
-that checks its own answers, and a defense that keeps poisoned documents out of RAG.
+security.
 
-<div class="stats">
-  <div><strong>144K+</strong><span>player records in the pipeline</span></div>
-  <div><strong>80%</strong><span>fewer hallucinations</span></div>
-  <div><strong>59% → 3%</strong><span>RAG attack success</span></div>
-</div>
-
-## Courses
-
-- Generative AI and LLMs
-- Systems and Tool Chains for AI Engineering
-- AI Governance
-- Introduction to Information Security
+Relevant courses: Generative AI and LLMs, Systems and Tool Chains for AI Engineering, AI Governance, and
+Introduction to Information Security.
 
 ## SysToolChain <span class="when">Oct – Nov 2025</span>
 
