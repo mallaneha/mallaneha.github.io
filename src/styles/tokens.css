@@ -117,6 +117,11 @@
   /* Header cat (src/components/header-cat.js): outline and shelf line. Decorative. */
   --color-cat-line: #22201f;
   --color-cat-ledge: #bfc3c8;
+  /* Margin grid (src/scripts/margin-grid.ts): three cell shades and the dot. Decorative, behind the margins. */
+  --grid-1: #f2f2f2;
+  --grid-2: #e8e8e8;
+  --grid-3: #dddddd;
+  --grid-dot: #b8b8b8;
 }
 
 /* Dark: follows the system unless the theme toggle chose light; or forced by the toggle. */
@@ -158,6 +163,10 @@
     --chart-on-other: #111111;
     --color-cat-line: #8d8880;
     --color-cat-ledge: #50545a;
+    --grid-1: #181818;
+    --grid-2: #1f1f1f;
+    --grid-3: #272727;
+    --grid-dot: #444444;
   }
 }
 
@@ -198,6 +207,10 @@
   --chart-on-other: #111111;
   --color-cat-line: #8d8880;
   --color-cat-ledge: #50545a;
+  --grid-1: #181818;
+  --grid-2: #1f1f1f;
+  --grid-3: #272727;
+  --grid-dot: #444444;
 }
 
 :root[data-theme="light"] {

@@ -149,3 +149,19 @@ html:has(dialog[open]) {
     transform: translate(-50%, 0);
   }
 }
+
+/* Margin grid (src/scripts/margin-grid.ts): a fixed canvas behind all content, wide screens only.
+   html has no background, so body's paints the canvas root and this sits above it, below content. */
+.margin-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+@media print {
+  .margin-grid {
+    display: none;
+  }
+}

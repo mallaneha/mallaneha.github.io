@@ -49,6 +49,19 @@ show ↗ on hover (always on touch screens).
   sections are separated by space alone (no `···`). To remove: delete both files and the `import("./mockups")`
   line in `drawer.ts`.
 
+## Margin grid (`src/scripts/margin-grid.ts`)
+
+From 1024px up, a fixed canvas behind every page fills the left and right margins with a quiet noise texture, a
+grayscale take on oddgrid: 10px square cells (1px gap) where a 3D value-noise field lights up irregular islands, in
+three faint grays (`--grid-1`..`--grid-3`, darker toward an island's core), with a small dot (`--grid-dot`) on about
+1 in 6 core cells. Motion and sparsity match the oddgrid recording Neha picked: it boils in place (no drift
+direction), about 10% of cells are lit, a cell stays lit about 1s, and the whole field re-forms in about 2s. The 34rem
+column plus a 2rem band on each side stays empty; islands thin out over 96px toward it. Redrawn every 100ms (cells
+step on and off, no fades), new seed per load (`?seed=<n>` pins it). One still frame with reduced motion; paused
+while the tab is hidden; redrawn after a resize. `effects.ts` imports it only on wide screens. If a page ever gets
+content wider than the column, widen the clear zone. Tests: `tests/visual/margin-grid.spec.ts`. Design:
+`docs/plans/2026-11-23-margin-grid-design.md`.
+
 ## Click effects (`src/scripts/effects.ts`)
 
 Every page, for clicks on links and buttons (not on text or empty space), and not inside an open

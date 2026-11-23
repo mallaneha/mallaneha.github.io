@@ -1,6 +1,13 @@
 # Margin grid: design
 
-Status: approved 2026-11-23, not built yet.
+Status: approved and built 2026-11-23 (branch `site/margin-grid`). Measured cost: about 2.4ms per frame at
+1920×1080 (median, headless Chrome), with a first-octave early-out. Dots are a bit darker than first planned
+(`#b8b8b8` light, `#444` dark) so they read.
+
+Retuned after review: the slow 10–20s drift looked wrong. Motion and sparsity now match the oddgrid recording,
+measured cell by cell (44×78 grid, 180 frames): ~10% of cells lit, ~1.3% flipping per frame, a cell lit ~1.1s
+(90% within ~2.5s), ~11 islands per frame, no drift direction. Parameters: `SPEED 0.045`, `SCALE 0.09`, `LIT 0.66`,
+octaves 0.58/0.42 at 2.5× frequency. Colors, shading and dots unchanged. Frame cost now ~1.7ms at 1920×1080.
 
 ## Goal
 
@@ -23,7 +30,7 @@ Rejected earlier: a "redacted intro" reveal in the header (felt gimmicky).
   small darker dot.
   - Light: about `#f0f0f0` to `#dcdcdc` on white, dots about `#c4c4c4`.
   - Dark: about `#1a1a1a` to `#2a2a2a` on `#111`, dots about `#3a3a3a`.
-- Slow drift: an island visibly reshapes over 10–20 seconds. Redrawn about 10 times a second, so cells step on
+- Motion (superseded, see status): an island visibly reshapes over 10–20 seconds. Redrawn about 10 times a second, so cells step on
   and off like the oddgrid recording, no smooth fades.
 - A new random seed on every page load.
 - Still (one frame) with `prefers-reduced-motion`. Paused while the tab is hidden. Redraws once after a resize.
