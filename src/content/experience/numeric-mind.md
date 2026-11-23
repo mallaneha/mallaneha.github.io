@@ -6,6 +6,7 @@ end: 2025
 location: "Kathmandu, Nepal"
 summary: "Senior Data Analyst · 2021–2025"
 icon: table
+logo: /logos/numeric-mind.jpg
 order: 20
 ---
 
