@@ -13,7 +13,15 @@ order: 10
 
 ## Overview <span class="when">Aug 2025 – Dec 2026</span>
 
-A master's in AI engineering with a concentration in information security.
+A master's in AI engineering at Carnegie Mellon in Pittsburgh, with a concentration in information
+security. I built three projects here: a data pipeline on GCP, a research agent that checks its own
+answers, and a defense that keeps poisoned documents out of RAG.
+
+<div class="stats">
+  <div><strong>144K+</strong><span>player records in the pipeline</span></div>
+  <div><strong>80%</strong><span>fewer hallucinations</span></div>
+  <div><strong>59% → 3%</strong><span>RAG attack success</span></div>
+</div>
 
 ## Courses
 
@@ -21,3 +29,41 @@ A master's in AI engineering with a concentration in information security.
 - Systems and Tool Chains for AI Engineering
 - AI Governance
 - Introduction to Information Security
+
+## SysToolChain <span class="when">Oct – Nov 2025</span>
+
+A batch and streaming pipeline on GCP. PySpark on Dataproc loads 144K+ FIFA player records from
+Cloud Storage into a self-hosted PostgreSQL container over JDBC. Live World Cup YouTube comments
+come through Kafka, where a custom consumer counts mentions of top-rated players and drops
+ambiguous names. I trained rating models in Spark MLlib and PyTorch, and a Random Forest reached
+0.97 RMSE and 0.98 R², against 1.94 RMSE for the linear baseline.
+
+## Research Assistant Agent <span class="when">Feb 2026</span>
+
+An agentic RAG workflow in LangGraph that answers from documents in a Milvus vector store. Before
+returning an answer, the agent checks it against the retrieved documents, and that step cut
+hallucinations by 80%. LangSmith traces every run. Milvus, the backend and the MCP services run as
+microservices on GKE, set up with Docker and Terraform, with a Streamlit UI and Google Translate
+through FastMCP for questions in other languages.
+
+<ol class="flow">
+  <li>Retrieve from Milvus</li>
+  <li>Generate an answer</li>
+  <li>Reflect: is it grounded?</li>
+  <li>Return, or try again</li>
+</ol>
+
+## Vector Guard <span class="when">Apr 2026</span>
+
+I attacked a RAG assistant for a security operations center, built over 1,063 CVE and MITRE ATT&CK
+documents. My adaptation of the PoisonedRAG attack changed its answers 59% of the time with 2
+poisoned documents per query. Then I put four checks between retrieval and the model: structural
+filtering, embedding anomaly detection, NLI contradiction checks and LLM-based document scoring.
+Attack success fell to 3% on the threat-intelligence data, and from 72% to 24% on the Natural
+Questions benchmark.
+
+## Takeaways
+
+The projects build on each other. The first moved and modeled data at scale, the second grounded
+an agent's answers in retrieved documents, and the third attacked that kind of retrieval and then
+defended it.
