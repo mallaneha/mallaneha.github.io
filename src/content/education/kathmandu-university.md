@@ -12,15 +12,15 @@ order: 20
 
 ## Overview <span class="when">Aug 2017 – Mar 2022</span>
 
-I did my bachelor's in computer engineering at Kathmandu University in Dhulikhel, Nepal. My projects there covered machine learning, computer vision, cryptography and OCR.
+A bachelor's in computer engineering at Kathmandu University in Dhulikhel, Nepal. Projects there covered machine learning, computer vision, cryptography and OCR.
 
 Relevant courses: Data Structures and Algorithms, Discrete Structures, Statistics and Probability, and Machine Learning.
 
 ## Rennervate
 
-Rennervate (April to July 2021) detects driver drowsiness in real time. I built it in Python with
-OpenCV and scikit-learn. dlib's 68-point detector pulls facial landmarks from the UTA-RLDD and NTHU
-video datasets, and I trained logistic regression, random forest and KNN classifiers on them. KNN
+Rennervate (April to July 2021) detects driver drowsiness in real time, built in Python with OpenCV
+and scikit-learn. dlib's 68-point detector pulls facial landmarks from the UTA-RLDD and NTHU video
+datasets, and logistic regression, random forest and KNN classifiers learn from them. KNN
 did best, at up to 89.32% accuracy.
 
 <div class="stats">
