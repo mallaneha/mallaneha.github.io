@@ -276,14 +276,14 @@
     border-color: var(--color-muted);
   }
   .xp-field input[aria-invalid="true"] {
-    border-color: var(--chart-4);
+    border-color: var(--chart-alert);
   }
   .xp-hint {
     font-size: var(--text-xs);
-    color: var(--chart-4);
+    color: var(--chart-alert);
   }
   .xp-field.is-invalid output {
-    color: var(--chart-4);
+    color: var(--chart-alert);
   }
 
   /* Segmented control (radio buttons). 2px inset, so the inner radius is the outer one minus 2px. */
@@ -674,7 +674,7 @@
     overflow: hidden;
   }
   .xp-stack.is-over {
-    outline: 2px dashed var(--chart-4);
+    outline: 2px dashed var(--chart-alert);
     outline-offset: 2px;
   }
   .xp-seg,
@@ -695,27 +695,31 @@
     height: 8px;
     border-radius: 50%;
   }
-  .xp-seg.c1,
-  .xp-swatch.c1 {
-    background: var(--chart-1);
+  .k-main {
+    background: var(--chart-main);
   }
-  .xp-seg.c2,
-  .xp-swatch.c2 {
-    background: var(--chart-2);
+  .k-main-soft {
+    background: var(--chart-main-soft);
   }
-  .xp-seg.c3,
-  .xp-swatch.c3 {
-    background: var(--chart-3);
+  .k-alert {
+    background: var(--chart-alert);
   }
-  .xp-seg.c4,
-  .xp-swatch.c4 {
-    background: var(--chart-4);
+  .k-alert-soft {
+    background: var(--chart-alert-soft);
   }
-  .xp-seg.c5,
-  .xp-swatch.c5 {
-    background: var(--chart-5);
+  .k-neutral {
+    background: var(--chart-neutral);
   }
-  .xp-swatch.c0 {
+  .k-other {
+    background: var(--chart-other);
+  }
+  .k-other-soft {
+    background: var(--chart-other-soft);
+  }
+  .xp-seg.k-free {
+    background: transparent;
+  }
+  .xp-swatch.k-free {
     border: 1px solid var(--color-subtle);
   }
 
@@ -845,10 +849,10 @@
     stroke-dasharray: 3 3;
   }
   .xp-guide.is-limit {
-    stroke: var(--chart-4);
+    stroke: var(--chart-alert);
   }
   .xp-cursor {
-    stroke: var(--chart-1);
+    stroke: var(--chart-main);
     stroke-width: 1;
     stroke-opacity: 0.4;
   }
@@ -869,7 +873,7 @@
     text-anchor: middle;
   }
   .xp-key {
-    fill: var(--chart-3);
+    fill: var(--chart-other);
     fill-opacity: 0.85;
   }
   .xp-key.is-masked {
@@ -884,7 +888,7 @@
   }
   .xp-line {
     fill: none;
-    stroke: var(--chart-1);
+    stroke: var(--chart-main);
     stroke-width: 2;
   }
   .xp-line.is-over {
@@ -893,11 +897,11 @@
   }
   .xp-dot {
     fill: var(--color-bg);
-    stroke: var(--chart-1);
+    stroke: var(--chart-main);
     stroke-width: 2;
   }
   .xp-dot.is-over {
-    stroke: var(--chart-4);
+    stroke: var(--chart-alert);
   }
 
   /* RAG widgets (src/scripts/rag-explainers.ts) */
@@ -914,22 +918,76 @@
   .xp-q {
     stroke: var(--color-bg);
     stroke-width: 1;
-    transition: opacity var(--transition);
+    transition: fill var(--transition);
   }
-  .xp-q.is-hit {
-    fill: var(--chart-3);
+  /* Dots take the color of their outcome at the current floor (data-o, set in rag-explainers.ts). */
+  .xp-q[data-o="right"] {
+    fill: var(--chart-main);
   }
-  .xp-q.is-miss {
-    fill: var(--chart-4);
+  .xp-q[data-o="wrong"] {
+    fill: var(--chart-alert-soft);
   }
-  .xp-q.is-none {
-    fill: var(--chart-2);
+  .xp-q[data-o="madeUp"] {
+    fill: var(--chart-alert);
   }
-  .xp-q.is-refused {
-    opacity: 0.35;
+  .xp-q[data-o="wrongRefusal"] {
+    fill: var(--chart-neutral);
+  }
+  .xp-q[data-o="rightRefusal"] {
+    fill: var(--chart-main-soft);
   }
   .xp-q.is-hidden {
     display: none;
+  }
+  .xp-q.is-active {
+    stroke: var(--color-text);
+    stroke-width: 2;
+    opacity: 1;
+  }
+  .xp-strip:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+
+  /* Abstain lab's question tooltip: the site's toast colors, above the dot. Position is set in px by the script
+     and never animated, so moving between dots is instant; only opening fades and scales in from the dot. */
+  .xp-has-tip {
+    position: relative;
+  }
+  .xp-tip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: grid;
+    gap: 2px;
+    max-width: min(18rem, 100%);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-row);
+    background: var(--color-toast-bg);
+    color: var(--color-toast-text);
+    font-size: var(--text-xs);
+    line-height: var(--leading-tight);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.97);
+    visibility: hidden;
+  }
+  .xp-tip[data-open] {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+  }
+  .xp-tip-q {
+    font-weight: var(--weight-medium);
+    text-wrap: pretty;
+  }
+  .xp-tip-meta {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
   }
   .xp-legend li[hidden] {
     display: none;
@@ -942,7 +1000,7 @@
   .xp-ranks td.is-target {
     color: var(--color-text);
     font-weight: var(--weight-medium);
-    background: color-mix(in srgb, var(--chart-3) 14%, transparent);
+    background: color-mix(in srgb, var(--chart-main) 14%, transparent);
   }
   .xp .xp-chunks,
   .xp .xp-gates,
@@ -964,7 +1022,7 @@
     border-radius: var(--radius);
   }
   .xp-chunks li.is-target {
-    background: color-mix(in srgb, var(--chart-3) 14%, transparent);
+    background: color-mix(in srgb, var(--chart-main) 14%, transparent);
     color: var(--color-text);
   }
   .xp-chunk-id {
@@ -1003,15 +1061,15 @@
   }
   .xp-tag.is-A,
   .xp-venn.is-A {
-    --c: var(--chart-2);
+    --c: var(--chart-other);
   }
   .xp-tag.is-B,
   .xp-venn.is-B {
-    --c: var(--chart-1);
+    --c: var(--chart-main);
   }
   .xp-tag.is-C,
   .xp-venn.is-C {
-    --c: var(--chart-3);
+    --c: var(--chart-neutral);
   }
   .xp-tag {
     background: var(--c);
@@ -1050,12 +1108,12 @@
       stroke var(--transition);
   }
   .xp-venn-core.is-on {
-    fill: var(--chart-4);
-    stroke: var(--chart-4);
+    fill: var(--chart-alert);
+    stroke: var(--chart-alert);
     stroke-dasharray: none;
   }
   .xp.is-danger .xp-verdict {
-    color: var(--chart-4);
+    color: var(--chart-alert);
     font-weight: var(--weight-medium);
   }
 
@@ -1096,18 +1154,18 @@
     color: var(--color-body);
   }
   .xp-gate[data-state="stop"] {
-    border-color: var(--chart-3);
+    border-color: var(--chart-main);
   }
   .xp-gate[data-state="stop"] .xp-gate-state {
-    color: var(--chart-3);
+    color: var(--chart-main);
     font-weight: var(--weight-medium);
   }
   .xp-gate[data-state="maybe"] {
-    border-color: var(--chart-4);
+    border-color: var(--chart-other);
     border-style: dashed;
   }
   .xp-gate[data-state="maybe"] .xp-gate-state {
-    color: var(--chart-4);
+    color: var(--chart-other);
   }
   .xp-gate[data-state="skip"] {
     opacity: 0.45;
@@ -1137,12 +1195,12 @@
   .xp-hbar-fill {
     display: block;
     height: 100%;
-    background: var(--chart-1);
+    background: var(--chart-main);
     transform: scaleX(0);
     transform-origin: left;
   }
   .xp-hbar.is-high .xp-hbar-fill {
-    background: var(--chart-4);
+    background: var(--chart-alert);
   }
   .xp-hbar-val {
     font-family: var(--font-mono);
@@ -1174,6 +1232,19 @@
     .xp-hbar-fill {
       transition: transform var(--duration-state) var(--ease-out);
     }
+    /* Open: 125ms ease-out. Close: a quicker fade, with visibility flipping at the end. */
+    .xp-tip {
+      transition:
+        opacity 100ms var(--ease-out),
+        transform 100ms var(--ease-out),
+        visibility 0s 100ms;
+    }
+    .xp-tip[data-open] {
+      transition:
+        opacity 125ms var(--ease-out),
+        transform 125ms var(--ease-out),
+        visibility 0s;
+    }
     .xp.is-instant .xp-bar-fill,
     .xp.is-instant .xp-seg,
     .xp.is-instant .xp-hbar-fill,
@@ -1192,7 +1263,8 @@
     .xp-check input::before {
       transition: none;
     }
-    .xp-check input::before {
+    .xp-check input::before,
+    .xp-tip {
       transform: none;
     }
     /* Vendor pseudo-elements get a rule each: one unknown selector would drop the whole rule. */

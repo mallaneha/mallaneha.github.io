@@ -79,6 +79,15 @@ export function abstain(floor: number, withNone = true) {
   return { ...o, n: set.length, answered: o.right + o.wrong + o.madeUp };
 }
 
+/** What happens to one question at this floor: the same five outcomes abstain() counts. */
+type Outcome = "right" | "wrong" | "madeUp" | "wrongRefusal" | "rightRefusal";
+function outcome(e: (typeof EVAL_SET)[number], floor: number): Outcome {
+  const answers = e.score >= floor - 1e-9;
+  if (e.kind === "none") return answers ? "madeUp" : "rightRefusal";
+  if (!answers) return "wrongRefusal";
+  return e.kind === "hit" ? "right" : "wrong";
+}
+
 const SW = 300; // strip plot viewBox width
 const sx = (v: number) => 20 + v * (SW - 40);
 
@@ -108,12 +117,13 @@ class AbstainLab extends HTMLElement {
       .sort((a, b) => a - b);
     const dots = EVAL_SET.map((e) => {
       const y = e.kind === "none" ? 66 : 20 + (order.indexOf(e.score) % 3) * 9;
-      const c = s(
-        "circle",
-        { class: `xp-q is-${e.kind}`, cx: sx(e.score), cy: y, r: 5 },
-        s("title", {}, `${e.q} (top score ${fixed(e.score)})`),
-      );
-      return { c, e };
+      const c = s("circle", {
+        class: "xp-q",
+        cx: sx(e.score),
+        cy: y,
+        r: 5,
+      });
+      return { c, e, y, x: sx(e.score) };
     });
     const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) =>
       s("text", { class: "xp-label xp-middle", x: sx(t), y: 100 }, fixed(t)),
@@ -123,9 +133,10 @@ class AbstainLab extends HTMLElement {
       {
         class: "xp-chart xp-strip",
         viewBox: `0 0 ${SW} 106`,
-        role: "img",
+        role: "group",
+        tabindex: "0",
         "aria-label":
-          "Each dot is one eval question, placed by its top retrieval score. Questions left of the floor get a refusal.",
+          "Each dot is one eval question, placed by its top retrieval score. Questions left of the floor get a refusal. Use the left and right arrow keys to read each question.",
       },
       shade,
       s("line", { class: "xp-axis", x1: sx(0), x2: sx(1), y1: 86, y2: 86 }),
@@ -140,19 +151,113 @@ class AbstainLab extends HTMLElement {
       ...ticks,
     );
 
+    // The question under the pointer, in a tooltip above its dot. The pointer picks the nearest dot within
+    // reach, so the 10px dots don't have to be hit exactly; a tap works the same way, and ←/→ step through them.
+    const tipQ = h("span", { class: "xp-tip-q" });
+    const tipMeta = h("span", { class: "xp-tip-meta" });
+    const tip = h(
+      "div",
+      { class: "xp-tip", role: "status", "aria-live": "polite" },
+      tipQ,
+      tipMeta,
+    );
+    let active: (typeof dots)[number] | null = null;
+    const visible = () =>
+      dots
+        .filter((d) => !d.c.classList.contains("is-hidden"))
+        .sort((a, b) => a.e.score - b.e.score);
+
+    const place = () => {
+      if (!active) return;
+      const fig = tip.parentElement!.getBoundingClientRect();
+      const box = plot.getBoundingClientRect();
+      const k = box.width / SW;
+      const x = box.left - fig.left + active.x * k;
+      const y = box.top - fig.top + (active.y - 5) * k;
+      // Kept inside the figure; the scale origin stays on the dot even when the box is pushed sideways.
+      const w = tip.offsetWidth;
+      const left = Math.max(0, Math.min(fig.width - w, x - w / 2));
+      tip.style.left = `${left}px`;
+      tip.style.top = `${y - tip.offsetHeight - 8}px`;
+      tip.style.transformOrigin = `${x - left}px 100%`;
+    };
+    const show = (d: (typeof dots)[number] | null) => {
+      if (d === active) return;
+      active?.c.classList.remove("is-active");
+      active = d;
+      if (!d) {
+        tip.removeAttribute("data-open");
+        return;
+      }
+      d.c.classList.add("is-active");
+      describe();
+      place();
+      tip.setAttribute("data-open", "");
+    };
+    const describe = () => {
+      if (!active) return;
+      const o = outcome(active.e, Number(floor.input.value));
+      tipQ.textContent = active.e.q;
+      tipMeta.textContent = `Top score ${fixed(active.e.score)} · ${labels.find(([k]) => k === o)![2]}`;
+    };
+    // Nearest visible dot to the pointer, within 24 CSS pixels.
+    const nearest = (ev: PointerEvent) => {
+      const box = plot.getBoundingClientRect();
+      const k = box.width / SW;
+      let best: (typeof dots)[number] | null = null;
+      let bestD = 24;
+      for (const d of visible()) {
+        const dx = box.left + d.x * k - ev.clientX;
+        const dy = box.top + d.y * k - ev.clientY;
+        const dist = Math.hypot(dx, dy);
+        if (dist < bestD) [best, bestD] = [d, dist];
+      }
+      return best;
+    };
+    plot.addEventListener("pointermove", (ev) => {
+      if (ev.pointerType === "mouse") show(nearest(ev));
+    });
+    plot.addEventListener("pointerleave", (ev) => {
+      if (ev.pointerType === "mouse") show(null);
+    });
+    plot.addEventListener("pointerdown", (ev) => {
+      if (ev.pointerType !== "mouse") show(nearest(ev));
+    });
+    // A tap anywhere else closes it.
+    document.addEventListener("pointerdown", (ev) => {
+      if (
+        active &&
+        ev.pointerType !== "mouse" &&
+        !plot.contains(ev.target as Node)
+      )
+        show(null);
+    });
+    plot.addEventListener("keydown", (ev) => {
+      const list = visible();
+      const i = active ? list.indexOf(active) : -1;
+      if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") {
+        ev.preventDefault();
+        const step = ev.key === "ArrowRight" ? 1 : -1;
+        const next = i < 0 ? (step > 0 ? 0 : list.length - 1) : i + step;
+        show(list[Math.max(0, Math.min(list.length - 1, next))] ?? null);
+      } else if (ev.key === "Escape") show(null);
+    });
+    plot.addEventListener("blur", () => show(null));
+    window.addEventListener("resize", place);
+
     const segs = {
-      right: h("span", { class: "xp-seg c3" }),
-      wrong: h("span", { class: "xp-seg c4" }),
-      madeUp: h("span", { class: "xp-seg c2" }),
-      wrongRefusal: h("span", { class: "xp-seg c5" }),
-      rightRefusal: h("span", { class: "xp-seg c1" }),
+      right: h("span", { class: "xp-seg k-main" }),
+      wrong: h("span", { class: "xp-seg k-alert-soft" }),
+      madeUp: h("span", { class: "xp-seg k-alert" }),
+      wrongRefusal: h("span", { class: "xp-seg k-neutral" }),
+      rightRefusal: h("span", { class: "xp-seg k-main-soft" }),
     };
     const labels: [keyof typeof segs, string, string][] = [
-      ["right", "c3", "Right answer"],
-      ["wrong", "c4", "Wrong answer (wrong chunk)"],
-      ["madeUp", "c2", "Made up (no answer exists)"],
-      ["wrongRefusal", "c5", "Wrong refusal"],
-      ["rightRefusal", "c1", "Right refusal"],
+      ["right", "k-main", "Right answer"],
+      ["wrong", "k-alert-soft", "Wrong answer (wrong chunk)"],
+      ["madeUp", "k-alert", "Made up (no answer exists)"],
+      ["wrongRefusal", "k-neutral", "Wrong refusal"],
+      ["rightRefusal", "k-main-soft", "Right refusal"],
     ];
     const counts = Object.fromEntries(
       labels.map(([k]) => [k, h("span")]),
@@ -177,7 +282,7 @@ class AbstainLab extends HTMLElement {
       { class: "xp" },
       head("Where should the system say “I don’t know”?"),
       h("div", { class: "xp-controls" }, floor.wrap, none.wrap),
-      h("figure", { class: "xp-figure" }, plot),
+      h("figure", { class: "xp-figure xp-has-tip" }, plot, tip),
       h(
         "div",
         { class: "xp-stack", "aria-hidden": "true" },
@@ -188,7 +293,7 @@ class AbstainLab extends HTMLElement {
       h(
         "p",
         { class: "xp-note" },
-        "A toy eval set of 20 questions about one plan document. Hover or tap a dot to see the question.",
+        "A toy eval set of 20 questions about one plan document. Hover or tap a dot to read its question.",
       ),
     );
     mount(this, root);
@@ -205,8 +310,11 @@ class AbstainLab extends HTMLElement {
       line.setAttribute("x2", String(sx(t)));
       dots.forEach(({ c, e }) => {
         c.classList.toggle("is-hidden", !withNone && e.kind === "none");
-        c.classList.toggle("is-refused", e.score < t - 1e-9);
+        // Each dot takes its outcome's color, so it matches the bar and legend and changes as the floor moves.
+        c.dataset.o = outcome(e, t);
       });
+      if (active?.c.classList.contains("is-hidden")) show(null);
+      describe();
       stackBar(
         labels.map(([k]) => segs[k]),
         labels.map(([k]) => r[k]),

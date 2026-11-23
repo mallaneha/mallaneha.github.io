@@ -98,13 +98,18 @@
   /* A control raised off a track (the selected segment in a widget's segmented control, a slider thumb). */
   --color-raised: #ffffff;
   --shadow-raised: 0 0 0 1px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.08);
-  /* Chart series for the explainer widgets on white / --color-surface: 6.7/6.2, 6.6/6.2, 5.1/4.7, 5.4/5.1, 5.0/4.7.
-     Dark values on --color-bg / --color-surface are all 6.5:1 or higher. */
-  --chart-1: #0b5cad;
-  --chart-2: #7048a8;
-  --chart-3: #1a7f37;
-  --chart-4: #a65300;
-  --chart-5: #6f6f6f;
+  /* Data palette, one for the post widgets and the drawers' figures. Seven roles: main (the measured series and
+     what went right), alert (what went wrong or is dangerous, and nothing else), neutral (no verdict), other (a
+     third category), each but neutral with a -soft step for a second series. main, alert, neutral and other are
+     also used for text, so they need 4.5:1 on --color-bg; the soft steps are marks only and need 3:1.
+     Current values: "Ink & red pencil". Candidates to compare: /dev/widgets/ (src/data/dev-palettes.ts). */
+  --chart-main: #0b5cad;
+  --chart-main-soft: #5b8bd0;
+  --chart-alert: #b4233c;
+  --chart-alert-soft: #d9667a;
+  --chart-neutral: #737373;
+  --chart-other: #8f6412;
+  --chart-other-soft: #ad8536;
   /* Header cat (src/components/header-cat.js): outline and shelf line. Decorative. */
   --color-cat-line: #22201f;
   --color-cat-ledge: #bfc3c8;
@@ -138,11 +143,14 @@
     --color-raised: #2e2e2e;
     --shadow-raised:
       0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
-    --chart-1: #8ab8ff;
-    --chart-2: #c4a5f5;
-    --chart-3: #3fb950;
-    --chart-4: #f0a35c;
-    --chart-5: #a0a0a0;
+    /* Data palette, dark: on --color-bg all ≥ 4.3:1, soft steps included. */
+    --chart-main: #8ab8ff;
+    --chart-main-soft: #4f7fc4;
+    --chart-alert: #ff7a8d;
+    --chart-alert-soft: #c4566a;
+    --chart-neutral: #8a8a8a;
+    --chart-other: #dba84f;
+    --chart-other-soft: #9c7a3c;
     --color-cat-line: #8d8880;
     --color-cat-ledge: #50545a;
   }
@@ -175,11 +183,13 @@
   --color-raised: #2e2e2e;
   --shadow-raised:
     0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
-  --chart-1: #8ab8ff;
-  --chart-2: #c4a5f5;
-  --chart-3: #3fb950;
-  --chart-4: #f0a35c;
-  --chart-5: #a0a0a0;
+  --chart-main: #8ab8ff;
+  --chart-main-soft: #4f7fc4;
+  --chart-alert: #ff7a8d;
+  --chart-alert-soft: #c4566a;
+  --chart-neutral: #8a8a8a;
+  --chart-other: #dba84f;
+  --chart-other-soft: #9c7a3c;
   --color-cat-line: #8d8880;
   --color-cat-ledge: #50545a;
 }

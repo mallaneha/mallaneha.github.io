@@ -22,6 +22,39 @@ test("abstain lab: floor 0 and 0.60", async ({ page }) => {
   await expect(summary).toContainText("11 of 14 right");
 });
 
+test("abstain lab: a dot shows its question on hover, tap and arrow keys", async ({
+  page,
+}, info) => {
+  await page.goto("/writing/rag-evals-unanswerable-questions/");
+  const w = page.locator("abstain-lab .xp");
+  const plot = w.locator("svg.xp-strip");
+  const tip = w.locator(".xp-tip");
+  await expect(tip).toBeHidden();
+  // The dot for "Who won the game last night?" (score 0.36), aimed a few pixels off: the nearest dot is picked.
+  const dot = w.locator("circle.xp-q").last();
+  await plot.scrollIntoViewIfNeeded();
+  const box = (await dot.boundingBox())!;
+  const at = { x: box.x + box.width / 2 + 3, y: box.y + box.height / 2 + 2 };
+  if (info.project.use.hasTouch) await page.touchscreen.tap(at.x, at.y);
+  else await page.mouse.move(at.x, at.y);
+  await expect(tip).toBeVisible();
+  await expect(tip).toContainText("Who won the game last night?");
+  await expect(tip).toContainText(
+    "Top score 0.36 · Made up (no answer exists)",
+  );
+
+  // Keyboard: focus the plot and step through the dots in score order.
+  await plot.focus();
+  await page.keyboard.press("Escape");
+  await expect(tip).toBeHidden();
+  await page.keyboard.press("ArrowRight");
+  await expect(tip).toContainText("Top score 0.36");
+  await page.keyboard.press("ArrowRight");
+  await expect(tip).toContainText("Top score 0.42");
+  await page.keyboard.press("Escape");
+  await expect(tip).toBeHidden();
+});
+
 test("code search: keyword, vector, hybrid ranks", async ({ page }) => {
   await page.goto("/writing/vector-search-medical-codes/");
   const w = page.locator("code-search .xp");
