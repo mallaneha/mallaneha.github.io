@@ -95,6 +95,9 @@
   --color-toast-bg: #111111;
   --color-toast-text: #ffffff;
   --shadow-sheet: 0 -1px 2px rgb(0 0 0 / 0.03), 0 -8px 24px rgb(0 0 0 / 0.06);
+  /* A control raised off a track (the selected segment in a widget's segmented control, a slider thumb). */
+  --color-raised: #ffffff;
+  --shadow-raised: 0 0 0 1px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.08);
   /* Chart series for the explainer widgets on white / --color-surface: 6.7/6.2, 6.6/6.2, 5.1/4.7, 5.4/5.1, 5.0/4.7.
      Dark values on --color-bg / --color-surface are all 6.5:1 or higher. */
   --chart-1: #0b5cad;
@@ -132,6 +135,9 @@
     --color-toast-bg: #ededed;
     --color-toast-text: #111111;
     --shadow-sheet: 0 -1px 0 rgb(255 255 255 / 0.06);
+    --color-raised: #2e2e2e;
+    --shadow-raised:
+      0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
     --chart-1: #8ab8ff;
     --chart-2: #c4a5f5;
     --chart-3: #3fb950;
@@ -166,6 +172,9 @@
   --color-toast-bg: #ededed;
   --color-toast-text: #111111;
   --shadow-sheet: 0 -1px 0 rgb(255 255 255 / 0.06);
+  --color-raised: #2e2e2e;
+  --shadow-raised:
+    0 0 0 1px rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4);
   --chart-1: #8ab8ff;
   --chart-2: #c4a5f5;
   --chart-3: #3fb950;

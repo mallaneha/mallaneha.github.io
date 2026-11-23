@@ -3,6 +3,7 @@
 // Every number shown is computed here from the formulas in the post; nothing is hard-coded output.
 
 import {
+  mount,
   bytes,
   checkbox,
   choice,
@@ -169,7 +170,7 @@ class AttentionLab extends HTMLElement {
       h("div", { class: "xp-scroll" }, pipeTable),
       h("div", { class: "xp-scroll" }, matTable),
     );
-    this.replaceChildren(root);
+    mount(this, root);
     const setMotion = motion(root);
 
     const weightsFor = (i: number) => {
@@ -388,7 +389,7 @@ class ScaleLab extends HTMLElement {
       summary,
       h("div", { class: "xp-scroll" }, table),
     );
-    this.replaceChildren(root);
+    mount(this, root);
     const setMotion = motion(root);
 
     const render = (animate = false) => {
@@ -530,7 +531,7 @@ class GptShape extends HTMLElement {
       notes,
       h("div", { class: "xp-scroll" }, shapeTable),
     );
-    this.replaceChildren(root);
+    mount(this, root);
     const setMotion = motion(root);
 
     const render = (animate = false) => {
@@ -803,7 +804,7 @@ class ServingBudget extends HTMLElement {
       facts,
       more,
     );
-    this.replaceChildren(root);
+    mount(this, root);
     const setMotion = motion(root);
 
     const read = (): Setup => ({

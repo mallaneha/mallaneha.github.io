@@ -13,7 +13,13 @@ const posts = readdirSync(writingDir)
   )
   .map((f) => `/writing/${f.replace(/\.md$/, "")}/`);
 
-const pages = ["/", ...posts, "/this-page-does-not-exist/"];
+// The widget gallery is a dev-only page (src/pages/dev/[page].astro), so it's tested locally but not live.
+const pages = [
+  "/",
+  ...posts,
+  ...(live ? [] : ["/dev/widgets/"]),
+  "/this-page-does-not-exist/",
+];
 
 for (const path of pages) {
   for (const scheme of ["light", "dark"] as const) {

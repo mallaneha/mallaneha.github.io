@@ -87,6 +87,27 @@ export function slider(
     step: String(step),
     value: String(value),
   });
+  // The filled part of the track (--p) follows the value however it changes: a drag, the arrow keys, or code
+  // that sets input.value (a reset, a preset, dragging the chart). Set on the input only, so nothing else restyles.
+  const paint = () => {
+    const p = (Number(input.value) - min) / (max - min || 1);
+    input.style.setProperty("--p", `${Math.max(0, Math.min(1, p)) * 100}%`);
+  };
+  const native = Object.getOwnPropertyDescriptor(
+    HTMLInputElement.prototype,
+    "value",
+  )!;
+  Object.defineProperty(input, "value", {
+    get() {
+      return native.get!.call(this);
+    },
+    set(v: string) {
+      native.set!.call(this, v);
+      paint();
+    },
+  });
+  input.addEventListener("input", paint);
+  paint();
   const out = h("output", { for: id }, fmt(value));
   const wrap = h(
     "div",
@@ -288,11 +309,40 @@ export const num = (
   return Number.isFinite(v) ? v : fallback;
 };
 
+// SVG text is sized in viewBox units, so a chart drawn 320 wide and shown 480 wide would blow 11px labels up
+// to 16.5px. --k (viewBox width ÷ shown width) on each svg lets .xp-label keep a true 11px at any width.
+const fit =
+  typeof ResizeObserver === "undefined"
+    ? null
+    : new ResizeObserver((entries) => {
+        for (const { target, contentRect } of entries) {
+          const vb = (target as SVGSVGElement).viewBox.baseVal;
+          if (vb && vb.width && contentRect.width)
+            (target as SVGElement).style.setProperty(
+              "--k",
+              (vb.width / contentRect.width).toFixed(3),
+            );
+        }
+      });
+
+/** Puts a built widget in place of its fallback content and keeps its chart labels at their real size. */
+export function mount(host: HTMLElement, root: HTMLElement) {
+  host.replaceChildren(root);
+  root
+    .querySelectorAll<SVGSVGElement>("svg[viewBox]")
+    .forEach((svg) => fit?.observe(svg));
+}
+
 export const head = (title: string, ...extra: Node[]) =>
   h(
     "div",
     { class: "xp-head" },
-    h("p", { class: "xp-title" }, title),
+    h(
+      "div",
+      { class: "xp-heading" },
+      h("span", { class: "xp-kicker", "aria-hidden": "true" }, "Interactive"),
+      h("p", { class: "xp-title" }, title),
+    ),
     ...extra,
   );
 

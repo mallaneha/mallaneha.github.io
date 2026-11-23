@@ -21,6 +21,8 @@ paths:
 - New dark colors go in both dark blocks of `tokens.css` (the media query and `:root[data-theme="dark"]`).
 - Reuse `Section`, `RowList`, `Row` for any list, and `Drawer` for details. Icons come from `src/data/icons.ts`.
 - Respect `prefers-reduced-motion`; keep keyboard support (Esc, ←/→, focus return) when touching drawers.
+- Every widget is on one dev-only page, http://localhost:4321/dev/widgets/ (`src/pages/dev/[page].astro`, not in the
+  production build). Add new widgets to its list.
 - `tests/visual/interactions.spec.ts` covers drawers and effects, and `tests/visual/explainers.spec.ts` pins the widgets'
   numbers to the posts' text; update them with behavior changes.
 - Keep one `<h1>` per page.
