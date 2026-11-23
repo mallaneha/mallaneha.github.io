@@ -8,6 +8,8 @@ summary: "M.S. AI Engineering"
 icon: school
 logo: /logos/cmu.png
 logoFull: true
+logoAlt: /logos/cmu-white.png # red wordmark on white; toggled in ?debug mode
+logoAltSize: 30
 order: 10
 ---
 

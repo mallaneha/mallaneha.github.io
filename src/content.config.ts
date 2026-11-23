@@ -91,6 +91,12 @@ const education = defineCollection({
     logoFull: z.boolean().default(false),
     // Logo size in px inside its 40px tile (default 24).
     logoSize: z.number().int().min(12).max(40).optional(),
+    // Debug only: an alternative logo (shown at logoAltSize px on the light tile) that `?debug` mode can swap in.
+    logoAlt: z
+      .string()
+      .regex(/^\/logos\/[\w-]+\.(png|svg|webp|jpg)$/)
+      .optional(),
+    logoAltSize: z.number().int().min(12).max(40).optional(),
     url: z.url().optional(),
     order: z.number().int().default(100),
   }),

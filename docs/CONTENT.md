@@ -105,6 +105,8 @@ summary: "M.S. AI Engineering" # short degree, fits a half-width column
 icon: school # fallback when there's no logo
 logo: /logos/cmu.png
 logoSize: 30 # optional, px inside the 40px tile (default 24)
+logoAlt: /logos/cmu-white.png # optional, debug only: alternative logo the ?debug panel can swap in
+logoAltSize: 30 # optional, px of logoAlt inside the tile (default 24)
 order: 10
 ---
 ```

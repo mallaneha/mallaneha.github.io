@@ -10,6 +10,7 @@ interface Props {
   icon: IconName;
   logo?: string; // image under public/logos/, shown instead of the icon
   logoFull?: boolean; // the logo is a filled square: it covers the whole tile
+  logoAlt?: string; // debug only: alternative logo the ?debug panel can swap in
   name: string;
   desc?: string; // the muted line after the name; omit for a header with just the name
   href?: string;
@@ -21,6 +22,7 @@ const {
   icon,
   logo,
   logoFull = false,
+  logoAlt,
   name,
   desc,
   href,
@@ -43,6 +45,8 @@ const linkAttrs = external
             width={logoFull ? 22 : 18}
             height={logoFull ? 22 : 18}
             loading="lazy"
+            data-logo-alt={logoAlt}
+            data-logo-alt-size={logoAlt && 18}
           />
         ) : (
           <Icon name={icon} />
