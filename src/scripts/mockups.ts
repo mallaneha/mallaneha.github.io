@@ -332,7 +332,7 @@ function renderCompare(m: Compare, note: HTMLElement) {
 function renderBars(m: Bars, note: HTMLElement) {
   const rows = m.items.map((item) => {
     const fill = h("span", { class: "mk-fill" });
-    fill.style.width = `${(item.value / item.max) * 100}%`;
+    fill.style.transform = `scaleX(${item.value / item.max})`;
     const r = h(
       "button",
       { type: "button", class: "mk-bar", "aria-pressed": "false" },

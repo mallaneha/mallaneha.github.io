@@ -8,9 +8,11 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
 function readMuted() {
   try {
-    return localStorage.getItem(KEY) === "true";
+    const saved = localStorage.getItem(KEY);
+    // No saved choice: start quiet for people who asked for reduced motion.
+    return saved === null ? reduceMotion.matches : saved === "true";
   } catch {
-    return false;
+    return reduceMotion.matches;
   }
 }
 let muted = readMuted();
@@ -104,6 +106,7 @@ const TICK: { gain: number; layers: Layer[] } = {
   ],
 };
 let audio: AudioContext | null = null;
+let master: GainNode | null = null; // one output gain, reused by every tick
 
 function tick() {
   const AC =
@@ -118,9 +121,12 @@ function tick() {
   }
   const a = audio;
   const play = () => {
-    const master = a.createGain();
-    master.gain.value = TICK.gain;
-    master.connect(a.destination);
+    if (!master) {
+      master = a.createGain();
+      master.gain.value = TICK.gain;
+      master.connect(a.destination);
+    }
+    const out = master;
     for (const l of TICK.layers) {
       const t = a.currentTime + l.offset;
       const len = Math.max(
@@ -140,7 +146,12 @@ function tick() {
       env.gain.setValueAtTime(0.0001, t);
       env.gain.exponentialRampToValueAtTime(l.peak, t + l.attack);
       env.gain.exponentialRampToValueAtTime(0.0001, t + l.attack + l.decay);
-      src.connect(filter).connect(env).connect(master);
+      src.connect(filter).connect(env).connect(out);
+      src.onended = () => {
+        src.disconnect();
+        filter.disconnect();
+        env.disconnect();
+      };
       src.start(t);
       src.stop(t + l.attack + l.decay + 0.05);
     }
@@ -154,7 +165,11 @@ if (effectsOn) {
     "click",
     (e) => {
       // Drawers are for reading: no effects inside one (a backdrop click targets the <dialog> too).
-      if ((e.target as Element | null)?.closest?.("dialog")) return;
+      const target = e.target as Element | null;
+      if (target?.closest?.("dialog")) return;
+      // Only things you can press get feedback, not clicks on text or empty space.
+      if (!target?.closest?.("a, button, summary, label, [role='button']"))
+        return;
       // Keyboard "clicks" have no pointer position: skip the spark, keep the sound.
       if (e.detail > 0 && !reduceMotion.matches) burst(e.clientX, e.clientY);
       if (muted) return;

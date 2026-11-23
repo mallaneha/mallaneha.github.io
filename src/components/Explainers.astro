@@ -208,8 +208,10 @@
   .xp-bar-fill {
     display: block;
     height: 100%;
-    width: 0;
+    width: 100%;
     background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
   }
 
   .xp-summary {
@@ -369,7 +371,10 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .xp-bar-fill,
+    .xp-bar-fill {
+      transition: transform var(--transition);
+    }
+    /* Segments share one stacked bar, so their widths have to reflow together. */
     .xp-seg {
       transition: width var(--transition);
     }

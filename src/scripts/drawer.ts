@@ -6,7 +6,11 @@ const drawers = [
   ...document.querySelectorAll<HTMLDialogElement>("dialog[data-drawer]"),
 ];
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
-const OUT_MS = 300;
+// Exit duration comes from the --drawer-out token; the timeout is only a fallback for transitionend.
+const outMs = () =>
+  parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue("--drawer-out"),
+  ) || 300;
 let current: HTMLDialogElement | null = null;
 let opener: HTMLElement | null = null;
 
@@ -22,7 +26,7 @@ function open(d: HTMLDialogElement, animate = true) {
   current = d;
   d.querySelector(".body")?.scrollTo(0, 0);
   d.style.transform = "";
-  d.classList.remove("is-closing");
+  d.classList.remove("is-closing", "is-flung");
   if (!animate || reduceMotion.matches) {
     d.classList.add("is-dragging"); // no transition for this frame
     d.classList.add("is-visible");
@@ -37,26 +41,33 @@ function open(d: HTMLDialogElement, animate = true) {
 }
 
 function closeNow(d: HTMLDialogElement) {
-  d.classList.remove("is-visible", "is-closing", "is-dragging");
+  d.classList.remove("is-visible", "is-closing", "is-flung", "is-dragging");
   d.style.transform = "";
   if (d.open) d.close();
   if (current === d) current = null;
 }
 
-function close(d: HTMLDialogElement) {
+function close(d: HTMLDialogElement, flung = false) {
   if (!d.open || d.classList.contains("is-closing")) return;
   d.classList.remove("is-dragging");
   d.classList.add("is-closing");
+  d.classList.toggle("is-flung", flung);
   d.classList.remove("is-visible");
   d.style.transform = "";
   setHash(null);
-  const done = () => {
+  let fallback = 0;
+  const done = (e?: TransitionEvent) => {
+    if (e && (e.target !== d || e.propertyName !== "transform")) return;
+    d.removeEventListener("transitionend", done);
+    clearTimeout(fallback);
+    if (!d.classList.contains("is-closing")) return; // reopened while closing
     closeNow(d);
     opener?.focus({ preventScroll: true });
     opener = null;
   };
-  if (reduceMotion.matches) done();
-  else setTimeout(done, OUT_MS);
+  if (reduceMotion.matches) return done();
+  d.addEventListener("transitionend", done);
+  fallback = window.setTimeout(done, outMs() + 100);
 }
 
 document.addEventListener("click", (e) => {
@@ -125,7 +136,7 @@ function enableDrag(d: HTMLDialogElement) {
     d.classList.remove("is-dragging");
     const velocity = dy / Math.max(1, performance.now() - startT); // px/ms
     if (dy > d.offsetHeight * 0.25 || (dy > 10 && velocity > 0.4)) {
-      close(d);
+      close(d, true);
     } else {
       d.style.transform = "";
     }

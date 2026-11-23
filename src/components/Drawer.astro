@@ -111,6 +111,11 @@ const linkAttrs = external
   }
   .drawer:global(.is-closing) {
     transition-duration: var(--drawer-out);
+    transition-timing-function: var(--ease-drawer-out);
+  }
+  /* A flicked sheet is already moving: keep its speed instead of easing in from rest. */
+  .drawer:global(.is-closing.is-flung) {
+    transition-timing-function: var(--ease-drawer);
   }
   .drawer:global(.is-dragging) {
     transition: none;

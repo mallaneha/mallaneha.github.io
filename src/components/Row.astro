@@ -126,8 +126,21 @@ if (drawer) {
       transform var(--transition);
     -webkit-tap-highlight-color: transparent;
   }
-  .row:not(.static):hover {
-    background: var(--color-hover);
+  @media (hover: hover) {
+    .row:not(.static):hover {
+      background: var(--color-hover);
+    }
+    .row:not(.static):hover .tile {
+      background: var(--color-surface-hover);
+    }
+    .row:not(.static):hover .tile.logo {
+      background: var(--color-logo-tile);
+    }
+    .row:not(.static):hover .tile :global(svg),
+    .row:not(.static):hover .tile img,
+    .row:not(.static):hover .tile .glyph {
+      transform: scale(1.1);
+    }
   }
   .row:not(.static):active {
     transform: scale(0.98);
@@ -175,17 +188,6 @@ if (drawer) {
   .tile .glyph {
     transition: transform var(--transition);
   }
-  .row:not(.static):hover .tile {
-    background: var(--color-surface-hover);
-  }
-  .row:not(.static):hover .tile.logo {
-    background: var(--color-logo-tile);
-  }
-  .row:not(.static):hover .tile :global(svg),
-  .row:not(.static):hover .tile img,
-  .row:not(.static):hover .tile .glyph {
-    transform: scale(1.1);
-  }
   .text {
     display: flex;
     flex-direction: column;
@@ -224,6 +226,15 @@ if (drawer) {
     }
     .row:hover :global(.arrow.open) {
       transform: translate(1px, -1px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .row:not(.static):active,
+    .row:not(.static):hover .tile :global(svg),
+    .row:not(.static):hover .tile img,
+    .row:not(.static):hover .tile .glyph,
+    .row:hover :global(.arrow.open) {
+      transform: none;
     }
   }
 </style>
