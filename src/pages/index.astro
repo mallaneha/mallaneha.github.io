@@ -101,14 +101,14 @@ const experienceDrawers = await Promise.all(
     </RowList>
   </Section>
 
-  <Section id="featured" title="Featured">
-    <RowList>
+  <Section id="projects" title="Projects">
+    <RowList columns={2}>
       {featuredDrawers.map(({ entry, id }) => (
         <Row
-          icon={entry.data.icon}
           name={entry.data.title}
           desc={entry.data.summary}
           drawer={id}
+          openIcon
         />
       ))}
     </RowList>
