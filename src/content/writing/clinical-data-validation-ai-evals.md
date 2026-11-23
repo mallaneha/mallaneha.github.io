@@ -4,7 +4,7 @@ description: "Applying FDA and Pinnacle 21 style checks to evaluating LLM output
 date: 2026-11-22
 type: post
 tags: [evals, healthcare, governance]
-draft: true
+draft: false
 ---
 
 Before I worked on AI systems, I spent three and a half years preparing clinical trial data for FDA
