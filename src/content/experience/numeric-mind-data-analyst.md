@@ -12,8 +12,8 @@ order: 30
 
 ## Overview <span class="when">Oct 2021 – Apr 2024</span>
 
-My first job in clinical data. I built the datasets and reports that go into FDA submissions, and I
-made sure they were right.
+The first role in clinical data: building the datasets and reports that go into FDA submissions,
+and making sure they were right.
 
 <div class="stats">
   <div><strong>800+</strong><span>CDISC datasets and reports</span></div>
@@ -23,19 +23,19 @@ made sure they were right.
 
 ## Datasets
 
-I built over 800 CDISC-compliant clinical datasets and statistical reports in SAS and R. They
-supported FDA submissions for more than 10 pharmaceutical clients.
+Over 800 CDISC-compliant clinical datasets and statistical reports came out of this role, built in
+SAS and R. They supported FDA submissions for more than 10 pharmaceutical clients.
 
 ## Validation
 
-I checked every dataset with Pinnacle 21 and statistical modeling, then fixed the anomalies and
-reported them. Tracing a Pinnacle 21 finding back to the patient records in the SDTM and ADaM
-datasets used to be a manual lookup, so I built a debugging tool that does it. Issue resolution
-time dropped by 75%.
+Every dataset went through Pinnacle 21 and statistical modeling to find, fix and report anomalies.
+Tracing a Pinnacle 21 finding back to the patient records in the SDTM and ADaM datasets used to be
+a manual lookup. A debugging tool built for the job replaced it and cut issue resolution time by
+75%.
 
 ## Takeaways
 
-Regulated work taught me to check everything and to make every check traceable. I use the same
-habits now when I evaluate AI systems.
+Regulated work builds the habit of checking everything and making every check traceable. The same
+habits carry over to evaluating AI systems.
 
 Tools: SAS, R, Pinnacle 21.
