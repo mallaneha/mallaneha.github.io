@@ -1,13 +1,15 @@
 ---
-title: "Build it, part 1: attention, one dot product at a time"
+title: "LLMs by hand, part 1: attention, one dot product at a time"
 description: "Build one attention head by hand with four tokens and two-dimensional vectors, then watch what scaling and the causal mask change."
 date: 2026-11-22
 type: post
 tags: [llm-systems]
+series: llms-by-hand
+part: 1
 draft: false
 ---
 
-This is part 1 of a three-part series where I build the pieces of a transformer small enough to check
+This is part 1 of "LLMs by hand", a three-part series where I build the pieces of a transformer small enough to check
 every number by hand. This part covers one attention head: four tokens, vectors with two numbers each,
 and every step on screen. It doesn't cover how the query, key and value matrices get learned (that's
 training), or anything that happens after the attention layer.

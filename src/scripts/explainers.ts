@@ -1,4 +1,4 @@
-// Interactive widgets for the "Build it" writing series. Each one is a custom element placed in a
+// Interactive widgets for the "LLMs by hand" writing series. Each one is a custom element placed in a
 // Markdown post as raw HTML, with static fallback content inside it. With JS off, the fallback stays.
 // Every number shown is computed here from the formulas in the post; nothing is hard-coded output.
 

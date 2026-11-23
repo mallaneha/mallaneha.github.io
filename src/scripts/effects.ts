@@ -274,7 +274,7 @@ for (const el of document.querySelectorAll<HTMLElement>("[data-local-time]")) {
   el.hidden = false;
 }
 
-// Interactive explainers for the "Build it" posts. Loaded only on pages that use one.
+// Interactive explainers for the "LLMs by hand" posts. Loaded only on pages that use one.
 if (
   document.querySelector("attention-lab, scale-lab, gpt-shape, serving-budget")
 ) {
