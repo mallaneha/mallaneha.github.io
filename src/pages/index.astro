@@ -488,7 +488,7 @@ const educationDrawers = await Promise.all(
     text-decoration: none;
     transition:
       background-color var(--transition),
-      transform var(--transition);
+      transform var(--transition-press);
     -webkit-tap-highlight-color: transparent;
   }
   .all-writing:hover {
@@ -512,8 +512,10 @@ const educationDrawers = await Promise.all(
     color: var(--color-muted);
     transition: transform var(--transition);
   }
-  .all-writing:hover :global(.go) {
-    transform: translateX(2px);
+  @media (hover: hover) and (pointer: fine) {
+    .all-writing:hover :global(.go) {
+      transform: translateX(2px);
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     header a.cta:active,

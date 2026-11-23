@@ -239,7 +239,7 @@
     transition:
       background-color var(--transition),
       color var(--transition),
-      transform var(--transition);
+      transform var(--transition-press);
   }
   .xp-button {
     align-self: flex-end;
@@ -574,10 +574,15 @@
       opacity var(--transition),
       transform var(--transition);
   }
-  .xp-handle:hover::before,
   .is-dragging > .xp-handle::before {
     opacity: 1;
     transform: scale(1.15);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .xp-handle:hover::before {
+      opacity: 1;
+      transform: scale(1.15);
+    }
   }
   .is-dragging,
   .is-dragging .xp-plot,

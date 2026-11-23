@@ -26,8 +26,9 @@ function open(d: HTMLDialogElement, animate = true) {
   current = d;
   d.querySelector(".body")?.scrollTo(0, 0);
   d.style.transform = "";
-  d.classList.remove("is-closing", "is-flung");
-  if (!animate || reduceMotion.matches) {
+  d.classList.remove("is-closing");
+  // Keyboard (←/→) and #hash opens are instant. With reduced motion the CSS fades instead of sliding.
+  if (!animate) {
     d.classList.add("is-dragging"); // no transition for this frame
     d.classList.add("is-visible");
     requestAnimationFrame(() => d.classList.remove("is-dragging"));
@@ -41,23 +42,24 @@ function open(d: HTMLDialogElement, animate = true) {
 }
 
 function closeNow(d: HTMLDialogElement) {
-  d.classList.remove("is-visible", "is-closing", "is-flung", "is-dragging");
+  d.classList.remove("is-visible", "is-closing", "is-dragging");
   d.style.transform = "";
   if (d.open) d.close();
   if (current === d) current = null;
 }
 
-function close(d: HTMLDialogElement, flung = false) {
+function close(d: HTMLDialogElement) {
   if (!d.open || d.classList.contains("is-closing")) return;
   d.classList.remove("is-dragging");
   d.classList.add("is-closing");
-  d.classList.toggle("is-flung", flung);
   d.classList.remove("is-visible");
   d.style.transform = "";
   setHash(null);
   let fallback = 0;
   const done = (e?: TransitionEvent) => {
-    if (e && (e.target !== d || e.propertyName !== "transform")) return;
+    // Reduced motion fades (opacity) instead of sliding (transform).
+    const prop = reduceMotion.matches ? "opacity" : "transform";
+    if (e && (e.target !== d || e.propertyName !== prop)) return;
     d.removeEventListener("transitionend", done);
     clearTimeout(fallback);
     if (!d.classList.contains("is-closing")) return; // reopened while closing
@@ -65,7 +67,6 @@ function close(d: HTMLDialogElement, flung = false) {
     opener?.focus({ preventScroll: true });
     opener = null;
   };
-  if (reduceMotion.matches) return done();
   d.addEventListener("transitionend", done);
   fallback = window.setTimeout(done, outMs() + 100);
 }
@@ -109,34 +110,47 @@ window.addEventListener("keydown", (e) => {
 function enableDrag(d: HTMLDialogElement) {
   const handle = d.querySelector<HTMLElement>("[data-drawer-handle]");
   if (!handle) return;
+  const VELOCITY_WINDOW = 100; // ms of recent movement that counts as the release speed
   let startY = 0;
-  let startT = 0;
   let dy = 0;
   let dragging = false;
+  let pointer = -1;
+  let samples: { y: number; t: number }[] = [];
 
   handle.addEventListener("pointerdown", (e) => {
+    // One finger drags; a second touch mid-drag would otherwise reset the start and make the sheet jump.
+    if (dragging) return;
     if ((e.target as HTMLElement).closest("a, button")) return;
     dragging = true;
+    pointer = e.pointerId;
     startY = e.clientY;
-    startT = performance.now();
     dy = 0;
+    samples = [{ y: e.clientY, t: performance.now() }];
     handle.setPointerCapture(e.pointerId);
     d.classList.add("is-dragging");
   });
   handle.addEventListener("pointermove", (e) => {
-    if (!dragging) return;
+    if (!dragging || e.pointerId !== pointer) return;
     dy = e.clientY - startY;
+    const now = performance.now();
+    samples.push({ y: e.clientY, t: now });
+    while (samples.length > 2 && now - samples[0]!.t > VELOCITY_WINDOW)
+      samples.shift();
     // Resist upward drags, follow downward ones.
     const y = dy < 0 ? -Math.sqrt(-dy) * 2 : dy;
     d.style.transform = `translateY(${y}px)`;
   });
-  const end = () => {
-    if (!dragging) return;
+  const end = (e: PointerEvent) => {
+    if (!dragging || e.pointerId !== pointer) return;
     dragging = false;
     d.classList.remove("is-dragging");
-    const velocity = dy / Math.max(1, performance.now() - startT); // px/ms
-    if (dy > d.offsetHeight * 0.25 || (dy > 10 && velocity > 0.4)) {
-      close(d, true);
+    // Speed at release, from the last VELOCITY_WINDOW ms only: hold-then-flick still counts as a flick.
+    const now = performance.now();
+    const last = samples[samples.length - 1]!;
+    const first = samples.find((s) => now - s.t <= VELOCITY_WINDOW) ?? last;
+    const velocity = (last.y - first.y) / Math.max(1, now - first.t); // px/ms, + is down
+    if (dy > d.offsetHeight * 0.25 || (dy > 10 && velocity > 0.11)) {
+      close(d);
     } else {
       d.style.transform = "";
     }

@@ -132,10 +132,10 @@ if (drawer) {
     cursor: pointer;
     transition:
       background-color var(--transition),
-      transform var(--transition);
+      transform var(--transition-press);
     -webkit-tap-highlight-color: transparent;
   }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .row:not(.static):hover {
       background: var(--color-hover);
     }
@@ -148,7 +148,7 @@ if (drawer) {
     .row:not(.static):hover .tile :global(svg),
     .row:not(.static):hover .tile img,
     .row:not(.static):hover .tile .glyph {
-      transform: scale(1.1);
+      transform: scale(1.05);
     }
   }
   .row:not(.static):active {

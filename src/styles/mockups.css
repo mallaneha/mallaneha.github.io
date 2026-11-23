@@ -279,7 +279,7 @@
     transition: transform var(--transition);
   }
   .mk-fill {
-    transition: transform 250ms cubic-bezier(0.215, 0.61, 0.355, 1);
+    transition: transform 250ms var(--ease-out);
   }
   .mk-stage {
     transition:

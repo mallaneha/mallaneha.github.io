@@ -35,6 +35,7 @@ document.body.append(canvas);
 const ctx = canvas.getContext("2d");
 let sparks: Spark[] = [];
 let raf = 0;
+let sparkColor = "";
 
 function resize() {
   const dpr = window.devicePixelRatio || 1;
@@ -51,7 +52,7 @@ function draw(now: number) {
   if (!ctx) return;
   ctx.clearRect(0, 0, innerWidth, innerHeight);
   ctx.globalAlpha = SPARK.opacity;
-  ctx.strokeStyle = getComputedStyle(canvas).color;
+  ctx.strokeStyle = sparkColor;
   ctx.lineWidth = SPARK.width;
   ctx.lineCap = "round";
   sparks = sparks.filter((s) => {
@@ -73,6 +74,7 @@ function draw(now: number) {
 
 function burst(x: number, y: number) {
   const start = performance.now();
+  sparkColor = getComputedStyle(canvas).color; // once per click, not every frame (follows the theme)
   for (let i = 0; i < SPARK.count; i++) {
     sparks.push({ x, y, angle: (2 * Math.PI * i) / SPARK.count, start });
   }
