@@ -1,5 +1,5 @@
 ---
-title: "Research Assistant Agent"
+title: "RAG Research Assistant Agent"
 summary: "Agentic RAG with self-reflection"
 year: 2026
 status: shipped
