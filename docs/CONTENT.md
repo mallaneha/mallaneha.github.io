@@ -99,7 +99,7 @@ location: "Pittsburgh, PA"
 summary: "M.S. AI Engineering" # short degree, fits a half-width column
 icon: school # fallback when there's no logo
 logo: /logos/cmu.png
-logoFull: true # the red square fills the tile
+logoSize: 30 # optional, px inside the 40px tile (default 24)
 order: 10
 ---
 ```

@@ -87,6 +87,8 @@ const education = defineCollection({
       .optional(),
     // The logo is a filled square (e.g. CMU's red one) and covers its whole tile.
     logoFull: z.boolean().default(false),
+    // Logo size in px inside its 40px tile (default 24).
+    logoSize: z.number().int().min(12).max(40).optional(),
     url: z.url().optional(),
     order: z.number().int().default(100),
   }),
