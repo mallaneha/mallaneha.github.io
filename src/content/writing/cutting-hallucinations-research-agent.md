@@ -4,7 +4,7 @@ description: "Self-reflection in LangGraph, and how I measured whether it actual
 date: 2026-11-22
 type: post
 tags: [evals, rag, agents]
-draft: true
+draft: false
 ---
 
 I built a research assistant that answers questions from a set of documents. My first version did
