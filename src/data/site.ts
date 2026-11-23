@@ -8,7 +8,7 @@ export const site = {
   timeZone: "America/New_York",
   // Header paragraphs, in order. Plain text.
   intro: [
-    "Finishing an M.S. in AI Engineering (Information Security) at Carnegie\u00A0Mellon. Previously at Autonomize AI, and 3.5 years at Numeric Mind shipping FDA clinical data submissions.",
+    "M.S. student in AI Engineering at Carnegie\u00A0Mellon, focused on information security. Previously at Autonomize AI, and 3.5 years at Numeric Mind shipping FDA clinical data submissions.",
     "I build applied AI systems where data is sensitive and mistakes are costly, like keeping patient records private and stopping poisoned documents from steering a model's answers.",
     "I'm most interested in healthcare, banking and insurance.",
   ],
