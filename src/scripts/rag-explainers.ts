@@ -246,18 +246,18 @@ class AbstainLab extends HTMLElement {
     window.addEventListener("resize", place);
 
     const segs = {
-      right: h("span", { class: "xp-seg k-ink" }),
-      wrong: h("span", { class: "xp-seg k-red-soft" }),
-      madeUp: h("span", { class: "xp-seg k-red" }),
-      wrongRefusal: h("span", { class: "xp-seg k-graphite" }),
-      rightRefusal: h("span", { class: "xp-seg k-ink-soft" }),
+      right: h("span", { class: "xp-seg k-main" }),
+      wrong: h("span", { class: "xp-seg k-alert-soft" }),
+      madeUp: h("span", { class: "xp-seg k-alert" }),
+      wrongRefusal: h("span", { class: "xp-seg k-neutral" }),
+      rightRefusal: h("span", { class: "xp-seg k-main-soft" }),
     };
     const labels: [keyof typeof segs, string, string][] = [
-      ["right", "k-ink", "Right answer"],
-      ["wrong", "k-red-soft", "Wrong answer (wrong chunk)"],
-      ["madeUp", "k-red", "Made up (no answer exists)"],
-      ["wrongRefusal", "k-graphite", "Wrong refusal"],
-      ["rightRefusal", "k-ink-soft", "Right refusal"],
+      ["right", "k-main", "Right answer"],
+      ["wrong", "k-alert-soft", "Wrong answer (wrong chunk)"],
+      ["madeUp", "k-alert", "Made up (no answer exists)"],
+      ["wrongRefusal", "k-neutral", "Wrong refusal"],
+      ["rightRefusal", "k-main-soft", "Right refusal"],
     ];
     const counts = Object.fromEntries(
       labels.map(([k]) => [k, h("span")]),

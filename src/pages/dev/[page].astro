@@ -8,17 +8,22 @@ export function getStaticPaths() {
   return import.meta.env.DEV ? [{ params: { page: "widgets" } }] : [];
 }
 
-// Every widget, with the post it lives in. effects.ts loads the widget scripts because the tags are on the page.
-const palette = [
-  ["ink", "measured series, right answer, a check that stops it"],
-  ["ink-soft", "second series of the same kind, right refusal"],
-  ["red", "made up, danger, over the limit, invalid input"],
-  ["red-soft", "a lesser error (wrong chunk)"],
-  ["graphite", "neutral: wrong refusal, layer norms"],
-  ["brass", "a third category: keys, KV cache, attention"],
-  ["brass-soft", "second series of brass (MLP)"],
-];
+import { PALETTES, ROLES, paletteCss } from "../../data/dev-palettes";
 
+// What each role is used for, shown next to its swatch.
+const uses: Record<(typeof ROLES)[number], string> = {
+  main: "measured series, right answer, a check that stops it",
+  "main-soft": "second series of the same kind, right refusal",
+  alert: "made up, danger, over the limit, invalid input",
+  "alert-soft": "a lesser error (wrong chunk)",
+  neutral: "no verdict: wrong refusal, layer norms",
+  other: "a third category: keys, KV cache, attention",
+  "other-soft": "second series of that category (MLP)",
+};
+// Roles that are also used for text or under white tag text need 4.5:1; the rest are marks and need 3:1.
+const textRoles = ["main", "alert", "neutral", "other"];
+
+// Every widget, with the post it lives in. effects.ts loads the widget scripts because the tags are on the page.
 const widgets = [
   { tag: "attention-lab", post: "build-attention", series: "LLMs by hand" },
   { tag: "scale-lab", post: "build-attention", series: "LLMs by hand" },
@@ -59,23 +64,82 @@ const widgets = [
       isn't in the production build.
     </p>
   </header>
+  <Fragment set:html={`<style>${paletteCss()}</style>`} />
+  <script is:inline>
+    // Apply the remembered palette before the widgets paint.
+    try {
+      const p = localStorage.getItem("dev-palette");
+      if (p) document.documentElement.dataset.palette = p;
+    } catch {}
+  </script>
   <section class="palette" aria-labelledby="palette">
-    <h2 id="palette">Palette</h2>
-    <p class="muted">
-      Ink and red pencil: ink for the measured series and what went right, red
-      only for what went wrong, graphite for neutral, brass for a third
-      category. Tokens in <code>src/styles/tokens.css</code>.
-    </p>
-    <ul>
-      {palette.map(([name, use]) => (
+    <div class="switcher">
+      <button
+        type="button"
+        class="step"
+        data-step="-1"
+        aria-label="Previous palette"
+      >
+        ‹
+      </button>
+      <div class="current" aria-live="polite">
+        <h2 id="palette">
+          <span data-name></span> <span class="count muted" data-count></span>
+        </h2>
+        <p class="muted" data-story></p>
+      </div>
+      <button
+        type="button"
+        class="step"
+        data-step="1"
+        aria-label="Next palette"
+      >
+        ›
+      </button>
+      <div class="strip" aria-hidden="true">
+        {ROLES.map((r) => (
+          <span style={`background: var(--chart-${r})`} />
+        ))}
+      </div>
+    </div>
+    <ul class="choices" aria-label="Palettes">
+      {PALETTES.map((p) => (
         <li>
-          <span class="chip" style={`background: var(--chart-${name})`} />
-          <code>--chart-{name}</code>
-          <span class="muted">{use}</span>
+          <button type="button" data-palette={p.id} aria-pressed="false">
+            <span class="mini" aria-hidden="true">
+              {ROLES.slice(0, 6).map((r) => (
+                <i style={`background: ${p.light[r]}`} />
+              ))}
+            </span>
+            {p.name}
+          </button>
         </li>
       ))}
     </ul>
   </section>
+  <details class="roles">
+    <summary>Roles and contrast</summary>
+    <ul>
+      {ROLES.map((r) => (
+        <li>
+          <span class="chip" style={`background: var(--chart-${r})`} />
+          <code>--chart-{r}</code>
+          <span
+            class="ratio"
+            data-role={r}
+            data-min={textRoles.includes(r) ? "4.5" : "3"}
+          />
+          <span class="muted">{uses[r]}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="muted">
+      Contrast against the page background. Roles also used for text need 4.5:1,
+      marks need 3:1. Candidates live in
+      <code>src/data/dev-palettes.ts</code>; the one in use on the site is in{" "}
+      <code>src/styles/tokens.css</code>.
+    </p>
+  </details>
   <nav aria-label="Widgets">
     <ul>
       {widgets.map((w) => (
@@ -98,6 +162,90 @@ const widgets = [
   ))}
   <Explainers />
 </Base>
+
+<script>
+  // Palette switcher: buttons, ‹ ›, and [ ] on the keyboard. Remembered in localStorage (dev-palette).
+  import { PALETTES } from "../../data/dev-palettes";
+
+  const root = document.documentElement;
+  const ids = PALETTES.map((p) => p.id);
+  const $ = <T extends Element>(s: string) => document.querySelector<T>(s)!;
+
+  const lum = (hex: string) => {
+    const n = hex.trim().replace("#", "");
+    const c = [0, 2, 4].map((i) => parseInt(n.slice(i, i + 2), 16) / 255);
+    const [r, g, b] = c.map((x) =>
+      x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4,
+    );
+    return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+  };
+  const ratio = (a: string, b: string) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+    return (x! + 0.05) / (y! + 0.05);
+  };
+
+  function contrast() {
+    const css = getComputedStyle(root);
+    const bg = css.getPropertyValue("--color-bg");
+    document.querySelectorAll<HTMLElement>(".ratio").forEach((el) => {
+      const r = ratio(css.getPropertyValue(`--chart-${el.dataset.role}`), bg);
+      const ok = r >= Number(el.dataset.min);
+      el.textContent = `${r.toFixed(1)}:1${ok ? "" : ` (needs ${el.dataset.min})`}`;
+      el.classList.toggle("is-low", !ok);
+    });
+  }
+
+  function apply(id: string) {
+    const i = Math.max(0, ids.indexOf(id));
+    const p = PALETTES[i]!;
+    root.dataset.palette = p.id;
+    try {
+      localStorage.setItem("dev-palette", p.id);
+    } catch {}
+    $("[data-name]").textContent = p.name;
+    $("[data-count]").textContent = `${i + 1} / ${ids.length}`;
+    $("[data-story]").textContent = p.story;
+    document
+      .querySelectorAll<HTMLButtonElement>("button[data-palette]")
+      .forEach((b) => {
+        const on = b.dataset.palette === p.id;
+        b.setAttribute("aria-pressed", String(on));
+        if (on) b.scrollIntoView({ block: "nearest", inline: "nearest" });
+      });
+    contrast();
+  }
+  const step = (d: number) => {
+    const i = ids.indexOf(root.dataset.palette ?? ids[0]!);
+    apply(ids[(i + d + ids.length) % ids.length]!);
+  };
+
+  document
+    .querySelectorAll<HTMLButtonElement>("button[data-palette]")
+    .forEach((b) =>
+      b.addEventListener("click", () => apply(b.dataset.palette!)),
+    );
+  document
+    .querySelectorAll<HTMLButtonElement>("button[data-step]")
+    .forEach((b) =>
+      b.addEventListener("click", () => step(Number(b.dataset.step))),
+    );
+  // [ and ] cycle from anywhere except while typing, so they don't fight the widgets' arrow keys.
+  document.addEventListener("keydown", (e) => {
+    if ((e.target as HTMLElement).closest("input, select, textarea")) return;
+    if (e.key === "[") step(-1);
+    if (e.key === "]") step(1);
+  });
+  // The theme toggle changes --color-bg, so recheck contrast when it flips.
+  new MutationObserver(contrast).observe(root, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener(
+    "change",
+    contrast,
+  );
+  apply(root.dataset.palette ?? ids[0]!);
+</script>
 
 <style>
   header {
@@ -129,31 +277,145 @@ const widgets = [
       color: var(--color-text);
     }
   }
-  .palette ul {
+  /* Sticky, so the palette can be changed while looking at any widget. */
+  .palette {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: 0 calc(-1 * var(--space-4)) var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .switcher {
     display: grid;
-    gap: var(--space-2);
-    margin: var(--space-3) 0 0;
-    padding: 0;
-    list-style: none;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-1) var(--space-3);
+    align-items: center;
+  }
+  .switcher h2 {
     font-size: var(--text-sm);
   }
-  .palette li {
+  .count {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-normal);
+  }
+  .current p {
+    margin: 2px 0 0;
+    font-size: var(--text-xs);
+    text-wrap: pretty;
+  }
+  @media (max-width: 30rem) {
+    .current p {
+      display: none;
+    }
+  }
+  .step {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: var(--text-lg);
+    cursor: pointer;
+    transition: transform var(--transition-press);
+  }
+  .step:active {
+    transform: scale(0.94);
+  }
+  .strip {
+    grid-column: 1 / -1;
+    display: flex;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .strip span {
+    flex: 1;
+  }
+  .choices {
+    display: flex;
+    gap: var(--space-2);
+    margin: var(--space-3) calc(-1 * var(--space-4)) 0;
+    padding: 0 var(--space-4) 2px;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .choices button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 32px;
+    padding: 0 var(--space-3) 0 var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-bg);
+    color: var(--color-body);
+    font: inherit;
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .choices button[aria-pressed="true"] {
+    border-color: var(--color-text);
+    color: var(--color-text);
+  }
+  .mini {
+    display: flex;
+    gap: 1px;
+  }
+  .mini i {
+    width: 6px;
+    height: 12px;
+    border-radius: 1px;
+  }
+  .roles {
+    margin: 0 0 var(--space-8);
+    font-size: var(--text-xs);
+  }
+  .roles summary {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    color: var(--color-muted);
+    cursor: pointer;
+  }
+  .roles ul {
     display: grid;
-    grid-template-columns: 2.5rem max-content 1fr;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .roles li {
+    display: grid;
+    grid-template-columns: 2rem 11rem 8.5rem 1fr;
     gap: var(--space-3);
     align-items: center;
   }
   @media (max-width: 30rem) {
-    .palette li {
-      grid-template-columns: 2.5rem 1fr;
+    .roles li {
+      grid-template-columns: 2rem 1fr auto;
     }
-    .palette li .muted {
-      grid-column: 2;
+    .roles li > .muted {
+      display: none;
     }
   }
   .chip {
-    height: 1rem;
+    height: 0.875rem;
     border-radius: var(--radius);
+  }
+  .ratio {
+    font-family: var(--font-mono);
+    color: var(--color-body);
+  }
+  .ratio.is-low {
+    color: var(--chart-alert);
   }
   section {
     margin: var(--space-12) 0;

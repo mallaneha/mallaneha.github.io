@@ -483,11 +483,11 @@ class GptShape extends HTMLElement {
     });
 
     const parts = [
-      { key: "tokenEmb", label: "Token embeddings", cls: "k-ink" },
-      { key: "posEmb", label: "Position embeddings", cls: "k-ink-soft" },
-      { key: "attention", label: "Attention", cls: "k-brass" },
-      { key: "mlp", label: "MLP", cls: "k-brass-soft" },
-      { key: "norms", label: "Layer norms", cls: "k-graphite" },
+      { key: "tokenEmb", label: "Token embeddings", cls: "k-main" },
+      { key: "posEmb", label: "Position embeddings", cls: "k-main-soft" },
+      { key: "attention", label: "Attention", cls: "k-other" },
+      { key: "mlp", label: "MLP", cls: "k-other-soft" },
+      { key: "norms", label: "Layer norms", cls: "k-neutral" },
     ] as const;
 
     // The answer sits above the controls so it stays in view while you drag on a phone.
@@ -747,7 +747,7 @@ class ServingBudget extends HTMLElement {
     const toBatch = (v: number) => Math.max(1, Math.round(2 ** (v / 10)));
     const batch = slider("Batch size", 0, 100, 1, 0, (v) => String(toBatch(v)));
 
-    const memSegs = ["k-ink", "k-brass", "k-free"].map((cls) =>
+    const memSegs = ["k-main", "k-other", "k-free"].map((cls) =>
       h("span", { class: `xp-seg ${cls}` }),
     );
     const memBar = h(

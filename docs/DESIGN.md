@@ -66,12 +66,11 @@ monochrome and drawn, not native: sliders are a thin track filled in `--color-te
 fill with `--color-text`, the segmented control is a sunken track with the selected segment raised
 (`--color-raised`, `--shadow-raised`). Chart labels render at a true 11px whatever the chart's width.
 All widgets on one page, dev server only: http://localhost:4321/dev/widgets/ (`src/pages/dev/[page].astro`). Tables scroll inside the panel instead of the page.
-Colors are "ink and red pencil", the marks on a corrected notebook page (and the two colors of the Nepali
-flag): `--chart-ink` (= the accent) for the measured series and what went right, `--chart-red` only for what went
-wrong or is dangerous, `--chart-graphite` for neutral, `--chart-brass` for a third category with no verdict, each
-with a `-soft` step. Never green, purple or orange. The abstain lab colors each dot by its outcome at the current
-floor, so dots, bar and legend agree. Weights are bars next to the number, never colored cell backgrounds, so text
-contrast doesn't depend on the data. Hover, tap or arrow keys show a dot's question in a tooltip (toast colors). Bar transitions only run without
+Colors come from one data palette of seven roles (`tokens.css`): `--chart-main` for the measured series and what
+went right, `--chart-alert` only for what went wrong or is dangerous, `--chart-neutral` for no verdict,
+`--chart-other` for a third category, each but neutral with a `-soft` step. The abstain lab colors each dot by its
+outcome at the current floor, so dots, bar and legend agree. Weights are bars next to the number, never colored cell
+backgrounds, so text contrast doesn't depend on the data. Hover, tap or arrow keys show a dot's question in a tooltip (toast colors). Bar transitions only run without
 `prefers-reduced-motion`.
 
 ## Tokens (`src/styles/tokens.css`)
@@ -80,8 +79,10 @@ contrast doesn't depend on the data. Hover, tap or arrow keys show a dot's quest
 - Sizes: rows and drawers at `--text-sm` (14px); post bodies at `--text-base`.
 - Colors: text, body, muted, faint, subtle (dotted rules), border, surface, hover, overlay. Each has
   a dark-mode value; contrast ratios are noted in the file.
-- Data colors: `--chart-ink`, `-red`, `-graphite`, `-brass` (+ `-soft` steps), one palette for the post widgets
-  and the drawers' figures (`mockups.css`, `story.css`). Red means wrong, flagged or dangerous, and nothing else.
+- Data colors: `--chart-main`, `-alert`, `-neutral`, `-other` (+ `-soft` steps), one palette for the post widgets
+  and the drawers' figures (`mockups.css`, `story.css`). Alert means wrong, flagged or dangerous, and nothing else.
+  Candidate palettes can be compared on the real widgets at /dev/widgets/ (`src/data/dev-palettes.ts`; `[` and `]`
+  cycle them).
 - Motion: `--ease-drawer`, `--drawer-in`, `--drawer-out`, `--transition`.
 
 ## Voice
