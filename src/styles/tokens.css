@@ -1,28 +1,11 @@
 /* Design tokens: the only place colors, fonts, spacing and motion are defined. See docs/DESIGN.md. */
 
-/* Nepali letters on writing rows (क ख ग …). A 5 KB subset of Noto Sans Devanagari (SIL OFL), only the 33
-   consonants. An installed copy is used first; if the file can't load, --font-devanagari falls back to the
-   Devanagari fonts every major OS ships. */
-@font-face {
-  font-family: "Nepali Letters";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src:
-    local("Noto Sans Devanagari Medium"),
-    local("NotoSansDevanagari-Medium"),
-    url("/fonts/noto-sans-devanagari-letters.woff") format("woff");
-  unicode-range: U+0915-0928, U+092A-0930, U+0932, U+0935-0939;
-}
 :root {
   color-scheme: light dark;
 
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  --font-devanagari:
-    "Nepali Letters", "Kohinoor Devanagari", "Devanagari Sangam MN",
-    "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif;
   --font-mono:
     ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 

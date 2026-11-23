@@ -14,6 +14,7 @@ export const icons = {
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   code: "M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14",
   file: "M7 3h7l5 5v13H7zM14 3v5h5",
+  search: "M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13zM15.5 15.5L20 20",
   arrowUpRight: "M7 17L17 7M8 7h9v9",
   arrowRight: "M5 12h14M13 6l6 6-6 6",
   x: "M6 6l12 12M18 6L6 18",

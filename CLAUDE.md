@@ -9,6 +9,9 @@ For every request that changes files (code, content, docs, config):
    then work only inside that folder. Install deps with `npm ci` (or symlink `node_modules` from the main checkout).
 2. Commit there. `npm run check` must pass (and `npm run test:visual` for UI changes, with a unique `TEST_PORT`
    if other agents may be testing, e.g. `TEST_PORT=4331`).
+   The full visual suite takes 1.5–3 min (~200 tests: every page × 4 widths × light/dark). While iterating, run only
+   the tests you touched (`npx playwright test -g "<test name>"`, seconds); run the full suite once, before merging.
+   Pick a free port first (`lsof -iTCP:<port> -sTCP:LISTEN` prints nothing): a busy port makes the run hang 60 s.
 3. Merge into local `main` from the main checkout: `git -C <main checkout> merge --no-ff <branch>`.
    Don't touch, stage, stash or commit other agents' uncommitted files there. If the merge is blocked by them, stop and ask.
 4. Remove the worktree and delete the merged branch. Check http://localhost:4321 shows the change.

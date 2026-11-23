@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { getCollection } from "astro:content";
 import { site } from "../data/site";
+import type { IconName } from "../data/icons";
 
 /** The resume path, or null until the PDF is actually in public/ (so we never link a missing file). */
 export const resumeHref =
@@ -9,9 +10,22 @@ export const resumeHref =
     ? site.resume
     : null;
 
-/** Nepali consonants in alphabet order (क ख ग घ …): the tile glyph for the nth row of a writing list. */
-const consonants = [..."कखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह"];
-export const nepaliLetter = (i: number) => consonants[i % consonants.length];
+/**
+ * The icon on a writing row: the post's series, else its first tag, else `file`.
+ * To change a post's icon, reorder its tags. Add a tag here when it starts leading a post.
+ */
+const writingIcons: Record<string, IconName> = {
+  "llms-by-hand": "pen",
+  security: "shield",
+  evals: "flask",
+  rag: "search",
+};
+export const writingIcon = (w: {
+  data: { series?: string; tags: string[] };
+}): IconName =>
+  (w.data.series && writingIcons[w.data.series]) ||
+  (w.data.tags[0] && writingIcons[w.data.tags[0]]) ||
+  "file";
 
 /**
  * Published writing, newest first. Drafts show in `npm run dev` only.

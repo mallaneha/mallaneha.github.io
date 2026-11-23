@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { icons } from "../../src/data/icons";
 
 // Drawers (src/scripts/drawer.ts) and click effects (src/scripts/effects.ts) on the home page.
 
@@ -379,4 +380,11 @@ test("home Writing section shows the featured posts", async ({ page }) => {
     "/writing/rag-evals-unanswerable-questions/",
     "/writing/clinical-data-validation-ai-evals/",
   ]);
+  // Each row's tile shows its topic icon (series, else first tag; see writingIcons in src/lib/content.ts).
+  const paths = await page
+    .locator(
+      "section:has(#writing) a[href^='/writing/']:not(.all-writing) .tile path",
+    )
+    .evaluateAll((ps) => ps.map((p) => p.getAttribute("d")));
+  expect(paths).toEqual([icons.shield, icons.flask, icons.flask]);
 });
