@@ -216,7 +216,7 @@ test("phones hide the header cat; the icons sit on the name's line", async ({
 }) => {
   test.skip(test.info().project.name !== "phone", "phones only");
   await expect(page.locator("header-cat")).toBeHidden();
-  const h1 = (await page.locator("h1").boundingBox())!;
+  const h1 = (await page.locator(".top h1").boundingBox())!;
   const icon = (await page.locator(".social svg").first().boundingBox())!;
   expect(
     Math.abs(icon.y + icon.height / 2 - (h1.y + h1.height / 2)),

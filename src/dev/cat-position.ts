@@ -1,21 +1,21 @@
 // Dev-only Astro toolbar app (registered in astro.config.mjs, never shipped): previews where
-// the header cat sits on the home page. "shelf" is the built layout (cat on its own shelf at
-// the right, icons hanging under it); "name" puts it right after the name, its ledge on the
-// name's baseline. The choice is kept in localStorage so it survives reloads.
+// the header cat sits on the home page. "name" is the built layout (cat right after the name,
+// its ledge on the name's baseline); "shelf" moves it onto its own shelf at the right, with
+// the icons hanging under it. The choice is kept in localStorage so it survives reloads.
 import { defineToolbarApp } from "astro/toolbar";
 
 type Pos = "shelf" | "name";
 const KEY = "debug-cat-position";
 const LABELS: Record<Pos, string> = {
+  name: "Next to the name (default)",
   shelf: "On its shelf (right)",
-  name: "Next to the name",
 };
 
 function saved(): Pos {
   try {
-    return localStorage.getItem(KEY) === "name" ? "name" : "shelf";
+    return localStorage.getItem(KEY) === "shelf" ? "shelf" : "name";
   } catch {
-    return "shelf";
+    return "name";
   }
 }
 
@@ -35,7 +35,7 @@ function apply(pos: Pos) {
 export default defineToolbarApp({
   init(canvas, app) {
     let pos = saved();
-    if (pos !== "shelf") apply(pos);
+    if (pos !== "name") apply(pos);
 
     const win = document.createElement("astro-dev-toolbar-window");
     const title = document.createElement("p");
