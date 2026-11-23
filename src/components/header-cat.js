@@ -6,12 +6,12 @@
  *  - Idle: the tail ripples slowly in an S-shaped wave and the cat breathes.
  *  - Hover: the tail moves a little wider and quicker and an ear twitches.
  *    Brushing the cursor across the tail bats it in that direction.
- *  - Starts asleep from 10pm to 6am Pittsburgh time; otherwise it starts
- *    awake, sitting up with the tail still hanging off the ledge.
+ *  - Always starts asleep.
  *  - Click / Enter / Space while asleep: the tail flicks, an ear twitches,
  *    it opens its eyes for a moment and purrs softly. WAKE_CLICKS clicks in
  *    a row (no pause longer than WAKE_PAUSE_MS) wake it up.
- *  - Purring is silent while the site's sound toggle is off.
+ *  - When it wakes up it sits up and gives one short, high, cute "mew".
+ *  - Purring and the mew are silent while the site's sound toggle is off.
  *  - prefers-reduced-motion: no tail motion or breathing. Clicking still
  *    opens the eyes, without motion.
  *
@@ -21,7 +21,7 @@
  *
  * Attributes:  no-ledge  — hide the little shelf line under the cat
  *              label="…" — accessible name (default: "Sleeping cat" / "Cat, awake")
- *              state="asleep|awake" — force the starting state (default: by Pittsburgh time)
+ *              state="awake" — start awake, sitting up (default: asleep)
  * CSS custom properties (set on the element or any ancestor):
  *   --cat-size   height of the cat (default 3em)
  *   --cat-fur    coat and tail color
@@ -191,26 +191,11 @@ const TEMPLATE = /* html */ `
   </g>
 </svg>`;
 
-// Asleep from SLEEP_HOUR to WAKE_HOUR in Pittsburgh (Neha's local time).
-const TIME_ZONE = "America/New_York";
-const SLEEP_HOUR = 22;
-const WAKE_HOUR = 6;
 // Clicks in a row it takes to wake the sleeping cat; a longer pause resets the count.
 const WAKE_CLICKS = 12;
 const WAKE_PAUSE_MS = 3000;
 // The site's sound toggle (src/scripts/effects.ts).
 const MUTE_KEY = "effects-muted";
-
-function asleepNow() {
-  const hour = Number(
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: TIME_ZONE,
-      hour: "numeric",
-      hourCycle: "h23",
-    }).format(new Date()),
-  );
-  return hour >= SLEEP_HOUR || hour < WAKE_HOUR;
-}
 
 // Tail region in viewBox units, for "batting" the tail with the cursor.
 const TAIL_BOX = { x0: 90, x1: 114, y0: 46, y1: 84 };
@@ -248,8 +233,7 @@ class HeaderCat extends HTMLElement {
     }
     if (!this.hasAttribute("tabindex")) this.tabIndex = 0;
     this.setAttribute("role", "button");
-    const state = this.getAttribute("state");
-    this.setAwake(state ? state === "awake" : !asleepNow());
+    this.setAwake(this.getAttribute("state") === "awake");
     this.clicks = 0;
 
     this.reduce = matchMedia("(prefers-reduced-motion: reduce)");
@@ -422,6 +406,7 @@ class HeaderCat extends HTMLElement {
         clearTimeout(this._peek);
         this.classList.remove("peek");
         this.setAwake(true);
+        mew();
       } else {
         this.restart("peek", 1400);
         purr();
@@ -452,14 +437,73 @@ function soundOff() {
   return matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function purr() {
-  if (soundOff()) return;
+function audio() {
+  if (soundOff()) return null;
   const AC =
     window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
-  if (!AC) return;
+  if (!AC) return null;
   audioCtx ??= new AC();
   if (audioCtx.state === "suspended") audioCtx.resume();
-  const ctx = audioCtx;
+  return audioCtx;
+}
+
+// A small, high "mew" for waking up: a bright sawtooth that lifts then falls,
+// through "ee" → "ah" → "oo" vowel formants, with a little vibrato. Short and soft.
+function mew() {
+  const ctx = audio();
+  if (!ctx) return;
+  const t = ctx.currentTime + 0.12; // a beat after it sits up
+  const dur = 0.5;
+  const peak = t + dur * 0.32;
+  const end = t + dur;
+  const f0 = 880;
+
+  const osc = ctx.createOscillator();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(f0 * 0.9, t);
+  osc.frequency.linearRampToValueAtTime(f0 * 1.3, peak);
+  osc.frequency.exponentialRampToValueAtTime(f0 * 0.78, end);
+  const vibrato = ctx.createOscillator();
+  vibrato.frequency.value = 7;
+  const vibratoDepth = ctx.createGain();
+  vibratoDepth.gain.value = 14;
+  vibrato.connect(vibratoDepth).connect(osc.frequency);
+
+  const out = ctx.createGain();
+  out.gain.setValueAtTime(0.0001, t);
+  out.gain.exponentialRampToValueAtTime(0.12, t + 0.04);
+  out.gain.setValueAtTime(0.12, end - dur * 0.4);
+  out.gain.exponentialRampToValueAtTime(0.0001, end);
+  const soften = ctx.createBiquadFilter();
+  soften.type = "lowpass";
+  soften.frequency.value = 5000;
+  out.connect(soften).connect(ctx.destination);
+
+  // formants [start, middle, end] in Hz, Q, loudness
+  for (const [hz, q, level] of [
+    [[550, 1050, 650], 5, 1],
+    [[2800, 1900, 1300], 8, 0.6],
+    [[3600, 3000, 2600], 10, 0.25],
+  ]) {
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.Q.value = q;
+    bp.frequency.setValueAtTime(hz[0], t);
+    bp.frequency.linearRampToValueAtTime(hz[1], peak);
+    bp.frequency.linearRampToValueAtTime(hz[2], end);
+    const g = ctx.createGain();
+    g.gain.value = level * 3;
+    osc.connect(bp).connect(g).connect(out);
+  }
+  osc.start(t);
+  vibrato.start(t);
+  osc.stop(end + 0.05);
+  vibrato.stop(end + 0.05);
+}
+
+function purr() {
+  const ctx = audio();
+  if (!ctx) return;
   const t = ctx.currentTime + 0.02;
   if (t < purrEnds) return;
   const dur = rand(1.1, 1.6);

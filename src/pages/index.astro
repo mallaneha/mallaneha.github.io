@@ -69,8 +69,13 @@ const educationDrawers = await Promise.all(
       </p>
     )}
     <div class="top">
-      <h1>{site.name}</h1>
-      <div class="end">
+      <div class="title">
+        <h1>{site.name}</h1>
+        <p class="tagline">{site.tagline}</p>
+      </div>
+      {/* The cat sleeps on a shelf; the social icons hang just under it, left of its tail. */}
+      <div class="perch">
+        <HeaderCat noLedge />
         <span class="social">
           <a
             href={site.links.linkedin}
@@ -96,10 +101,8 @@ const educationDrawers = await Promise.all(
             </a>
           )}
         </span>
-        <HeaderCat />
       </div>
     </div>
-    <p class="tagline">{site.tagline}</p>
     {site.intro.map((line) => (
       <p>{line}</p>
     ))}
@@ -250,31 +253,64 @@ const educationDrawers = await Promise.all(
   h1 {
     color: var(--color-text);
   }
-  /* Social icons, then the cat at the far right. */
-  .end {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-  }
-  /* Follow the site's theme toggle, not only the system setting. */
-  .end :global(header-cat) {
-    --cat-size: 2.5rem;
-    --cat-line: var(--color-cat-line);
-    --cat-ledge: var(--color-cat-ledge);
-  }
   .tagline {
-    margin: 0 0 var(--space-6);
+    margin: 0;
     color: var(--color-muted);
   }
   .top {
+    --cat: 2.5rem; /* the cat's height; the name and the perch both measure from it */
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-4);
+    margin-bottom: var(--space-6);
   }
-  /* Negative margins so the icon buttons don't make the name row taller. */
-  .top .social {
-    margin: calc(-1 * var(--space-2)) 0;
+  /* The name's baseline sits level with the cat's shelf. */
+  .title {
+    padding-top: calc(var(--cat) * 52.5 / 84 - 1em - 1px);
+  }
+
+  /* Cat + shelf + icons. Measurements come from the cat's 112×84 drawing (header-cat.js):
+     the shelf is at y 52.5 and ends at x 94; the tail's left edge is 16.4 from the right.
+     --gap is the one spacing used everywhere: between icons, from the last icon to the
+     tail, and from the shelf down to the icons. */
+  .perch {
+    --gap: var(--space-2);
+    --glyph: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex: none;
+  }
+  .perch :global(header-cat) {
+    --cat-size: var(--cat);
+    /* Follow the site's theme toggle, not only the system setting. */
+    --cat-line: var(--color-cat-line);
+    --cat-ledge: var(--color-cat-ledge);
+    display: block;
+    position: relative;
+    z-index: 1; /* paws over the shelf line */
+  }
+  .social {
+    position: relative;
+    display: flex;
+    /* top: shelf line (1px, centered on y 52.5) + gap, minus the link's own padding */
+    margin-top: calc(var(--cat) * (52.5 / 84 - 1) + 0.5px + var(--gap) / 2);
+    margin-right: calc(var(--cat) * 16.4 / 84 + var(--gap) / 2);
+  }
+  /* The shelf: overhangs the icons by the same amount on both sides; the right end is
+     where the cat's drawing ends it, at the tail. */
+  .social::before {
+    content: "";
+    position: absolute;
+    top: calc(-1px - var(--gap) / 2);
+    left: calc(
+      var(--cat) * 1.6 / 84 - var(--gap) / 2
+    ); /* same overhang as the right end */
+    right: calc(var(--cat) * (18 - 16.4) / 84 - var(--gap) / 2);
+    height: 1px;
+    border-radius: 1px;
+    background: var(--color-cat-ledge);
   }
   .availability {
     margin: 0 0 var(--space-4);
@@ -310,16 +346,14 @@ const educationDrawers = await Promise.all(
       background-size: 0% 100%;
     }
   }
-  .social {
-    display: inline-flex;
-    gap: var(--space-1);
-  }
+  /* Each link is the glyph plus half a gap on every side, so neighbours sit one gap apart. */
   .social a {
+    position: relative;
     display: grid;
     place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: var(--radius-row);
+    width: calc(var(--glyph) + var(--gap));
+    height: calc(var(--glyph) + var(--gap));
+    border-radius: var(--radius);
     color: var(--color-muted);
     transition:
       background-color var(--transition),
@@ -329,10 +363,13 @@ const educationDrawers = await Promise.all(
     background: var(--color-hover);
     color: var(--color-text);
   }
+  /* Bigger touch target on phones without moving the icons: taller, and wider
+     only into the gaps (never overlapping a neighbour). */
   @media (pointer: coarse) {
-    .social a {
-      width: 2.75rem;
-      height: 2.75rem;
+    .social a::after {
+      content: "";
+      position: absolute;
+      inset: calc(-1 * var(--space-2)) 0;
     }
   }
   .dot {
