@@ -57,8 +57,7 @@ languages.
 ## Vector Guard <span class="when">Apr 2026</span>
 
 The target was a RAG assistant for a security operations center, built over 1,063 CVE and MITRE
-ATT&CK documents. An adapted PoisonedRAG attack changed its answers 59% of the time, with just 2
-poisoned documents per query. The defense puts four checks between retrieval and the model: structural
+ATT&CK documents. I adapted the PoisonedRAG attack to it. With just 2 poisoned documents per query, the attack changed the assistant's answers 59% of the time. My defense puts four checks between retrieval and the model: structural
 filtering, embedding anomaly detection, NLI contradiction checks and LLM-based document scoring.
 Attack success fell to 3% on the threat-intelligence data, and from 72% to 24% on the Natural
 Questions benchmark.

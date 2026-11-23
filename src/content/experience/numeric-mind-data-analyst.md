@@ -30,8 +30,7 @@ SAS and R. They supported FDA submissions for more than 10 pharmaceutical client
 
 Every dataset went through Pinnacle 21 and statistical modeling to find, fix and report anomalies.
 Tracing a Pinnacle 21 finding back to the patient records in the SDTM and ADaM datasets used to be
-a manual lookup. A debugging tool built for the job replaced it and cut issue resolution time by
-75%.
+a manual lookup. I built a debugging tool that replaced it and cut issue resolution time by 75%.
 
 ## Takeaways
 
