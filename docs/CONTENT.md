@@ -151,6 +151,10 @@ What changed, and what I learned.
 
 - `##` starts a section, `###` is a small label. No `>` footnotes in drawers (removed 2026-11-23).
 - `stats` (2–3 tiles) and `flow` (2–5 steps) are optional. Only use numbers from the resume or SPEC.
+- Featured projects use a three-step `<figure class="story">` under the Overview paragraph instead of `stats`
+  (problem → what it does → result, each card ending in its numbers). Markup: the existing projects; styles:
+  `src/styles/story.css`. Keep it one HTML block with no blank lines, and give it an `aria-label` that tells the
+  whole story with every number. Sample text inside (questions, comments) is illustrative; numbers are not.
 
 ## Short copy
 
