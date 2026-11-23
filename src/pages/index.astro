@@ -279,6 +279,8 @@ const educationDrawers = await Promise.all(
   }
   .top {
     --cat: 2.5rem; /* the cat's height; the name and the perch both measure from it */
+    /* "next to the name" variant: icons end level with the cat's shelf, i.e. the name's baseline */
+    --name-icons-top: calc(var(--cat) * 52.5 / 84 - var(--glyph, 1rem));
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -302,12 +304,27 @@ const educationDrawers = await Promise.all(
     align-items: flex-end;
     flex: none;
   }
-  .perch :global(header-cat) {
+  .top :global(header-cat) {
     --cat-size: var(--cat);
     /* Follow the site's theme toggle, not only the system setting. */
     --cat-line: var(--color-cat-line);
     --cat-ledge: var(--color-cat-ledge);
+  }
+  .perch :global(header-cat) {
     display: block;
+  }
+  /* Variant, previewed with the dev toolbar's "Cat position" app (src/dev/cat-position.ts):
+     the cat sits right after the name, its ledge on the name's baseline, and the icons move
+     onto the name's line. */
+  :global(html[data-cat-pos="name"]) .title {
+    padding-top: 0;
+  }
+  h1 :global(header-cat) {
+    margin-left: var(--space-2);
+  }
+  :global(html[data-cat-pos="name"]) .social {
+    margin-top: var(--name-icons-top);
+    margin-right: calc(var(--gap) / -2);
   }
   .social {
     position: relative;
@@ -315,6 +332,21 @@ const educationDrawers = await Promise.all(
     /* top: bottom of the shelf line + gap, minus the link's own padding */
     margin-top: calc(var(--cat) * (53.2 / 84 - 1) + var(--gap) / 2);
     margin-right: calc(var(--cat) * 16.4 / 84 + var(--gap) / 2);
+  }
+  /* Phones: no cat. The icons sit on the name's line, their glyphs flush with the
+     right edge of the text column (the link's half-gap padding hangs outside it). */
+  @media (max-width: 47.99rem) {
+    .title {
+      padding-top: 0;
+    }
+    .top :global(header-cat) {
+      display: none;
+    }
+    .social,
+    :global(html[data-cat-pos="name"]) .social {
+      margin-top: 0;
+      margin-right: calc(var(--gap) / -2);
+    }
   }
   .availability {
     margin: 0 0 var(--space-4);

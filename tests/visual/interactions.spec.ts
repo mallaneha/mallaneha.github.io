@@ -200,11 +200,27 @@ test("theme toggle flips the theme and remembers it", async ({ page }) => {
 test("clicking or double-clicking the header cat selects no text", async ({
   page,
 }) => {
+  test.skip(
+    test.info().project.name === "phone",
+    "the header cat is hidden on phones",
+  );
   const cat = page.locator("header-cat");
   await cat.click();
   await cat.dblclick();
   await cat.click({ clickCount: 3 });
   expect(await page.evaluate(() => getSelection()?.toString() ?? "")).toBe("");
+});
+
+test("phones hide the header cat; the icons sit on the name's line", async ({
+  page,
+}) => {
+  test.skip(test.info().project.name !== "phone", "phones only");
+  await expect(page.locator("header-cat")).toBeHidden();
+  const h1 = (await page.locator("h1").boundingBox())!;
+  const icon = (await page.locator(".social svg").first().boundingBox())!;
+  expect(
+    Math.abs(icon.y + icon.height / 2 - (h1.y + h1.height / 2)),
+  ).toBeLessThan(2);
 });
 
 // Fakes only Date (page.clock also fakes performance, which breaks Astro's dev toolbar),
@@ -246,6 +262,10 @@ for (const [utc, local] of [
 test("sleeping header cat stirs on each click and wakes after 12 in a row", async ({
   page,
 }) => {
+  test.skip(
+    test.info().project.name === "phone",
+    "the header cat is hidden on phones",
+  );
   await atUtc(page, "08:00");
   const cat = page.locator("header-cat");
   for (let i = 0; i < 11; i++) await cat.click();
