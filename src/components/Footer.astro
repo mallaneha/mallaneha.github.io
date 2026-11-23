@@ -16,16 +16,6 @@ const year = new Date().getFullYear();
   <span class="controls">
     <button
       type="button"
-      class="control sound"
-      data-effects-toggle
-      aria-pressed="true"
-      aria-label="Click sounds"
-    >
-      <Icon name="soundOn" size={14} class="on" />
-      <Icon name="soundOff" size={14} class="off" />
-    </button>
-    <button
-      type="button"
       class="control theme"
       data-theme-toggle
       aria-label="Dark theme"
@@ -33,6 +23,16 @@ const year = new Date().getFullYear();
     >
       <Icon name="moon" size={14} class="moon" />
       <Icon name="sun" size={14} class="sun" />
+    </button>
+    <button
+      type="button"
+      class="control sound"
+      data-effects-toggle
+      aria-pressed="true"
+      aria-label="Click sounds"
+    >
+      <Icon name="soundOn" size={14} class="on" />
+      <Icon name="soundOff" size={14} class="off" />
     </button>
   </span>
 </footer>
