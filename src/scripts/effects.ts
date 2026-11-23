@@ -1,5 +1,5 @@
 // Click feedback modeled on ch.sh: a small spark burst on a canvas, a soft synthesized
-// "tick", and an 8ms vibration on phones, on every page, for clicks on links and buttons (never inside a
+// "tick", and an 8ms vibration on phones, on every page, for mouse or touch clicks on links and buttons (never inside a
 // drawer). The toggle ([data-effects-toggle]) mutes the sound and vibration;
 // the sparks stay. Also: theme toggle, [data-copy] buttons with a toast, and the footer's local time.
 
@@ -81,7 +81,7 @@ function burst(x: number, y: number) {
   if (!raf) raf = requestAnimationFrame(draw);
 }
 
-// ---------- sound: two short filtered-noise ticks (ch.sh's "toggle" recipe) ----------
+// ---------- sound: two short filtered-noise ticks ----------
 type Layer = {
   freq: number;
   q: number;
@@ -90,16 +90,17 @@ type Layer = {
   decay: number;
   peak: number;
 };
+// Click recipe (userinterface.wiki): bandpass 3–6 kHz, Q 2–5, each layer under 15 ms.
 const TICK: { gain: number; layers: Layer[] } = {
   gain: 0.4,
   layers: [
-    { freq: 2200, q: 1.6, offset: 0, attack: 0.001, decay: 0.016, peak: 0.12 },
+    { freq: 3200, q: 2.5, offset: 0, attack: 0.001, decay: 0.011, peak: 0.12 },
     {
-      freq: 3800,
-      q: 1.6,
+      freq: 4800,
+      q: 2.5,
       offset: 0.024,
       attack: 0.001,
-      decay: 0.02,
+      decay: 0.012,
       peak: 0.1,
     },
   ],
@@ -131,14 +132,12 @@ function audioContext(): AudioContext | null {
 // comes before the click, so the tick is ready by the time the click lands.
 function warmUp(e: Event) {
   if (muted) return;
-  if (e instanceof KeyboardEvent && e.key !== "Enter" && e.key !== " ") return;
   if (!(e.target as Element | null)?.closest?.("a, button, summary, label"))
     return;
   const a = audioContext();
   if (a && a.state === "suspended") a.resume().catch(() => {});
 }
 addEventListener("pointerdown", warmUp, true);
-addEventListener("keydown", warmUp, true);
 
 /** Play a tick. Resolves once it has finished playing (or right away if it can't play). */
 function tick(): Promise<void> {
@@ -226,8 +225,9 @@ function sameTabNavigation(e: MouseEvent): HTMLAnchorElement | null {
       // Only things you can press get feedback, not clicks on text or empty space.
       if (!target?.closest?.("a, button, summary, label, [role='button']"))
         return;
-      // Keyboard "clicks" have no pointer position: skip the spark, keep the sound.
-      if (e.detail > 0 && !reduceMotion.matches) burst(e.clientX, e.clientY);
+      // Keyboard "clicks" (Enter/Space, detail 0) stay silent and spark-free: no sound on keyboard use.
+      if (e.detail === 0) return;
+      if (!reduceMotion.matches) burst(e.clientX, e.clientY);
       if (muted) return;
       pendingTick = tick();
       navigator.vibrate?.(8);
