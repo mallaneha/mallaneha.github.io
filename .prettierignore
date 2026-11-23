@@ -9,3 +9,5 @@ playwright-report/
 .claude/worktrees/
 # Vendored skill, kept identical to upstream (github.com/shouvik12/living-canvas)
 .claude/skills/living-canvas/
+# Vendored animation skills (installed via skills-lock.json), kept identical to upstream
+.agents/
