@@ -5,6 +5,7 @@ date: 2026-11-23
 type: post
 tags: [security, healthcare, rag, agents]
 draft: false
+featured: true
 ---
 
 With [Vector Guard](/#projects) I worked on keeping poisoned documents out of a RAG index. This post is

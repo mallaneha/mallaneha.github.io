@@ -29,7 +29,15 @@ const [projects, experience, education, writing] = await Promise.all([
 ]);
 const published = new Set(writing.map((w) => w.id));
 const featured = projects.filter((p) => p.data.featured);
-const latest = writing.slice(0, 3);
+// Home page Writing section: featured posts first (newest first), topped up with the newest others to 3.
+const latest = [
+  ...writing.filter((w) => w.data.featured),
+  ...writing.filter((w) => !w.data.featured),
+].slice(0, 3);
+// The "LLMs by hand" series gets its own button next to "All writing", pointing at part 1.
+const llmsByHand = writing
+  .filter((w) => w.data.series === "llms-by-hand")
+  .sort((a, b) => (a.data.part ?? 0) - (b.data.part ?? 0));
 
 const featuredDrawers = await Promise.all(
   featured.map(async (p) => ({
@@ -167,11 +175,23 @@ const educationDrawers = await Promise.all(
             />
           ))}
         </RowList>
-        <a class="all-writing" href="/writing/">
-          <span>All writing</span>
-          <span class="count">{writing.length} posts</span>
-          <Icon name="arrowRight" size={14} class="go" />
-        </a>
+        <div class="writing-links">
+          <a class="all-writing" href="/writing/">
+            <span>All writing</span>
+            <span class="count">{writing.length} posts</span>
+            <Icon name="arrowRight" size={14} class="go" />
+          </a>
+          {llmsByHand.length > 0 && (
+            <a
+              class="all-writing secondary"
+              href={`/writing/${llmsByHand[0]!.id}/`}
+            >
+              <span>LLMs by hand</span>
+              <span class="count">{llmsByHand.length} parts</span>
+              <Icon name="arrowRight" size={14} class="go" />
+            </a>
+          )}
+        </div>
       </>
     ) : (
       <p class="muted small">First posts coming soon.</p>
@@ -393,11 +413,16 @@ const educationDrawers = await Promise.all(
   .small {
     font-size: var(--text-sm);
   }
+  .writing-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
   .all-writing {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    margin-top: var(--space-4);
     padding: var(--space-2) var(--space-4);
     border: 1px solid var(--color-border);
     border-radius: 999px;
@@ -414,6 +439,13 @@ const educationDrawers = await Promise.all(
   }
   .all-writing:hover {
     background: var(--color-surface-hover);
+  }
+  /* Secondary: same pill, no fill until hover. */
+  .all-writing.secondary {
+    background: transparent;
+  }
+  .all-writing.secondary:hover {
+    background: var(--color-surface);
   }
   .all-writing:active {
     transform: scale(0.98);

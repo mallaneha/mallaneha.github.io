@@ -6,6 +6,8 @@ status: shipped
 featured: true
 icon: shield
 tech: [Python]
+links:
+  post: measuring-rag-poisoning-defense
 order: 10
 ---
 

@@ -255,3 +255,21 @@ test("sleeping header cat stirs on each click and wakes after 12 in a row", asyn
   await expect(cat).toHaveClass(/awake/);
   await expect(cat).toHaveAttribute("aria-label", "Cat, awake");
 });
+
+test("home Writing section shows the featured posts", async ({ page }) => {
+  await page.goto("/");
+  const hrefs = await page
+    .locator("section:has(#writing) a[href^='/writing/']:not(.all-writing)")
+    .evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+  // Featured posts come first, newest first (see `featured` in docs/CONTENT.md).
+  expect(hrefs).toEqual([
+    "/writing/rule-of-two-healthcare-rag/",
+    "/writing/rag-evals-unanswerable-questions/",
+    "/writing/clinical-data-validation-ai-evals/",
+  ]);
+  // A secondary button next to "All writing" opens part 1 of the LLMs by hand series.
+  const series = page.locator("section:has(#writing) a.secondary");
+  await expect(series).toContainText("LLMs by hand");
+  await expect(series).toContainText("3 parts");
+  await expect(series).toHaveAttribute("href", "/writing/build-attention/");
+});
