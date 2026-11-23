@@ -16,6 +16,7 @@ import {
   projectHref,
   years,
   formatDate,
+  nepaliLetter,
   resumeHref,
 } from "../lib/content";
 
@@ -144,9 +145,9 @@ const educationDrawers = await Promise.all(
     {latest.length > 0 ? (
       <>
         <RowList>
-          {latest.map((w) => (
+          {latest.map((w, i) => (
             <Row
-              icon="pen"
+              glyph={nepaliLetter(i)}
               name={w.data.draft ? `[draft] ${w.data.title}` : w.data.title}
               desc={formatDate(w.data.date)}
               href={`/writing/${w.id}/`}

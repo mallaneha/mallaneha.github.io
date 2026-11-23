@@ -5,6 +5,9 @@
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
+  --font-devanagari:
+    "Kohinoor Devanagari", "Noto Sans Devanagari", "Nirmala UI", "Mangal",
+    sans-serif;
   --font-mono:
     ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 

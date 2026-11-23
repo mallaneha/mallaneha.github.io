@@ -9,6 +9,10 @@ export const resumeHref =
     ? site.resume
     : null;
 
+/** Nepali consonants in alphabet order (क ख ग घ …): the tile glyph for the nth row of a writing list. */
+const consonants = [..."कखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह"];
+export const nepaliLetter = (i: number) => consonants[i % consonants.length];
+
 /**
  * Published writing, newest first. Drafts show in `npm run dev` only.
  * Posts in a series stay together in `part` order, placed where the series' newest part would be.
