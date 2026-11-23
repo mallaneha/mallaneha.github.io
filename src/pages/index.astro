@@ -56,54 +56,42 @@ const educationDrawers = await Promise.all(
 
 <Base description={site.summary} effects>
   <header>
-    <h1>{site.name}</h1>
-    <p class="tagline">{site.tagline}</p>
-    <div class="status">
-      <div class="availability" class:list={{ bare: !site.availability }}>
-        {site.availability && (
-          <>
-            <span class="dot" aria-hidden="true" />
-            <p class="avail-text">
-              <strong>{site.availability.title}</strong>
-              <span>{site.availability.detail}</span>
-            </p>
-          </>
-        )}
-        <div class="actions">
-          <span class="social">
-            <a
-              href={site.links.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-              title="LinkedIn"
-            >
-              <Icon name="linkedin" />
-            </a>
-            <a
-              href={site.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-              title="GitHub"
-            >
-              <Icon name="github" />
-            </a>
-          </span>
-          {site.availability && (
-            <a class="cta" href="#connect">
-              Get in touch
-            </a>
-          )}
-        </div>
-      </div>
-      {resumeHref && (
-        <a class="resume" href={resumeHref}>
-          <Icon name="file" size={14} />
-          <span>Resume (PDF)</span>
+    <div class="top">
+      <h1>{site.name}</h1>
+      <span class="social">
+        <a
+          href={site.links.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="LinkedIn"
+          title="LinkedIn"
+        >
+          <Icon name="linkedin" />
         </a>
-      )}
+        <a
+          href={site.links.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub"
+          title="GitHub"
+        >
+          <Icon name="github" />
+        </a>
+        {resumeHref && (
+          <a href={resumeHref} aria-label="Resume (PDF)" title="Resume (PDF)">
+            <Icon name="file" />
+          </a>
+        )}
+      </span>
     </div>
+    <p class="tagline">{site.tagline}</p>
+    {site.availability && (
+      <p class="availability">
+        <span class="dot" aria-hidden="true" />
+        <mark>{site.availability}.</mark>
+        <a href="#connect">Get in touch →</a>
+      </p>
+    )}
     {site.intro.map((line) => (
       <p>{line}</p>
     ))}
@@ -259,81 +247,47 @@ const educationDrawers = await Promise.all(
     margin: 0 0 var(--space-6);
     color: var(--color-muted);
   }
-  .status {
+  .top {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    margin: calc(-1 * var(--space-2)) 0 var(--space-6);
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .top h1 {
+    margin: 0;
+  }
+  .top .social {
+    margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) 0 0;
   }
   .availability {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-tile);
-    background: var(--color-surface);
-  }
-  .avail-text {
     display: flex;
-    flex-direction: column;
-    margin: 0;
-    line-height: 1.25rem;
-  }
-  .avail-text strong {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
     color: var(--color-text);
+  }
+  .availability mark {
+    padding: 0.1em 0.35em;
+    margin-left: -0.35em;
+    border-radius: var(--radius);
+    background: linear-gradient(var(--color-highlight), var(--color-highlight))
+      no-repeat 0 0 / 100% 100%;
+    color: inherit;
     font-weight: var(--weight-medium);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
-  .avail-text span {
-    color: var(--color-muted);
-    font-size: var(--text-xs);
+  .availability .dot {
+    flex: none;
   }
-  header a.cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2.25rem;
-    padding: 0 var(--space-4);
-    border-radius: 999px;
-    background: var(--color-text);
-    color: var(--color-bg);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    text-decoration: none;
-    white-space: nowrap;
-    transition:
-      opacity var(--transition),
-      transform var(--transition);
-  }
-  header a.cta:hover {
-    color: var(--color-bg);
-    opacity: 0.85;
-  }
-  header a.cta:active {
-    transform: scale(0.97);
-  }
-  .actions {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-  }
-  /* No availability: just the icon links, no card. */
-  .availability.bare {
-    display: flex;
-    padding: 0;
-    border: 0;
-    background: none;
-    margin-left: calc(-1 * var(--space-2));
-  }
-  @media (max-width: 30rem) {
-    .availability {
-      grid-template-columns: auto 1fr;
+  @media (prefers-reduced-motion: no-preference) {
+    .availability mark {
+      animation: sweep 700ms 200ms var(--ease-drawer) backwards;
     }
-    .actions {
-      grid-column: 1 / -1;
-      justify-content: space-between;
-      margin-left: calc(-1 * var(--space-2));
+  }
+  @keyframes sweep {
+    from {
+      background-size: 0% 100%;
     }
   }
   .social {
@@ -360,17 +314,6 @@ const educationDrawers = await Promise.all(
       width: 2.75rem;
       height: 2.75rem;
     }
-  }
-  .resume {
-    align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    text-decoration: none;
-  }
-  .resume span {
-    text-decoration: underline dotted var(--color-subtle);
-    text-underline-offset: 4px;
   }
   .dot {
     width: 0.5rem;
