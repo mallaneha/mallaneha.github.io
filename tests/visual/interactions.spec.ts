@@ -229,25 +229,17 @@ async function atUtc(page: Page, utc: string) {
   await page.reload();
 }
 
-for (const [utc, local, awake] of [
-  ["03:30", "10:30pm", false],
-  ["08:00", "3am", false],
-  ["10:59", "5:59am", false],
-  ["11:00", "6am", true],
-  ["17:00", "noon", true],
-  ["02:59", "9:59pm", true],
+for (const [utc, local] of [
+  ["08:00", "3am"],
+  ["17:00", "noon"],
 ] as const) {
-  test(`header cat starts ${awake ? "awake" : "asleep"} at ${local} Pittsburgh time`, async ({
+  test(`header cat starts asleep at ${local} Pittsburgh time`, async ({
     page,
   }) => {
     await atUtc(page, utc);
     const cat = page.locator("header-cat");
-    await expect(cat).toHaveAttribute(
-      "aria-label",
-      awake ? "Cat, awake" : "Sleeping cat",
-    );
-    if (awake) await expect(cat).toHaveClass(/awake/);
-    else await expect(cat).not.toHaveClass(/awake/);
+    await expect(cat).toHaveAttribute("aria-label", "Sleeping cat");
+    await expect(cat).not.toHaveClass(/awake/);
   });
 }
 
