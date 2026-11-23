@@ -1,11 +1,14 @@
 /* Three-step animated story under a project drawer's Overview: problem → what it does → result.
    Raw HTML in src/content/projects/<slug>.md (`<figure class="story">`), styled only with tokens so it follows
    the theme toggle. Three equal cards: label, scene (small looping motion), then the step's numbers at the bottom,
-   so the numbers line up across cards. With prefers-reduced-motion nothing moves. */
+   so the numbers line up across cards. With prefers-reduced-motion nothing moves.
+   Wider than the 30rem text column: up to --figure-wide, centered on the text and never wider than the drawer.
+   Hidden below 48rem, where three cards would be too cramped; the case study's text carries the story there. */
 
 .story {
-  container-type: inline-size;
-  margin: var(--space-6) 0;
+  --story-width: min(var(--figure-wide), 100cqw);
+  width: var(--story-width);
+  margin: var(--space-8) calc((100% - var(--story-width)) / 2);
   padding: var(--space-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-tile);
@@ -24,7 +27,7 @@
   flex-direction: column;
   gap: var(--space-3);
   min-width: 0;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-row);
   background: var(--color-bg);
@@ -46,21 +49,24 @@
 .story-note {
   color: var(--color-muted);
 }
-/* The step's numbers: a dotted rule, a small title, then one or two numbers, each with its label below. */
+/* The step's numbers: a dotted rule, a small title, then one or two numbers side by side, each with its label below. */
 .story-stats {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
   padding-top: var(--space-3);
   border-top: 1px dotted var(--color-subtle);
   color: var(--color-muted);
 }
 .story-stats-title {
+  flex-basis: 100%;
   color: var(--color-faint);
 }
 .story-stat {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 .story-stat strong {
   font-size: var(--text-lg);
@@ -420,23 +426,9 @@
   }
 }
 
-/* Narrow drawers (phones): one card per row, the scene on the left and its numbers in a column on the right. */
-@container (width < 26rem) {
-  .story-steps {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .story-step {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 6rem;
-    gap: var(--space-3);
-  }
-  .story-label {
-    grid-column: 1 / -1;
-  }
-  .story-stats {
-    padding: 0 0 0 var(--space-3);
-    border-top: 0;
-    border-left: 1px dotted var(--color-subtle);
+@media (max-width: 47.99rem) {
+  .story {
+    display: none;
   }
 }
 
