@@ -1,5 +1,5 @@
 ---
-title: "How I cut hallucinations 80% in a research agent"
+title: "How I cut hallucinations 80% in a RAG research agent"
 description: "Self-reflection in LangGraph, and how I measured whether it actually helped."
 date: 2026-03-01
 type: post
