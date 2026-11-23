@@ -17,7 +17,13 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--leading);
+  font-synthesis: none;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--color-selection);
 }
 
 main {
