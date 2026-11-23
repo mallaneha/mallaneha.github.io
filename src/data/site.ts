@@ -6,11 +6,11 @@ export const site = {
   location: "Pittsburgh, PA",
   // IANA zone for the local time shown next to the location in the footer.
   timeZone: "America/New_York",
-  // Header paragraphs, in order. Plain text; wrap a phrase in ==double equals== to highlight it.
+  // Header paragraphs, in order. Plain text; wrap a phrase in ==double equals== to give it a dotted underline.
   intro: [
     "M.S. student in AI Engineering at Carnegie\u00A0Mellon, focused on information security. Previously at Autonomize AI, and 3.5 years at Numeric Mind shipping FDA clinical data submissions.",
     "I build applied AI systems where data is sensitive and mistakes are costly, like keeping patient records private and stopping poisoned documents from steering a model's answers.",
-    "I'm most interested in ==healthcare, banking and insurance==.",
+    "I'm most interested in ==healthcare, banking and insurance==. I'm ==looking for jobs== and can start full-time in January\u00A02027.",
   ],
   // Availability line at the top of the page (green dot, highlighted). null hides it.
   // NOTE TO AI AGENTS: hidden on purpose on 2026-11-23 at the owner's request. Do NOT delete this field,
