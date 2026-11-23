@@ -1,11 +1,12 @@
 // Debug panel, never shown to visitors. Open any page with `?debug` to turn it on (remembered in this
 // browser), `?debug=0` or the panel's × to turn it off. Loaded by effects.ts only when debug mode is on.
 //
-// Logo toggle: an <img data-logo-alt="…"> (a Row or Drawer whose entry sets `logoAlt`, e.g. CMU's red square
-// vs. its red-on-white wordmark) swaps to the alternative logo, shown at data-logo-alt-size px on the light tile.
+// Logo toggle: an <img data-logo-alt="…"> (a Row or Drawer whose entry sets `logoAlt`, e.g. CMU's red-on-white
+// wordmark vs. its red square) swaps to the alternative logo at data-logo-alt-size px, covering the whole tile
+// when data-logo-alt-full is set.
 
 const FLAG = "debug";
-const LOGO_KEY = "debug-logo"; // "alt" shows the alternative logos
+const LOGO_KEY = "debug-logo-alt"; // "alt" shows the alternative logos
 
 function store(key: string, value: string | null) {
   try {
@@ -52,7 +53,9 @@ function init() {
       }
       tile?.classList.toggle(
         "full",
-        !alt && img.dataset.logoDefaultFull === "true",
+        alt
+          ? img.dataset.logoAltFull === "true"
+          : img.dataset.logoDefaultFull === "true",
       );
     }
   }
@@ -107,11 +110,11 @@ function init() {
   const logoButton = panel.querySelector<HTMLButtonElement>(".debug-logo")!;
 
   function syncButton() {
-    logoButton.textContent = alt ? "CMU logo: white" : "CMU logo: red";
+    logoButton.textContent = alt ? "CMU logo: red" : "CMU logo: white";
     logoButton.setAttribute("aria-pressed", String(alt));
     logoButton.title = alt
-      ? "Switch to the red logo"
-      : "Switch to the white logo";
+      ? "Switch to the white logo"
+      : "Switch to the red logo";
   }
 
   logoButton.addEventListener("click", () => {

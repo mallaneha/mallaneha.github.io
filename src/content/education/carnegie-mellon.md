@@ -6,10 +6,10 @@ end: 2026
 location: "Pittsburgh, PA"
 summary: "M.S. AI Engineering"
 icon: school
-logo: /logos/cmu.png
-logoFull: true
-logoAlt: /logos/cmu-white.png # red wordmark on white; toggled in ?debug mode
-logoAltSize: 30
+logo: /logos/cmu-white.png # red wordmark on white
+logoSize: 30
+logoAlt: /logos/cmu.png # red square; swapped in from the ?debug panel
+logoAltFull: true
 order: 10
 ---
 
