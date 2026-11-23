@@ -58,22 +58,40 @@ const educationDrawers = await Promise.all(
   <header>
     <h1>{site.name}</h1>
     <p class="tagline">{site.tagline}</p>
-    {(site.availability || resumeHref) && (
-      <p class="status">
-        {site.availability && (
-          <span class="badge">
-            <span class="dot" aria-hidden="true" />
-            {site.availability}
-          </span>
-        )}
-        {resumeHref && (
-          <a class="resume" href={resumeHref}>
-            <Icon name="file" size={14} />
-            <span>Resume (PDF)</span>
-          </a>
-        )}
-      </p>
-    )}
+    <p class="status">
+      {site.availability && (
+        <span class="badge">
+          <span class="dot" aria-hidden="true" />
+          {site.availability}
+        </span>
+      )}
+      <span class="social">
+        <a
+          href={site.links.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="LinkedIn"
+          title="LinkedIn"
+        >
+          <Icon name="link" />
+        </a>
+        <a
+          href={site.links.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub"
+          title="GitHub"
+        >
+          <Icon name="code" />
+        </a>
+      </span>
+      {resumeHref && (
+        <a class="resume" href={resumeHref}>
+          <Icon name="file" size={14} />
+          <span>Resume (PDF)</span>
+        </a>
+      )}
+    </p>
     {site.intro.map((line) => (
       <p>{line}</p>
     ))}
@@ -166,11 +184,10 @@ const educationDrawers = await Promise.all(
   </Section>
 
   <Section id="connect" title="Connect">
-    {/* With a resume: Email | Resume, LinkedIn | GitHub. Without: Email alone, then LinkedIn | GitHub. */}
-    <RowList columns={resumeHref ? 2 : 1}>
+    <RowList>
       <Row
         icon="mail"
-        name={site.email.replace("@", "@\u200b")}
+        name={site.email}
         desc="Email"
         copy={site.email}
         copyLabel="Email copied"
@@ -179,8 +196,6 @@ const educationDrawers = await Promise.all(
       {resumeHref && (
         <Row icon="file" name="Resume" desc="PDF" href={resumeHref} />
       )}
-    </RowList>
-    <RowList columns={2}>
       <Row
         icon="link"
         name="mallaneha"
@@ -266,6 +281,31 @@ const educationDrawers = await Promise.all(
     font-size: var(--text-xs);
     font-weight: var(--weight-medium);
     line-height: 1.25rem;
+  }
+  .social {
+    display: inline-flex;
+    gap: var(--space-1);
+  }
+  .social a {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-row);
+    color: var(--color-muted);
+    transition:
+      background-color var(--transition),
+      color var(--transition);
+  }
+  .social a:hover {
+    background: var(--color-hover);
+    color: var(--color-text);
+  }
+  @media (pointer: coarse) {
+    .social a {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
   }
   .resume {
     display: inline-flex;
