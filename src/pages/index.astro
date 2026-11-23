@@ -487,8 +487,9 @@ const educationDrawers = await Promise.all(
   .all-writing:hover {
     background: var(--color-surface-hover);
   }
-  /* Secondary: same pill, no fill until hover. */
+  /* Secondary: same pill, no fill or border until hover (border stays transparent to keep the size). */
   .all-writing.secondary {
+    border-color: transparent;
     background: transparent;
   }
   .all-writing.secondary:hover {
