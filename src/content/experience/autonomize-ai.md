@@ -10,9 +10,9 @@ logo: /logos/autonomize-ai.png
 order: 10
 ---
 
-## Overview
+## Overview <span class="when">May – Jul 2026</span>
 
-A summer internship (May to July 2026) at a healthcare AI company. I worked on keeping patient
+A summer internship at a healthcare AI company. I worked on keeping patient
 data private and on getting reliable answers out of messy insurance documents.
 
 <div class="stats">

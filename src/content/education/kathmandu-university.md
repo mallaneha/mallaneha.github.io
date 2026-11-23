@@ -10,10 +10,9 @@ logo: /logos/kathmandu-university.png
 order: 20
 ---
 
-## Overview
+## Overview <span class="when">Aug 2017 – Mar 2022</span>
 
-A bachelor's in computer engineering at Kathmandu University in Dhulikhel, Nepal, from August 2017
-to March 2022. My projects there covered machine learning, computer vision, cryptography and OCR.
+A bachelor's in computer engineering at Kathmandu University in Dhulikhel, Nepal. My projects there covered machine learning, computer vision, cryptography and OCR.
 
 ## Courses
 

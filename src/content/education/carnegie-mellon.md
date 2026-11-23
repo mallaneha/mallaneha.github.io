@@ -10,10 +10,9 @@ logo: /logos/cmu.png
 order: 10
 ---
 
-## Overview
+## Overview <span class="when">Aug 2025 – Dec 2026</span>
 
-A master's in AI engineering with a concentration in information security, from August 2025 to
-December 2026.
+A master's in AI engineering with a concentration in information security.
 
 ## Courses
 
