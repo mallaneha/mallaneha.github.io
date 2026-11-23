@@ -34,7 +34,7 @@ test("wide screens: a decorative grid fills the margins, never the text column",
 }) => {
   const vw = page.viewportSize()!.width;
   test.skip(vw < 1024, "only from 1024px up");
-  await page.goto("/");
+  await page.goto("/?seed=7");
   await expect.poll(() => frames(page)).toBeGreaterThan(1);
 
   const canvas = grid(page);
@@ -46,10 +46,16 @@ test("wide screens: a decorative grid fills the margins, never the text column",
   const main = (await page.locator("main").boundingBox())!;
   const vh = page.viewportSize()!.height;
   expect(await inked(page, main.x, 0, main.width, vh)).toBe(0);
-  expect(await inked(page, 0, 0, main.x, vh)).toBeGreaterThan(0.02);
-  expect(
-    await inked(page, main.x + main.width, 0, vw - main.x - main.width, vh),
-  ).toBeGreaterThan(0.02);
+  // Sparse by design, so check both margins together.
+  const left = await inked(page, 0, 0, main.x, vh);
+  const right = await inked(
+    page,
+    main.x + main.width,
+    0,
+    vw - main.x - main.width,
+    vh,
+  );
+  expect(left + right).toBeGreaterThan(0);
 });
 
 test("phones and tablets: no grid", async ({ page }) => {
@@ -93,4 +99,42 @@ test("stops while the tab is hidden", async ({ page }) => {
   await page.waitForTimeout(500);
   // At most the one frame drawn while pausing.
   expect(await frames(page)).toBeLessThanOrEqual(n + 1);
+});
+
+test("hovering a cluster reveals the color of a few of its cells, and keeps the shape", async ({
+  page,
+}) => {
+  const vw = page.viewportSize()!.width;
+  test.skip(vw < 1024, "only from 1024px up");
+  const colored = () =>
+    grid(page).evaluate((c) =>
+      Number((c as HTMLCanvasElement).dataset.colored),
+    );
+  // A still frame (reduced motion) so the clusters stay put while we hover them.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?seed=7");
+  await expect.poll(() => frames(page)).toBeGreaterThan(0);
+  await page.mouse.move(vw / 2, 300); // text column: nothing revealed
+  await expect.poll(colored).toBe(0);
+  const points = await grid(page).evaluate((c) => {
+    const canvas = c as HTMLCanvasElement;
+    const dpr = canvas.width / canvas.clientWidth;
+    const d = canvas
+      .getContext("2d")!
+      .getImageData(0, 0, canvas.width, canvas.height).data;
+    const out: number[][] = [];
+    for (let y = 0; y < canvas.height; y += Math.round(10 * dpr))
+      for (let x = 0; x < canvas.width; x += Math.round(10 * dpr))
+        if (d[(y * canvas.width + x) * 4 + 3])
+          out.push([x / dpr + 5, y / dpr + 5]);
+    return out;
+  });
+  test.skip(points.length === 0, "no lit cells for this seed and size");
+  const [x, y] = points[Math.floor(points.length / 2)];
+  await page.mouse.move(x, y);
+  await expect.poll(colored).toBeGreaterThan(0);
+  expect(await colored()).toBeLessThanOrEqual(9);
+  // Empty space reveals nothing.
+  await page.mouse.move(vw / 2, 300);
+  await expect.poll(colored).toBe(0);
 });

@@ -1,21 +1,41 @@
-// Margin grid: a quiet, boiling noise texture in the left and right margins on wide screens, a
-// grayscale take on oddgrid. A square grid where a noise field lights up irregular islands of cells in three
-// faint grays (--grid-1..3), some with a small dot (--grid-dot). Imported lazily by effects.ts from 64rem up.
+// Margin grid: a boiling noise texture in the left and right margins on wide screens, after oddgrid. A square
+// grid where a noise field lights up irregular islands of cells. At rest it's a barely-there grayscale version
+// (--grid-1..3 by how deep in an island a cell is, dots --grid-dot). Cells near the mouse take oddgrid's own
+// palette (--grid-hue-1..5 in patches, dots --grid-hue-dot), fading out with distance. Imported lazily by effects.ts
+// from 64rem.
 // Design: docs/plans/2026-11-23-margin-grid-design.md.
 
 const CELL = 10; // px, cell pitch
-const GAP = 1; // px between cells
 const TICK = 100; // ms per frame (~10fps, cells step like the oddgrid recording)
-// Motion and sparsity are tuned to the oddgrid recording (measured on its 44x78 grid): ~10% of cells lit,
-// ~1.3% flipping per frame, a cell stays lit ~1.1s (90% within ~2.5s), ~11 islands, no drift direction.
-const SPEED = 0.045; // noise time per frame
+// Motion: boils in place like the oddgrid recording (no drift direction), but ~4.5x slower so it stays calm: a
+// cell stays lit ~5s, the field re-forms over ~10s. Much sparser than oddgrid on purpose: ~2% of cells lit, a few small islands.
+const SPEED = 0.01; // noise time per frame: slow and calm (oddgrid itself is ~0.045)
 const SCALE = 0.09; // noise lattice per cell
-const LIT = 0.66; // noise above this lights a cell (~10%)
+// Noise above the threshold lights a cell. The threshold is LIT at the screen edge and rises by EDGE_BIAS toward
+// the text column, so islands sit out by the edges and almost never next to the text (oddgrid is 0.66 everywhere).
+// It also rises by TOP_BIAS toward the top of the window, so islands gather lower down.
+const LIT = 0.72;
+const EDGE_BIAS = 0.14;
+const TOP_BIAS = 0.08;
 const STEP = 0.05; // each shade is this much further above LIT
-const DOT_ABOVE = 0.09; // dots only in island cores...
-const DOT_SHARE = 1 / 6; // ...on about 1 in 6 of those cells
+const DOT_SHARE = 0.55; // share of lit cells with a marker (oddgrid: 56%)
+const DOT_SIZE = 0.55; // marker size / cell (oddgrid's dots: ~24 of 44px)
+// Marker shapes, picked per cell: dot, ring, plus, cross, small square, dash.
+const MARKERS = 6;
+// Which hue a cell takes: a second noise field cut at its quantiles so the shares match oddgrid's
+// (pink 32%, navy 27%, olive 21%, blue 10%, orange 10%).
+const HUE_CUTS = [0.407, 0.545, 0.667, 0.747];
+// Hover reveal patterns around the pointer's cell, as [dx, dy] pairs (see draw()).
+const PATTERNS = [
+  [-1, -1, 0, -1, 1, -1, -1, 0, 0, 0, 1, 0, -1, 1, 0, 1, 1, 1], // all 8 around
+  [0, -1, -1, 0, 0, 0, 1, 0, 0, 1], // +
+  [-1, -1, 1, -1, 0, 0, -1, 1, 1, 1], // x
+  [-1, 0, 0, 0, 1, 0], // -
+];
+// The reveal eases toward the pointer (SPOT_EASE of the way per animation frame), so it drifts after the mouse.
+const SPOT_EASE = 0.06;
+const LEVELS = 2; // gray, full color
 const CLEAR_PAD = 2; // rem of empty band on each side of the text column
-const FADE = 96; // px over which islands thin out toward the band
 
 const wide = matchMedia("(min-width: 64rem)");
 const still = matchMedia("(prefers-reduced-motion: reduce)");
@@ -107,66 +127,200 @@ function measure() {
   clearRight = width / 2 + half;
 }
 
-function colors() {
+let pointerX = -1e9; // CSS px, where the mouse is; far away = no spotlight
+let pointerY = -1e9;
+let spotX = -1e9; // CSS px, the spotlight's center, trailing the pointer
+let spotY = -1e9;
+
+type RGB = [number, number, number];
+const rgb = (hex: string): RGB => {
+  const n = parseInt(hex.trim().replace("#", ""), 16) || 0;
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+const blend = (a: RGB, b: RGB, m: number) =>
+  `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * m)).join(" ")})`;
+
+// Fill styles for this frame: fills[level * 15 + shade * 5 + hue], dots[level]; level 0 = gray, LEVELS-1 = color.
+function palette() {
   const cs = getComputedStyle(document.documentElement);
-  const get = (name: string) => cs.getPropertyValue(name).trim();
-  return [get("--grid-1"), get("--grid-2"), get("--grid-3"), get("--grid-dot")];
+  const get = (name: string) => rgb(cs.getPropertyValue(name));
+  const grays = [1, 2, 3].map((i) => get(`--grid-${i}`));
+  const hues = [1, 2, 3, 4, 5].map((i) => get(`--grid-hue-${i}`));
+  const grayDot = get("--grid-dot");
+  const hueDot = get("--grid-hue-dot");
+  const levels = Array.from({ length: LEVELS }, (_, l) => l / (LEVELS - 1));
+  return {
+    fills: levels.flatMap((m) =>
+      grays.flatMap((g) => hues.map((h) => blend(g, h, m))),
+    ),
+    dots: levels.map((m) => blend(grayDot, hueDot, m)),
+  };
+}
+
+// Hover reveals color: when the (eased) pointer is on a lit cell, the lit cells of one small pattern around it
+// (PATTERNS) show their own hue instead of gray. The pattern is picked at random when the pointer reaches a cluster
+// (4-connected lit cells) and kept while it stays on that cluster, which is tracked frame to frame as it boils. A
+// new pattern only when that cluster disappears or the pointer lands on a different one.
+let cluster: Set<number> | null = null; // the hovered cluster's cell indices (cy * cols + cx)
+let clusterCols = 0;
+let pattern = PATTERNS[0];
+
+function component(lit: Map<number, number>, start: number, cols: number) {
+  const seen = new Set([start]);
+  const stack = [start];
+  while (stack.length && seen.size < 4000) {
+    const i = stack.pop()!;
+    const cx = i % cols;
+    for (const n of [
+      cx > 0 ? i - 1 : -1,
+      cx < cols - 1 ? i + 1 : -1,
+      i - cols,
+      i + cols,
+    ]) {
+      if (n >= 0 && lit.has(n) && !seen.has(n)) {
+        seen.add(n);
+        stack.push(n);
+      }
+    }
+  }
+  return seen;
 }
 
 function draw() {
   if (!ctx) return;
   const start = performance.now();
-  const [c1, c2, c3, dotColor] = colors();
-  const shades: number[][] = [[], [], []]; // cell indices per shade, so each color is set once
-  const dots: number[] = [];
+  const { fills, dots: dotFills } = palette();
   const cols = Math.ceil(width / CELL);
   const rows = Math.ceil(height / CELL);
+  const leftWidth = Math.max(1, clearLeft);
+  const rightWidth = Math.max(1, width - clearRight);
+
+  // 1. Which cells are lit, and their shade and hue (packed as shade * 5 + hue).
+  const lit = new Map<number, number>();
   for (let cy = 0; cy < rows; cy++) {
     for (let cx = 0; cx < cols; cx++) {
       const x = cx * CELL;
-      // Distance from the clear zone; skip cells inside it.
-      const d =
+      // Distance from the clear zone, as a share of that margin (0 at the band, 1 at the screen edge).
+      const p =
         x + CELL <= clearLeft
-          ? clearLeft - (x + CELL)
+          ? (clearLeft - (x + CELL)) / leftWidth
           : x >= clearRight
-            ? x - clearRight
+            ? (x - clearRight) / rightWidth
             : -1;
-      if (d < 0) continue;
-      const lit = LIT + (d < FADE ? (1 - d / FADE) * 0.15 : 0);
-      const v = field(cx, cy, t, lit);
-      if (v < lit) continue;
-      const shade = v >= lit + 2 * STEP ? 2 : v >= lit + STEP ? 1 : 0;
-      shades[shade].push(cx, cy);
-      if (v >= lit + DOT_ABOVE && hash(cx, cy, -1) < DOT_SHARE)
-        dots.push(cx, cy);
+      if (p < 0) continue;
+      const threshold =
+        LIT + (1 - p) * EDGE_BIAS + (1 - (cy * CELL) / height) * TOP_BIAS;
+      const v = field(cx, cy, t, threshold);
+      if (v < threshold) continue;
+      const shade =
+        v >= threshold + 2 * STEP ? 2 : v >= threshold + STEP ? 1 : 0;
+      const h = noise(cx * SCALE * 1.6 + 40, cy * SCALE * 1.6, t + 9);
+      let hue = 0;
+      while (hue < HUE_CUTS.length && h >= HUE_CUTS[hue]) hue++;
+      lit.set(cy * cols + cx, shade * 5 + hue);
     }
   }
+
+  // 2. Follow the hovered cluster as it boils; forget it once it's gone.
+  if (cluster && clusterCols !== cols) cluster = null;
+  if (cluster) {
+    let seed = -1;
+    for (const i of cluster)
+      if (lit.has(i)) {
+        seed = i;
+        break;
+      }
+    cluster = seed < 0 ? null : component(lit, seed, cols);
+  }
+  const pcx = Math.floor(spotX / CELL);
+  const pcy = Math.floor(spotY / CELL);
+  const here = pcy * cols + pcx;
+  const reveal = new Set<number>();
+  if (pcx >= 0 && pcx < cols && pcy >= 0 && pcy < rows && lit.has(here)) {
+    if (!cluster || !cluster.has(here)) {
+      cluster = component(lit, here, cols);
+      clusterCols = cols;
+      pattern = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
+    }
+    for (let k = 0; k < pattern.length; k += 2) {
+      const nx = pcx + pattern[k];
+      const i = (pcy + pattern[k + 1]) * cols + nx;
+      if (nx >= 0 && nx < cols && lit.has(i)) reveal.add(i);
+    }
+  }
+
+  // 3. Group cells by fill style, so each style is set once.
+  const groups: number[][] = fills.map(() => []);
+  const dots: number[][] = dotFills.map(() => []);
+  for (const [i, code] of lit) {
+    const cx = i % cols;
+    const cy = (i - cx) / cols;
+    const l = reveal.has(i) ? LEVELS - 1 : 0;
+    groups[l * 15 + code].push(cx, cy);
+    if (hash(cx, cy, -1) < DOT_SHARE)
+      dots[l].push(cx, cy, Math.floor(hash(cx, cy, -2) * MARKERS));
+  }
+  const colored = reveal.size;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const size = Math.max(1, Math.round((CELL - GAP) * dpr));
-  [c1, c2, c3].forEach((color, i) => {
-    ctx.fillStyle = color;
-    const list = shades[i];
+  // Cells touch (no gap, like oddgrid); edges come from rounding each side, so there are no seams.
+  const edge = (n: number) => Math.round(n * CELL * dpr);
+  groups.forEach((list, i) => {
+    if (!list.length) return;
+    ctx.fillStyle = fills[i];
     for (let k = 0; k < list.length; k += 2) {
-      ctx.fillRect(
-        Math.round(list[k] * CELL * dpr),
-        Math.round(list[k + 1] * CELL * dpr),
-        size,
-        size,
-      );
+      const x0 = edge(list[k]);
+      const y0 = edge(list[k + 1]);
+      ctx.fillRect(x0, y0, edge(list[k] + 1) - x0, edge(list[k + 1] + 1) - y0);
     }
   });
-  ctx.fillStyle = dotColor;
-  ctx.beginPath();
-  const r = size * 0.2;
-  for (let k = 0; k < dots.length; k += 2) {
-    const px = Math.round(dots[k] * CELL * dpr) + size / 2;
-    const py = Math.round(dots[k + 1] * CELL * dpr) + size / 2;
-    ctx.moveTo(px + r, py);
-    ctx.arc(px, py, r, 0, Math.PI * 2);
-  }
-  ctx.fill();
+  // Markers: filled shapes (dot, square) in one path, stroked ones (ring, plus, cross, dash) in another.
+  const r = (CELL * dpr * DOT_SIZE) / 2;
+  ctx.lineWidth = Math.max(1, Math.round(CELL * dpr * 0.14));
+  ctx.lineCap = "butt";
+  dots.forEach((list, l) => {
+    if (!list.length) return;
+    const filled = new Path2D();
+    const stroked = new Path2D();
+    for (let k = 0; k < list.length; k += 3) {
+      const px = (edge(list[k]) + edge(list[k] + 1)) / 2;
+      const py = (edge(list[k + 1]) + edge(list[k + 1] + 1)) / 2;
+      switch (list[k + 2]) {
+        case 0: // dot
+          filled.moveTo(px + r, py);
+          filled.arc(px, py, r, 0, Math.PI * 2);
+          break;
+        case 1: // ring
+          stroked.moveTo(px + r * 0.8, py);
+          stroked.arc(px, py, r * 0.8, 0, Math.PI * 2);
+          break;
+        case 2: // plus
+          stroked.moveTo(px - r, py);
+          stroked.lineTo(px + r, py);
+          stroked.moveTo(px, py - r);
+          stroked.lineTo(px, py + r);
+          break;
+        case 3: // cross
+          stroked.moveTo(px - r * 0.75, py - r * 0.75);
+          stroked.lineTo(px + r * 0.75, py + r * 0.75);
+          stroked.moveTo(px + r * 0.75, py - r * 0.75);
+          stroked.lineTo(px - r * 0.75, py + r * 0.75);
+          break;
+        case 4: // small square
+          filled.rect(px - r * 0.7, py - r * 0.7, r * 1.4, r * 1.4);
+          break;
+        default: // dash
+          stroked.moveTo(px - r, py);
+          stroked.lineTo(px + r, py);
+      }
+    }
+    ctx.fillStyle = dotFills[l];
+    ctx.strokeStyle = dotFills[l];
+    ctx.fill(filled);
+    ctx.stroke(stroked);
+  });
   canvas.dataset.frames = String(Number(canvas.dataset.frames) + 1);
+  canvas.dataset.colored = String(colored); // cells in the spotlight, for tests
   canvas.dataset.ms = (performance.now() - start).toFixed(2); // frame cost, for tuning and tests
 }
 
@@ -205,6 +359,43 @@ new MutationObserver(() => timer || draw()).observe(document.documentElement, {
   attributes: true,
   attributeFilter: ["data-theme"],
 });
+// The color spotlight follows a mouse or pen (touch has no hover, so it stays gray). Its center eases toward the
+// pointer on animation frames, redrawing without advancing the noise, and stops once it has arrived. It appears
+// where the pointer enters and disappears when the pointer leaves the window.
+let spotFrame = 0;
+function followPointer() {
+  spotFrame = 0;
+  if (canvas.hidden) return;
+  const dx = pointerX - spotX;
+  const dy = pointerY - spotY;
+  const arrived = Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5;
+  if (arrived || still.matches) {
+    spotX = pointerX;
+    spotY = pointerY;
+  } else {
+    spotX += dx * SPOT_EASE;
+    spotY += dy * SPOT_EASE;
+  }
+  draw();
+  if (!arrived && !still.matches)
+    spotFrame = requestAnimationFrame(followPointer);
+}
+function movePointer(x: number, y: number, jump: boolean) {
+  pointerX = x;
+  pointerY = y;
+  if (jump) {
+    spotX = x;
+    spotY = y;
+  }
+  if (!spotFrame) spotFrame = requestAnimationFrame(followPointer);
+}
+document.addEventListener("pointermove", (e) => {
+  if (e.pointerType !== "touch")
+    movePointer(e.clientX, e.clientY, pointerX < -1e8);
+});
+document.documentElement.addEventListener("pointerleave", () =>
+  movePointer(-1e9, -1e9, true),
+);
 matchMedia("(prefers-color-scheme: dark)").addEventListener(
   "change",
   () => timer || draw(),

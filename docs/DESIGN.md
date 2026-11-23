@@ -51,15 +51,22 @@ show ↗ on hover (always on touch screens).
 
 ## Margin grid (`src/scripts/margin-grid.ts`)
 
-From 1024px up, a fixed canvas behind every page fills the left and right margins with a quiet noise texture, a
-grayscale take on oddgrid: 10px square cells (1px gap) where a 3D value-noise field lights up irregular islands, in
-three faint grays (`--grid-1`..`--grid-3`, darker toward an island's core), with a small dot (`--grid-dot`) on about
-1 in 6 core cells. Motion and sparsity match the oddgrid recording Neha picked: it boils in place (no drift
-direction), about 10% of cells are lit, a cell stays lit about 1s, and the whole field re-forms in about 2s. The 34rem
-column plus a 2rem band on each side stays empty; islands thin out over 96px toward it. Redrawn every 100ms (cells
-step on and off, no fades), new seed per load (`?seed=<n>` pins it). One still frame with reduced motion; paused
-while the tab is hidden; redrawn after a resize. `effects.ts` imports it only on wide screens. If a page ever gets
-content wider than the column, widen the clear zone. Tests: `tests/visual/margin-grid.spec.ts`. Design:
+From 1024px up, a fixed canvas behind every page puts a sparse, slow noise texture in the left and right margins,
+after oddgrid: 10px square cells, touching, lit where a 3D value-noise field crosses a threshold. About half the lit
+cells carry a marker (dot, ring, plus, cross, small square or dash). At rest it's barely there: three
+near-background grays (`--grid-1`..`--grid-3`) and gray markers (`--grid-dot`). The threshold rises toward the text
+column and toward the top of the window, so the few islands sit out by the screen edges and lower down; none touch
+the 34rem column plus its 2rem band. It boils in place (no drift direction), slowly: a cell stays lit for several
+seconds.
+
+Hover reveals color, never adds cells: when the mouse is on a lit cell, the lit cells of one small pattern around it
+(the 8 neighbors, a +, an x or a -) show their own oddgrid color (`--grid-hue-1`..`--grid-hue-5`: pink, navy, olive,
+blue, orange, in patches from a second noise field; maroon markers `--grid-hue-dot`). The pattern is picked at random
+when the pointer reaches a cluster and kept while it stays on that cluster (tracked as it boils); a new one only when
+that cluster disappears or another is hovered. The reveal eases after the pointer rather than snapping. Touch screens
+never see color. Redrawn every 100ms; new seed per load (`?seed=<n>` pins it). One still frame with reduced motion;
+paused while the tab is hidden; redrawn after a resize. `effects.ts` imports it only on wide screens. If a page ever
+gets content wider than the column, widen the clear zone. Tests: `tests/visual/margin-grid.spec.ts`. Design:
 `docs/plans/2026-11-23-margin-grid-design.md`.
 
 ## Click effects (`src/scripts/effects.ts`)

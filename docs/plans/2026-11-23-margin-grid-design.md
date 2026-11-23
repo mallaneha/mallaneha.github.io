@@ -7,7 +7,13 @@ Status: approved and built 2026-11-23 (branch `site/margin-grid`). Measured cost
 Retuned after review: the slow 10–20s drift looked wrong. Motion and sparsity now match the oddgrid recording,
 measured cell by cell (44×78 grid, 180 frames): ~10% of cells lit, ~1.3% flipping per frame, a cell lit ~1.1s
 (90% within ~2.5s), ~11 islands per frame, no drift direction. Parameters: `SPEED 0.045`, `SCALE 0.09`, `LIT 0.66`,
-octaves 0.58/0.42 at 2.5× frequency. Colors, shading and dots unchanged. Frame cost now ~1.7ms at 1920×1080.
+octaves 0.58/0.42 at 2.5× frequency. Frame cost now ~1.7ms at 1920×1080.
+
+Second review: oddgrid's own colors on hover, fainter gray at rest. Hovering either margin (mouse or pen) fades the
+grid in ~300ms to the source palette, read from the recording: pink `#ff87c3`, navy `#0d2a8b`, olive `#8d9a23`, blue
+`#1b4f9f`, orange `#fd5b1c` (patches from a second noise field cut at its quantiles for shares 32/27/21/10/10%),
+maroon dots `#520000` on ~55% of lit cells at 55% of the cell. Cells touch, as in oddgrid. At rest the grays are
+nearly the background (`#f8`–`#f2`, dots `#ed` light; `#14`–`#19`, dots `#1c` dark).
 
 ## Goal
 
@@ -83,3 +89,20 @@ plus a look at the motion in a browser.
 
 New `src/scripts/margin-grid.ts` and `tests/visual/margin-grid.spec.ts`. Changed: `src/scripts/effects.ts`,
 `src/styles/tokens.css`, `src/styles/global.css`, `docs/DESIGN.md`, `AGENTS.md`, `.claude/rules/components.md`.
+
+## Changes after review (2026-11-23)
+
+What shipped differs from the plan above in these ways, all at Neha's request:
+
+- **Sparser and slower.** Threshold `LIT 0.72` at the screen edge, rising by 0.14 toward the column and by 0.08
+  toward the top of the window, so islands are rare and sit by the outer edges and lower down (about 2× more ink
+  in the bottom half). `SPEED 0.01`, about 4.5× slower than oddgrid: calm, a cell lit for several seconds.
+- **Oddgrid's look.** Cells touch (no gap). Markers on about 55% of lit cells, picked per cell from dot, ring, plus,
+  cross, small square and dash.
+- **Fainter at rest.** Grays `#f8`/`#f5`/`#f2`, markers `#ed` (light); `#14`/`#16`/`#19`, markers `#1c` (dark).
+- **Hover reveals color, only on clusters.** The source palette, read from the recording: pink `#ff87c3`, navy
+  `#0d2a8b`, olive `#8d9a23`, blue `#1b4f9f`, orange `#fd5b1c` (patches from a second noise field cut for shares
+  32/27/21/10/10%), maroon markers `#520000`. Only the lit cells of one pattern around the pointer's cell (8
+  neighbors, +, x or -) show it; the pattern is chosen once per hovered cluster and kept while that cluster lives.
+  The reveal eases after the pointer (6% of the distance per frame).
+- Frame cost about 1–2ms at 1440–1920px.
