@@ -124,11 +124,11 @@
 /* Dark: follows the system unless the theme toggle chose light; or forced by the toggle. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    /* Dark. On --color-bg: text 16.0:1, body 9.4:1, muted 7.4:1, faint 5.0:1. */
+    /* Dark. On --color-bg: text 16.0:1, body 9.4:1, muted 6.4:1, faint 5.0:1. */
     --color-bg: #111111;
     --color-text: #ededed;
     --color-body: #b4b4b4;
-    --color-muted: #a0a0a0;
+    --color-muted: #969696; /* a step below body, so intro and metadata stay apart */
     --color-faint: #828282;
     --color-subtle: #4a4a4a;
     --color-border: #262626;
@@ -177,7 +177,7 @@
   --color-bg: #111111;
   --color-text: #ededed;
   --color-body: #b4b4b4;
-  --color-muted: #a0a0a0;
+  --color-muted: #969696; /* a step below body, so intro and metadata stay apart */
   --color-faint: #828282;
   --color-subtle: #4a4a4a;
   --color-border: #262626;
