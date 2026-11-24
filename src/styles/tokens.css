@@ -52,11 +52,6 @@
   /* User-initiated motion stays within 300 ms (userinterface.wiki duration-max-300ms). */
   --drawer-in: 300ms;
   --drawer-out: 300ms;
-  /* Skills tabs (src/components/Skills.astro): old chips fade out fast, new ones rise in one after another
-     (stagger per chip, capped at 8 chips = 200 ms). */
-  --skills-out: 90ms;
-  --skills-in: 240ms;
-  --skills-stagger: 25ms;
 
   /* Light. On --color-bg: text 18.9:1, body 7.6:1, muted 5.0:1, faint 4.5:1. */
   --color-bg: #ffffff;

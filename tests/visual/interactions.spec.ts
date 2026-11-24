@@ -408,47 +408,24 @@ test("posts show a reading-progress bar that fills as you scroll", async ({
     .toBe("1.0000");
 });
 
-test("skills tabs: first topic by default; tap, hover and arrow keys switch; height stays put", async ({
+test("skills: three topics after Projects, each listing its tools", async ({
   page,
 }, info) => {
-  const tabs = page.locator("[data-skills] [role='tab']");
-  const panels = page.locator("[data-skills] [role='tabpanel']");
-  await expect(tabs).toHaveCount(3);
-  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
-  await expect(panels.nth(0)).toBeVisible();
-  await expect(panels.nth(1)).toBeHidden();
-
-  // The three tiles sit in one row at every width.
-  const tops = await tabs.evaluateAll((els) =>
+  const section = page.locator("section:has(#skills)");
+  const rows = section.locator(".row");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0).locator(".desc")).toContainText("LangGraph");
+  // Skills comes right after Projects.
+  const order = await page
+    .locator("main section h2")
+    .evaluateAll((hs) => hs.map((h) => h.id));
+  expect(order.indexOf("skills")).toBe(order.indexOf("projects") + 1);
+  // One line from tablet width up, stacked on phones (like Projects).
+  const tops = await rows.evaluateAll((els) =>
     els.map((el) => Math.round(el.getBoundingClientRect().top)),
   );
-  expect(new Set(tops).size).toBe(1);
-
-  const card = page.locator("[data-skills] .panels");
-  const before = (await card.boundingBox())!.height;
-
-  await tabs.nth(1).click();
-  await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
-  await expect(panels.nth(1)).toBeVisible();
-  await expect(panels.nth(0)).toBeHidden();
-  expect((await card.boundingBox())!.height).toBe(before);
-
-  if (info.project.name !== "phone") {
-    await tabs.nth(2).hover();
-    await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
-  }
-
-  await tabs.nth(0).focus();
-  await page.keyboard.press("ArrowLeft");
-  await expect(tabs.nth(2)).toBeFocused();
-  await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
-  await page.keyboard.press("Home");
-  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
-  await expect(panels.nth(0)).toBeVisible();
-
-  await page.waitForTimeout(500);
-  await page
-    .locator("#skills")
-    .locator("..")
-    .screenshot({ path: `test-results/shots/${info.project.name}/skills.png` });
+  expect(new Set(tops).size).toBe(info.project.name === "phone" ? 3 : 1);
+  await section.screenshot({
+    path: `test-results/shots/${info.project.name}/skills.png`,
+  });
 });

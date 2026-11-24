@@ -8,7 +8,7 @@ import Drawer from "../components/Drawer.astro";
 import SectionColumns from "../components/SectionColumns.astro";
 import Icon from "../components/Icon.astro";
 import HeaderCat from "../components/HeaderCat.astro";
-import Skills from "../components/Skills.astro";
+import { skills } from "../data/skills";
 import { site } from "../data/site";
 import {
   getWriting,
@@ -124,10 +124,6 @@ const educationDrawers = await Promise.all(
     ))}
   </header>
 
-  <Section id="skills" title="Skills">
-    <Skills />
-  </Section>
-
   <SectionColumns>
     <Section id="experience" title="Experience">
       <RowList>
@@ -173,6 +169,14 @@ const educationDrawers = await Promise.all(
           drawer={id}
           openIcon
         />
+      ))}
+    </RowList>
+  </Section>
+
+  <Section id="skills" title="Skills">
+    <RowList columns={3}>
+      {skills.map((s) => (
+        <Row name={s.name} desc={s.items.join(", ")} />
       ))}
     </RowList>
   </Section>

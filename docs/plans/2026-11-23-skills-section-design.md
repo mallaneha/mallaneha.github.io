@@ -1,6 +1,6 @@
 # Skills section and regulated-data positioning
 
-Date: 2026-11-23. Status: built (first iteration).
+Date: 2026-11-23. Status: built. Revised the same day: the tabbed version below was replaced by three static columns (see the end).
 
 ## Problem
 
@@ -40,3 +40,10 @@ Seen occasionally, so standard motion is fine. Purpose: state indication, and no
 - Real tool logos (would need licensed SVGs; the topics use existing generic icons).
 - Linking chips to the projects or roles that used them.
 - A governance topic: there's only coursework so far. Add one when Neha has hands-on work to point to.
+
+## Revision: three static columns
+
+The tabbed version looked heavy next to the rest of the page, the hover and blur were fussy, and it sat too high,
+pushing Experience down. Replaced with the Projects layout: `RowList columns={3}` after Projects, each a static Row
+with the topic name and its tools as the muted line. Everything is visible at once; no component, script or motion
+tokens of its own. Same topics and tools.
