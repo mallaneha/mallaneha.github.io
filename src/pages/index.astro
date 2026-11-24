@@ -82,6 +82,7 @@ const educationDrawers = await Promise.all(
         <p class="tagline">
           <mark>{site.tagline}</mark>
         </p>
+        <p class="location">{site.location}</p>
       </div>
       <span class="social">
         <a
@@ -270,9 +271,11 @@ const educationDrawers = await Promise.all(
     color: var(--color-body);
   }
   h1 {
+    font-size: var(--text-xl);
     color: var(--color-text);
   }
-  .tagline {
+  .tagline,
+  .location {
     margin: 0;
     color: var(--color-muted);
   }
@@ -318,7 +321,7 @@ const educationDrawers = await Promise.all(
     .social {
       --pad: calc(2.75rem - var(--glyph));
       --glyph-top: calc(
-        (var(--text-base) * var(--leading-tight) - var(--glyph)) / 2
+        (var(--text-xl) * var(--leading-tight) - var(--glyph)) / 2
       );
       margin-top: calc(var(--glyph-top) - var(--pad) / 2);
       margin-right: calc(var(--pad) / -2);
