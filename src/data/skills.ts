@@ -7,6 +7,9 @@ export interface SkillTopic {
   items: string[];
 }
 
+// Shown as the muted line under the Skills title.
+export const languages = ["Python", "R", "SAS", "SQL", "C", "C++"];
+
 export const skills: SkillTopic[] = [
   {
     id: "ai-systems",
@@ -14,11 +17,15 @@ export const skills: SkillTopic[] = [
     items: [
       "LangGraph",
       "LangChain",
+      "LangFlow",
       "Milvus",
       "FastMCP",
       "LangSmith tracing & evals",
       "Self-reflection",
-      "GKE",
+      "PyTorch",
+      "Scikit-learn",
+      "Streamlit",
+      "GCP (GKE, Dataproc)",
       "Docker",
       "Terraform",
     ],
@@ -46,11 +53,14 @@ export const skills: SkillTopic[] = [
       "CDISC (SDTM, ADaM)",
       "Pinnacle 21",
       "FDA submissions",
-      "SAS",
-      "R",
+      "Tidyverse",
       "PySpark",
       "Kafka",
       "PostgreSQL",
+      "Pandas",
+      "NumPy",
+      "Matplotlib",
+      "Seaborn",
     ],
   },
 ];
