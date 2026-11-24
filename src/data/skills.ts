@@ -44,7 +44,6 @@ export const skills: SkillTopic[] = [
       "OpenMed",
       "Private AI",
       "Reversible pseudonymization",
-      "HIPAA",
       "RAG poisoning defenses",
       "NLI checks",
       "OWASP LLM Top 10",
@@ -55,6 +54,6 @@ export const skills: SkillTopic[] = [
   {
     id: "regulated-data",
     name: "Regulated data",
-    items: ["CDISC (SDTM, ADaM)", "Pinnacle 21", "FDA submissions"],
+    items: ["HIPAA", "CDISC (SDTM, ADaM)", "Pinnacle 21", "FDA submissions"],
   },
 ];
