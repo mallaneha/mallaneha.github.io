@@ -1,0 +1,118 @@
+---
+// Skills: three text tabs (topic names) over the active topic's tools as a muted comma list.
+// Click/tap or ←/→ to switch; no hover switching. The first topic shows by default and without JS.
+// Behavior: src/scripts/skills.ts (effects.ts loads it when this is on the page). Data: src/data/skills.ts.
+import { skills } from "../data/skills";
+---
+
+<div class="skills" data-skills>
+  <div class="tabs" role="tablist" aria-label="Skill areas">
+    {skills.map((s, i) => (
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        id={`skill-tab-${s.id}`}
+        aria-controls={`skill-panel-${s.id}`}
+        aria-selected={i === 0 ? "true" : "false"}
+        tabindex={i === 0 ? 0 : -1}
+      >
+        {s.name}
+      </button>
+    ))}
+  </div>
+  <div class="panels">
+    {skills.map((s, i) => (
+      <p
+        role="tabpanel"
+        class="panel"
+        id={`skill-panel-${s.id}`}
+        aria-labelledby={`skill-tab-${s.id}`}
+        data-active={i === 0 ? "" : undefined}
+      >
+        {s.items.join(", ")}
+      </p>
+    ))}
+  </div>
+</div>
+
+<style>
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-5);
+  }
+  .tab {
+    position: relative;
+    padding: var(--space-1) 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    line-height: 1.25rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--duration-state) var(--ease-out);
+  }
+  /* The underline grows in from the left on the active tab. */
+  .tab::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--duration-state) var(--ease-out);
+  }
+  .tab[aria-selected="true"] {
+    color: var(--color-text);
+  }
+  .tab[aria-selected="true"]::after {
+    transform: scaleX(1);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .tab[aria-selected="false"]:hover {
+      color: var(--color-body);
+    }
+  }
+
+  /* All panels share one grid cell: the area is as tall as the longest list, so switching never
+     moves the page below. Hidden panels keep their size but leave the accessibility tree. */
+  .panels {
+    display: grid;
+    margin-top: var(--space-2);
+  }
+  .panel {
+    grid-area: 1 / 1;
+    margin: 0;
+    color: var(--color-muted);
+    font-size: var(--text-sm);
+    line-height: 1.25rem;
+    visibility: hidden;
+    opacity: 0;
+    /* Leaving: quick, so two lists never overlap for long. */
+    transition:
+      opacity 100ms var(--ease-out),
+      visibility 0s linear 100ms;
+  }
+  /* Arriving: starts as the old list is mostly gone. */
+  .panel[data-active] {
+    visibility: visible;
+    opacity: 1;
+    transition:
+      opacity var(--duration-state) var(--ease-out) 50ms,
+      visibility 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tab::after,
+    .panel {
+      transition: none;
+    }
+  }
+</style>

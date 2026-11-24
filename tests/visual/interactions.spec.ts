@@ -409,23 +409,47 @@ test("posts show a reading-progress bar that fills as you scroll", async ({
     .toBe("1.0000");
 });
 
-test("skills: three topics after Projects, each listing its tools", async ({
+test("skills: text tabs after Projects; click and arrow keys switch, height stays put", async ({
   page,
 }, info) => {
   const section = page.locator("section:has(#skills)");
-  const rows = section.locator(".row");
-  await expect(rows).toHaveCount(3);
-  await expect(rows.nth(0).locator(".desc")).toContainText("LangGraph");
-  // Skills comes right after Projects.
   const order = await page
     .locator("main section h2")
     .evaluateAll((hs) => hs.map((h) => h.id));
   expect(order.indexOf("skills")).toBe(order.indexOf("projects") + 1);
-  // One line from tablet width up, stacked on phones (like Projects).
-  const tops = await rows.evaluateAll((els) =>
-    els.map((el) => Math.round(el.getBoundingClientRect().top)),
-  );
-  expect(new Set(tops).size).toBe(info.project.name === "phone" ? 3 : 1);
+
+  const tabs = section.locator("[role='tab']");
+  const panels = section.locator("[role='tabpanel']");
+  await expect(tabs).toHaveCount(3);
+  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
+  await expect(panels.nth(0)).toBeVisible();
+  await expect(panels.nth(0)).toContainText("LangGraph");
+  await expect(panels.nth(1)).toBeHidden();
+
+  const area = section.locator(".panels");
+  const before = (await area.boundingBox())!.height;
+
+  // Hovering doesn't switch; clicking does.
+  if (info.project.name !== "phone") {
+    await tabs.nth(2).hover();
+    await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
+  }
+  await tabs.nth(2).click();
+  await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+  await expect(panels.nth(2)).toBeVisible();
+  await expect(panels.nth(2)).toContainText("HIPAA");
+  await expect(panels.nth(0)).toBeHidden();
+  expect((await area.boundingBox())!.height).toBe(before);
+
+  await page.keyboard.press("ArrowRight");
+  await expect(tabs.nth(0)).toBeFocused();
+  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("End");
+  await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+
+  await tabs.nth(1).click();
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(400);
   await section.screenshot({
     path: `test-results/shots/${info.project.name}/skills.png`,
   });

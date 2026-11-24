@@ -27,7 +27,7 @@ Final spec as of 2026-11-22. Everything decided so far, ready to build.
 
 ### Skills (added 2026-11-23)
 
-After Projects, three columns like Projects (stacked on phones): the topic name, then its tools as the muted line. Static, no interaction. (A first version with hover tabs right after the header was dropped the same day.) Data: `src/data/skills.ts` (resume facts only).
+After Projects: a Languages line, then the three topics as text tabs (click/tap) over the active topic's tools. (Earlier the same day: hover tabs with chips right after the header, then three static columns.) Data: `src/data/skills.ts` (resume facts only).
 
 - **Languages** (muted line under the title): Python, R, SAS, SQL
 - **AI systems** (Build): LangGraph, LangChain, LangFlow, Milvus, FastMCP, LangSmith, PyTorch, Scikit-learn, GCP, Docker, Terraform, PySpark, Kafka, PostgreSQL, Pandas, NumPy, Tidyverse, Matplotlib, Seaborn

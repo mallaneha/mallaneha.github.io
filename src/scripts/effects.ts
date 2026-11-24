@@ -415,6 +415,10 @@ if (
 ) {
   import("./rag-explainers");
 }
+// Skills tabs on the home page (src/components/Skills.astro).
+if (document.querySelector("[data-skills]")) {
+  import("./skills");
+}
 
 // Debug panel (e.g. the CMU logo toggle). Visitors never get it: `?debug` turns it on, `?debug=0` off.
 if (/[?&]debug\b/.test(location.search) || hasDebugFlag()) {
