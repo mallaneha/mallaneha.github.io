@@ -2,6 +2,7 @@
 // "tick", and an 8ms vibration on phones, on every page, for mouse or touch clicks on links and buttons (never inside a
 // drawer). The toggle ([data-effects-toggle]) mutes the sound and vibration;
 // the sparks stay. Also: theme toggle, [data-copy] buttons with a toast, and the footer's local time.
+import { snow } from "../data/snow";
 
 const KEY = "effects-muted";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -374,6 +375,9 @@ for (const el of document.querySelectorAll<HTMLElement>("[data-local-time]")) {
 //   const loadMarginGrid = () => { if (wideScreen.matches) import("./margin-grid"); };
 //   loadMarginGrid();
 //   wideScreen.addEventListener("change", loadMarginGrid);
+
+// Falling snow behind everything (src/scripts/snow.ts); settings in src/data/snow.ts.
+if (snow.enabled) import("./snow");
 
 // Interactive explainers for the "LLMs by hand" posts and the RAG posts. Loaded only on pages that use one.
 if (

@@ -38,7 +38,8 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
   vibration, mute toggle, theme toggle, copy-email toast). `effects.ts` also lazy-loads `src/scripts/explainers.ts`
   (widgets for the "LLMs by hand" posts) and `src/scripts/rag-explainers.ts` (widgets for the RAG posts), only on pages
   that use one. Shared widget helpers: `src/scripts/explainer-kit.ts`. `effects.ts` also lazy-loads `src/scripts/margin-grid.ts` (the noise
-  texture in the side margins) on screens 1024px and wider. Icons: `src/data/icons.ts` (generic glyphs, plus the LinkedIn and GitHub marks for the Connect rows).
+  texture in the side margins) on screens 1024px and wider (turned off for now), and `src/scripts/snow.ts` (falling-snow
+  dots behind every page; settings such as wind strength and direction in `src/data/snow.ts`). Icons: `src/data/icons.ts` (generic glyphs, plus the LinkedIn and GitHub marks for the Connect rows).
 - `/llms.txt` is generated from the same content by `src/pages/llms.txt.ts`.
 - Background research and the source resume: `docs/research/`, `docs/reference/` (not published).
 

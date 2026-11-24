@@ -101,6 +101,8 @@
   /* Header cat (src/components/header-cat.js): outline and shelf line. Decorative. */
   --color-cat-line: #22201f;
   --color-cat-ledge: #bfc3c8;
+  /* Snow dots (src/scripts/snow.ts), decorative; each flake also gets its own opacity. */
+  --snow: #9a9a9a;
   /* Margin grid (src/scripts/margin-grid.ts), decorative, behind the margins. At rest: three barely-there grays
      and the dot. On hover it fades to oddgrid's palette (--grid-hue-*, the same in dark mode). Hex only: the
      script parses them. */
@@ -160,6 +162,7 @@
     --chart-on-other: #111111;
     --color-cat-line: #8d8880;
     --color-cat-ledge: #50545a;
+    --snow: #ffffff;
     --grid-1: #131313;
     --grid-2: #141414;
     --grid-3: #151515;
@@ -208,6 +211,7 @@
   --chart-on-other: #111111;
   --color-cat-line: #8d8880;
   --color-cat-ledge: #50545a;
+  --snow: #ffffff;
   --grid-1: #131313;
   --grid-2: #141414;
   --grid-3: #151515;
