@@ -49,6 +49,14 @@ show ↗ on hover (always on touch screens).
   sections are separated by space alone (no `···`). To remove: delete both files and the `import("./mockups")`
   line in `drawer.ts`.
 
+## Snow (`src/scripts/snow.ts`)
+
+Small dots fall behind every page on a fixed canvas (`.snow`, `z-index: -1`, no pointer events). Near flakes are
+bigger, brighter and faster than far ones; each sways a little. Settings live in `src/data/snow.ts`: `density`,
+`speed`, `wind` (px/s) and `direction` (degrees the wind blows toward: 0 right, 90 down, 180 left), `sway`, size and
+opacity ranges, and `enabled`. Any of them can be tried from the URL (`?wind=60&direction=180`). Color: `--snow`.
+Pauses while the tab is hidden; reduced motion shows one still frame.
+
 ## Margin grid (`src/scripts/margin-grid.ts`)
 
 From 1024px up, a fixed canvas behind every page puts a sparse, slow noise texture in the left and right margins,

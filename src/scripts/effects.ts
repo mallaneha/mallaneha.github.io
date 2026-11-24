@@ -2,6 +2,7 @@
 // "tick", and an 8ms vibration on phones, on every page, for mouse or touch clicks on links and buttons (never inside a
 // drawer). The toggle ([data-effects-toggle]) mutes the sound and vibration;
 // the sparks stay. Also: theme toggle, [data-copy] buttons with a toast, and the footer's local time.
+import { snow } from "../data/snow";
 
 const KEY = "effects-muted";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -374,6 +375,32 @@ for (const el of document.querySelectorAll<HTMLElement>("[data-local-time]")) {
 //   const loadMarginGrid = () => { if (wideScreen.matches) import("./margin-grid"); };
 //   loadMarginGrid();
 //   wideScreen.addEventListener("change", loadMarginGrid);
+
+// Reading progress on posts ([data-read-progress]): scale the bar to how far through the article you are,
+// shown once you've scrolled past the first 2% of it. One rAF per scroll burst.
+const progressBar = document.querySelector<HTMLElement>("[data-read-progress]");
+if (progressBar) {
+  let queued = false;
+  const update = () => {
+    queued = false;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+    progressBar.style.setProperty("--progress", p.toFixed(4));
+    progressBar.classList.toggle("shown", p > 0.02);
+  };
+  const queue = () => {
+    if (!queued) {
+      queued = true;
+      requestAnimationFrame(update);
+    }
+  };
+  addEventListener("scroll", queue, { passive: true });
+  addEventListener("resize", queue);
+  update();
+}
+
+// Falling snow behind everything (src/scripts/snow.ts); settings in src/data/snow.ts.
+if (snow.enabled) import("./snow");
 
 // Interactive explainers for the "LLMs by hand" posts and the RAG posts. Loaded only on pages that use one.
 if (
