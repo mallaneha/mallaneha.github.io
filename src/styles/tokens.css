@@ -98,7 +98,8 @@
   --chart-other: #f5b800;
   --chart-other-soft: #fadb6e;
   --chart-on-other: #111111;
-  /* Header cat (src/components/header-cat.js): outline and shelf line. Decorative. */
+  /* Header cat (src/components/header-cat.js): fur, outline and shelf line. Black cat in light mode, white in dark. Decorative. */
+  --color-cat-fur: #22201f;
   --color-cat-line: #22201f;
   --color-cat-ledge: #bfc3c8;
   /* Snow dots (src/scripts/snow.ts), decorative; each flake also gets its own opacity. */
@@ -160,7 +161,8 @@
     --chart-other: #ffcc00;
     --chart-other-soft: #a88a1a;
     --chart-on-other: #111111;
-    --color-cat-line: #8d8880;
+    --color-cat-fur: #f2efea; /* a white cat in dark mode */
+    --color-cat-line: #b9b3ab;
     --color-cat-ledge: #50545a;
     --snow: #ffffff;
     --grid-1: #131313;
@@ -209,7 +211,8 @@
   --chart-other: #ffcc00;
   --chart-other-soft: #a88a1a;
   --chart-on-other: #111111;
-  --color-cat-line: #8d8880;
+  --color-cat-fur: #f2efea;
+  --color-cat-line: #b9b3ab;
   --color-cat-ledge: #50545a;
   --snow: #ffffff;
   --grid-1: #131313;
