@@ -7,9 +7,9 @@ export const snow = {
   density: 6,
   maxFlakes: 160,
   /** How fast flakes fall, in px per second (the biggest ones; small ones fall slower, for depth). */
-  speed: 40,
+  speed: 20,
   /** Wind speed in px per second. 0 is still air. */
-  wind: 20,
+  wind: 10,
   /** Where the wind blows TO, in degrees: 0 right, 90 down, 180 left, 270 up. */
   direction: 0,
   /** How much each flake drifts side to side on its own, in px. */
