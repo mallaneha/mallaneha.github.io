@@ -27,7 +27,7 @@ Final spec as of 2026-11-22. Everything decided so far, ready to build.
 
 ### Skills (added 2026-11-23)
 
-Right after the header. Three topics, read left to right as build, protect, comply. Hover, tap or focus a topic to see its competencies. Data: `src/data/skills.ts` (resume facts only).
+After Projects, three columns like Projects (stacked on phones): the topic name, then its tools as the muted line. Static, no interaction. (A first version with hover tabs right after the header was dropped the same day.) Data: `src/data/skills.ts` (resume facts only).
 
 - **AI systems** (Build): LangGraph, LangChain, Milvus, FastMCP, LangSmith tracing & evals, self-reflection, GKE, Docker, Terraform
 - **AI security & privacy** (Protect): Presidio, OpenMed, Private AI, reversible pseudonymization, HIPAA, RAG poisoning defenses, NLI checks, OWASP LLM Top 10, red & blue teaming, Wiz
