@@ -25,7 +25,7 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 ## Where things live
 
 - Short site copy (name, tagline, header paragraphs, contact links, location, resume, motto): `src/data/site.ts`
-- Skills section (three topics with their tools, after Projects; also in `/llms.txt`): `src/data/skills.ts`
+- Skills section (text tabs after Projects, one per topic, `src/components/Skills.astro` + `src/scripts/skills.ts`; also in `/llms.txt`): `src/data/skills.ts`
 - Writing (posts and short notes): `src/content/writing/<slug>.md` → `/writing/<slug>/`.
   Example: `src/content/writing/cutting-hallucinations-research-agent.md`
 - Projects: `src/content/projects/<slug>.md`. `featured: true` → Featured row + drawer; `status: building` → Building row.

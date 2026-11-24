@@ -8,7 +8,8 @@ import Drawer from "../components/Drawer.astro";
 import SectionColumns from "../components/SectionColumns.astro";
 import Icon from "../components/Icon.astro";
 import HeaderCat from "../components/HeaderCat.astro";
-import { skills, languages } from "../data/skills";
+import { languages } from "../data/skills";
+import Skills from "../components/Skills.astro";
 import { site } from "../data/site";
 import {
   getWriting,
@@ -178,11 +179,7 @@ const educationDrawers = await Promise.all(
     title="Skills"
     blurb={`Languages: ${languages.join(", ")}`}
   >
-    <RowList columns={3}>
-      {skills.map((s) => (
-        <Row name={s.name} desc={s.items.join(", ")} />
-      ))}
-    </RowList>
+    <Skills />
   </Section>
 
   <Section id="writing" title="Writing">

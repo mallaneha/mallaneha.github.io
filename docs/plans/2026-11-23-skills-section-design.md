@@ -47,3 +47,9 @@ The tabbed version looked heavy next to the rest of the page, the hover and blur
 pushing Experience down. Replaced with the Projects layout: `RowList columns={3}` after Projects, each a static Row
 with the topic name and its tools as the muted line. Everything is visible at once; no component, script or motion
 tokens of its own. Same topics and tools.
+
+## Revision 2: text tabs
+
+Tabs again, without what was wrong the first time: they stay after Projects, switch on click/tap only (no hover, no
+blur), and show the tools as the same muted comma list, not chips. Tabs are plain text: the active one in text color
+with a 1px underline that grows in from the left. Panels share one grid cell (fixed height, nothing jumps).
