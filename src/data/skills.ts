@@ -8,7 +8,7 @@ export interface SkillTopic {
 }
 
 // Shown as the muted line under the Skills title.
-export const languages = ["Python", "R", "SAS", "SQL", "C", "C++"];
+export const languages = ["Python", "R", "SAS", "SQL"];
 
 export const skills: SkillTopic[] = [
   {
