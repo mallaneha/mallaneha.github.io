@@ -21,6 +21,7 @@ const { Content } = await render(entry);
   <p>
     <a href="/writing/">← Writing</a>
   </p>
+  <div class="read-progress" data-read-progress aria-hidden="true"></div>
   <article>
     <header>
       <h1>{entry.data.title}</h1>
@@ -43,6 +44,28 @@ const { Content } = await render(entry);
 </Base>
 
 <style>
+  /* Reading progress (src/scripts/effects.ts sets --progress): a thin bar along the top edge,
+     hidden at the very top of the post, filling as you read. */
+  .read-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 10;
+    height: 2px;
+    background: var(--color-text);
+    transform-origin: left;
+    transform: scaleX(var(--progress, 0));
+    opacity: 0;
+    transition: opacity var(--transition);
+    pointer-events: none;
+  }
+  .read-progress.shown {
+    opacity: 1;
+  }
+  @media print {
+    .read-progress {
+      display: none;
+    }
+  }
   header {
     margin: var(--space-8) 0;
   }

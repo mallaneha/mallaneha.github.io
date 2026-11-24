@@ -376,6 +376,29 @@ for (const el of document.querySelectorAll<HTMLElement>("[data-local-time]")) {
 //   loadMarginGrid();
 //   wideScreen.addEventListener("change", loadMarginGrid);
 
+// Reading progress on posts ([data-read-progress]): scale the bar to how far through the article you are,
+// shown once you've scrolled past the first 2% of it. One rAF per scroll burst.
+const progressBar = document.querySelector<HTMLElement>("[data-read-progress]");
+if (progressBar) {
+  let queued = false;
+  const update = () => {
+    queued = false;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+    progressBar.style.setProperty("--progress", p.toFixed(4));
+    progressBar.classList.toggle("shown", p > 0.02);
+  };
+  const queue = () => {
+    if (!queued) {
+      queued = true;
+      requestAnimationFrame(update);
+    }
+  };
+  addEventListener("scroll", queue, { passive: true });
+  addEventListener("resize", queue);
+  update();
+}
+
 // Falling snow behind everything (src/scripts/snow.ts); settings in src/data/snow.ts.
 if (snow.enabled) import("./snow");
 

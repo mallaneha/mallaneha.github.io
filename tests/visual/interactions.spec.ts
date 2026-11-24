@@ -388,3 +388,22 @@ test("home Writing section shows the featured posts", async ({ page }) => {
     .evaluateAll((ps) => ps.map((p) => p.getAttribute("d")));
   expect(paths).toEqual([icons.shield, icons.flask, icons.flask]);
 });
+
+test("posts show a reading-progress bar that fills as you scroll", async ({
+  page,
+}) => {
+  await page.goto("/writing/");
+  const href = await page
+    .locator("main a[href^='/writing/']")
+    .first()
+    .getAttribute("href");
+  await page.goto(href!);
+  const bar = page.locator("[data-read-progress]");
+  await expect(bar).toHaveCount(1);
+  await expect(bar).not.toHaveClass(/shown/);
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await expect(bar).toHaveClass(/shown/);
+  await expect
+    .poll(() => bar.evaluate((b) => b.style.getPropertyValue("--progress")))
+    .toBe("1.0000");
+});
