@@ -52,8 +52,7 @@ show ↗ on hover (always on touch screens).
 ## Snow (`src/scripts/snow.ts`)
 
 Small dots fall behind every page on a fixed canvas (`.snow`, `z-index: -1`, no pointer events). Near flakes are
-bigger, brighter and faster than far ones; each sways a little. A fake depth of field blurs the flakes far from the
-`focus` depth (both the farthest and the nearest), up to `blur` px, using pre-rendered soft dots. Settings live in `src/data/snow.ts`: `density`,
+bigger, brighter and faster than far ones; each sways a little. Settings live in `src/data/snow.ts`: `density`,
 `speed`, `wind` (px/s) and `direction` (degrees the wind blows toward: 0 right, 90 down, 180 left), `sway`, size and
 opacity ranges, and `enabled`. Any of them can be tried from the URL (`?wind=60&direction=180`). Color: `--snow`.
 Pauses while the tab is hidden; reduced motion shows one still frame.
