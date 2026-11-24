@@ -78,18 +78,53 @@ function resize() {
   canvas.dataset.flakes = String(count);
 }
 
+// Depth of field: flakes at the focus depth are sharp; the farther from it (behind or in front), the softer.
+// Each blur level is a pre-rendered soft dot (radial gradient), so frames only copy images.
+const LEVELS = 8;
+const SPRITE = 32; // px, the sprite's radius
+let sprites: HTMLCanvasElement[] = [];
+
 function readColor() {
   color = getComputedStyle(canvas).color;
+  sprites = Array.from({ length: LEVELS }, (_, k) => {
+    const c = document.createElement("canvas");
+    c.width = c.height = SPRITE * 2;
+    const g = c.getContext("2d")!;
+    const softness = k / (LEVELS - 1); // 0 sharp … 1 fully blurred
+    const grad = g.createRadialGradient(
+      SPRITE,
+      SPRITE,
+      0,
+      SPRITE,
+      SPRITE,
+      SPRITE,
+    );
+    grad.addColorStop(0, color);
+    grad.addColorStop(Math.max(0, 0.9 - 0.9 * softness), color);
+    grad.addColorStop(1, "transparent");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, SPRITE * 2, SPRITE * 2);
+    return c;
+  });
 }
+
+// Blur radius in px for a flake, from how far its depth is from the focus.
+const blurOf = (depth: number) =>
+  Math.min(
+    1,
+    Math.abs(depth - settings.focus) /
+      Math.max(settings.focus, 1 - settings.focus),
+  ) * settings.blur;
 
 function draw() {
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = color;
   for (const f of flakes) {
-    ctx.globalAlpha = f.a;
-    ctx.beginPath();
-    ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-    ctx.fill();
+    const blur = blurOf(f.depth);
+    const size = f.r + blur; // a blurred dot spreads out…
+    const k = Math.round((blur / (f.r + blur || 1)) * (LEVELS - 1));
+    // …and its light thins out over the bigger area.
+    ctx.globalAlpha = f.a * Math.min(1, (f.r / size) ** 1.2 + 0.25);
+    ctx.drawImage(sprites[k], f.x - size, f.y - size, size * 2, size * 2);
   }
   ctx.globalAlpha = 1;
   canvas.dataset.frames = String(++frames);

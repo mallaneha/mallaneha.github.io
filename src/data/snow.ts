@@ -14,9 +14,13 @@ export const snow = {
   direction: 0,
   /** How much each flake drifts side to side on its own, in px. */
   sway: 12,
-  /** Dot radius in px. */
+  /** Dot radius in px (far flakes are small, near ones big). */
   minSize: 0.6,
-  maxSize: 1.8,
+  maxSize: 3.2,
+  /** Fake depth of field. Blur radius in px for the flakes farthest from focus; 0 turns it off. */
+  blur: 7,
+  /** Which depth is in focus: 0 the farthest flakes, 1 the nearest. In between, both ends blur. */
+  focus: 0.35,
   minOpacity: 0.25,
   maxOpacity: 0.8,
 };
