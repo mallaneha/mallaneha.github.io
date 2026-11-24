@@ -379,6 +379,7 @@ test("home Writing section shows the featured posts", async ({ page }) => {
     "/writing/rule-of-two-healthcare-rag/",
     "/writing/rag-evals-unanswerable-questions/",
     "/writing/clinical-data-validation-ai-evals/",
+    "/writing/measuring-rag-poisoning-defense/",
   ]);
   // Each row's tile shows its topic icon (series, else first tag; see writingIcons in src/lib/content.ts).
   const paths = await page
@@ -386,7 +387,7 @@ test("home Writing section shows the featured posts", async ({ page }) => {
       "section:has(#writing) a[href^='/writing/']:not(.all-writing) .tile path",
     )
     .evaluateAll((ps) => ps.map((p) => p.getAttribute("d")));
-  expect(paths).toEqual([icons.shield, icons.flask, icons.flask]);
+  expect(paths).toEqual([icons.shield, icons.flask, icons.flask, icons.shield]);
 });
 
 test("posts show a reading-progress bar that fills as you scroll", async ({
