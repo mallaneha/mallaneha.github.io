@@ -14,14 +14,23 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
    name (h1) with LinkedIn and GitHub icon links at the right of the same line (plus a resume icon when the
    file exists), and the tagline (muted). Then 3 short paragraphs (now, what I build, which industries).
    The email is only in Connect.
-2. Experience: each row opens a drawer. The tile shows the company's logo (`logo:` in frontmatter,
+2. Skills (`src/components/Skills.astro`, data `src/data/skills.ts`, script `src/scripts/skills.ts`): three topic
+   tiles in one row at every width (a WAI-ARIA tab list), with one card of competency chips below. The first topic is
+   active by default and without JS. A mouse hover, tap, click or keyboard focus (←/→, Home, End) makes a topic active:
+   its name grows to 1.04, its icon tile is raised, and while the mouse is over the row the other tiles blur back
+   (50% opacity, 1.5px blur; fine pointers only). Chips: the old ones fade out in 90ms, the new ones rise in (4px,
+   0.97 scale → none, 240ms `--ease-out`) 25ms apart, capped at 8. All transitions, so fast hovering retargets. Panels
+   share one grid cell, so the card is as tall as the longest topic and switching never moves the page. Reduced
+   motion: opacity only, no stagger. Below 375px the muted verb line is dropped. Inspired by Framer's "Toolstack
+   Gallery"; design notes in `docs/plans/2026-11-23-skills-section-design.md`.
+3. Experience: each row opens a drawer. The tile shows the company's logo (`logo:` in frontmatter,
    file in `public/logos/`) in its own colors on a light tile,
    or the icon when there's no logo.
-3. Projects: projects with `featured: true`, three in one line (stacked on phones), no icon tile, an open-link arrow on each. Each row opens a drawer.
-4. Writing: latest 3 published posts, then a quiet "All writing · N posts →" link styled like a row (no fill until hover).
-5. Connect: one column: Email (copies, toast), LinkedIn, GitHub, and Resume when `site.resume` is set.
+4. Projects: projects with `featured: true`, three in one line (stacked on phones), no icon tile, an open-link arrow on each. Each row opens a drawer.
+5. Writing: latest 3 published posts, then a quiet "All writing · N posts →" link styled like a row (no fill until hover).
+6. Connect: one column: Email (copies, toast), LinkedIn, GitHub, and Resume when `site.resume` is set.
    LinkedIn and GitHub also appear as icon links next to the name in the header.
-6. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound
+7. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound
    toggle and the light/dark theme toggle.
    The theme is dark until toggled; the choice is saved in localStorage (`theme`). Without JS it follows the system.
    Dark values live twice in `tokens.css` (system media query and `[data-theme="dark"]`): keep them in sync.

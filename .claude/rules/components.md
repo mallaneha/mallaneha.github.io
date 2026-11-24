@@ -19,6 +19,8 @@ paths:
   styles in `src/styles/mockups.css`.
   Also `src/scripts/margin-grid.ts` (the noise texture in the side margins): `effects.ts` imports it lazily from 64rem
   wide up; styles in `src/styles/global.css`, colors `--grid-*` and `--grid-hue-*` in `tokens.css` (hex only; the script parses them).
+  Also `src/scripts/skills.ts` (the Skills tabs on the home page): `effects.ts` imports it lazily when `[data-skills]`
+  is on the page; styles scoped in `src/components/Skills.astro`.
   The other exception is the tiny inline script in `Base.astro`'s `<head>` that applies the saved theme before paint.
 - New dark colors go in both dark blocks of `tokens.css` (the media query and `:root[data-theme="dark"]`).
 - Reuse `Section`, `RowList`, `Row` for any list, and `Drawer` for details. Icons come from `src/data/icons.ts`.

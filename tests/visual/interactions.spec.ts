@@ -388,3 +388,48 @@ test("home Writing section shows the featured posts", async ({ page }) => {
     .evaluateAll((ps) => ps.map((p) => p.getAttribute("d")));
   expect(paths).toEqual([icons.shield, icons.flask, icons.flask]);
 });
+
+test("skills tabs: first topic by default; tap, hover and arrow keys switch; height stays put", async ({
+  page,
+}, info) => {
+  const tabs = page.locator("[data-skills] [role='tab']");
+  const panels = page.locator("[data-skills] [role='tabpanel']");
+  await expect(tabs).toHaveCount(3);
+  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
+  await expect(panels.nth(0)).toBeVisible();
+  await expect(panels.nth(1)).toBeHidden();
+
+  // The three tiles sit in one row at every width.
+  const tops = await tabs.evaluateAll((els) =>
+    els.map((el) => Math.round(el.getBoundingClientRect().top)),
+  );
+  expect(new Set(tops).size).toBe(1);
+
+  const card = page.locator("[data-skills] .panels");
+  const before = (await card.boundingBox())!.height;
+
+  await tabs.nth(1).click();
+  await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
+  await expect(panels.nth(1)).toBeVisible();
+  await expect(panels.nth(0)).toBeHidden();
+  expect((await card.boundingBox())!.height).toBe(before);
+
+  if (info.project.name !== "phone") {
+    await tabs.nth(2).hover();
+    await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+  }
+
+  await tabs.nth(0).focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(tabs.nth(2)).toBeFocused();
+  await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Home");
+  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
+  await expect(panels.nth(0)).toBeVisible();
+
+  await page.waitForTimeout(500);
+  await page
+    .locator("#skills")
+    .locator("..")
+    .screenshot({ path: `test-results/shots/${info.project.name}/skills.png` });
+});

@@ -1,7 +1,7 @@
 // Short, one-off site copy. Longer content lives in src/content/.
 export const site = {
   name: "Neha Malla",
-  tagline: "Safe AI for high-stakes data.",
+  tagline: "AI engineering for regulated data.",
   url: "https://mallaneha.github.io",
   location: "Pittsburgh, PA",
   // IANA zone for the local time shown in the footer.
@@ -9,7 +9,7 @@ export const site = {
   // Header paragraphs, in order. Plain text; wrap a phrase in ==double equals== to give it a dotted underline.
   intro: [
     "M.S. student in AI Engineering at Carnegie\u00A0Mellon, focused on information security. Previously at Autonomize AI, and 3.5 years at Numeric Mind shipping FDA clinical data submissions.",
-    "I build applied AI systems where data is sensitive and mistakes are costly, like keeping patient records private and stopping poisoned documents from steering a model's answers.",
+    "I'm most interested in AI work where safety and compliance come first: healthcare, banking and insurance. I build AI systems that hold up to compliance and governance requirements, like HIPAA-grade PII redaction and RAG pipelines that resist poisoned documents.",
     "I'm ==looking for jobs== and can start full-time in January\u00A02027.",
   ],
   // Availability line at the top of the page (green dot, highlighted). null hides it.
@@ -19,7 +19,7 @@ export const site = {
   availability: null as string | null,
   // One-sentence summary for meta tags and llms.txt.
   summary:
-    "I build applied AI systems where data is sensitive and mistakes are costly. M.S. in AI Engineering (Information Security) at Carnegie Mellon. Previously at Autonomize AI on HIPAA-grade PII redaction and RAG, and 3.5 years shipping FDA clinical data submissions. Looking for full-time roles in healthcare, banking and insurance from January 2027.",
+    "AI engineer for regulated data. M.S. in AI Engineering (Information Security) at Carnegie Mellon. Previously at Autonomize AI on HIPAA-grade PII redaction and RAG, and 3.5 years shipping FDA clinical data submissions. Most interested in AI work where safety and compliance come first. Looking for full-time roles in healthcare, banking and insurance from January 2027.",
   // Meta description for /writing/ only (not shown on the page).
   writingBlurb: "Notes on evaluating and observing AI systems.",
   // Spelled out so scrapers looking for "@" don't harvest it. The page shows it like this, and clicking it
