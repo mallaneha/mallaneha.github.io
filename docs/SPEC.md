@@ -31,8 +31,8 @@ After Projects, three columns like Projects (stacked on phones): the topic name,
 
 - **Languages** (muted line under the title): Python, R, SAS, SQL
 - **AI systems** (Build): LangGraph, LangChain, LangFlow, Milvus, FastMCP, LangSmith, PyTorch, Scikit-learn, GCP, Docker, Terraform, PySpark, Kafka, PostgreSQL, Pandas, NumPy, Tidyverse, Matplotlib, Seaborn
-- **AI security & privacy** (Protect): Presidio, OpenMed, Private AI, reversible pseudonymization, HIPAA, RAG poisoning defenses, NLI checks, OWASP LLM Top 10, red & blue teaming, Wiz
-- **Regulated data** (Comply): CDISC (SDTM, ADaM), Pinnacle 21, FDA submissions
+- **AI security & privacy** (Protect): Presidio, OpenMed, Private AI, reversible pseudonymization, RAG poisoning defenses, NLI checks, OWASP LLM Top 10, red & blue teaming, Wiz
+- **Regulated data** (Comply): HIPAA, CDISC (SDTM, ADaM), Pinnacle 21, FDA submissions
 
 ### Building
 
