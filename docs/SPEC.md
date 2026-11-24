@@ -68,7 +68,7 @@ A one-line personal motto + year. Motto still to be chosen.
 
 ## 3. Small touches
 
-- Dark mode that follows the system setting.
+- Dark theme by default, with a toggle to light (the choice is saved).
 - An `llms.txt` file so AI tools can read the site cleanly.
 - Good meta tags: title "Neha Malla", the tagline as description, and a simple social preview.
 - Fast, accessible, readable on phones.

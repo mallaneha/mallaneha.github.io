@@ -23,7 +23,7 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
    LinkedIn and GitHub also appear as icon links next to the name in the header.
 6. Footer: optional motto · © year · city · local time (live, from `site.timeZone`), then the sound
    toggle and the light/dark theme toggle.
-   The theme follows the system until toggled; the choice is saved in localStorage (`theme`).
+   The theme is dark until toggled; the choice is saved in localStorage (`theme`). Without JS it follows the system.
    Dark values live twice in `tokens.css` (system media query and `[data-theme="dark"]`): keep them in sync.
 
 ## Row (`src/components/Row.astro`)

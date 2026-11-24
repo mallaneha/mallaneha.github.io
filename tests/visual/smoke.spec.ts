@@ -27,7 +27,9 @@ for (const path of pages) {
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
       page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+      // Dark is the default whatever the system says; a saved choice picks light.
       await page.emulateMedia({ colorScheme: scheme });
+      await page.addInitScript((t) => localStorage.setItem("theme", t), scheme);
       await page.goto(path);
 
       const overflow = await page.evaluate(

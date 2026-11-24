@@ -278,17 +278,11 @@ document.addEventListener("click", (e) => {
 });
 
 // ---------- theme toggle ----------
-// Base.astro's inline head script applies a saved choice before paint. With no saved choice the page follows
-// the system setting (CSS media query), and the button flips relative to whatever is showing now.
+// Base.astro's inline head script sets data-theme before paint: the saved choice, else dark (the default).
+// The system setting only applies without JS (CSS media query).
 const THEME_KEY = "theme";
-const systemDark = matchMedia("(prefers-color-scheme: dark)");
 const root = document.documentElement;
-const currentTheme = () =>
-  root.dataset.theme === "dark" || root.dataset.theme === "light"
-    ? root.dataset.theme
-    : systemDark.matches
-      ? "dark"
-      : "light";
+const currentTheme = () => (root.dataset.theme === "light" ? "light" : "dark");
 
 function syncThemeToggles() {
   const dark = currentTheme() === "dark";
@@ -301,7 +295,6 @@ function syncThemeToggles() {
   }
 }
 syncThemeToggles();
-systemDark.addEventListener("change", syncThemeToggles);
 document.addEventListener("click", (e) => {
   if (!(e.target as HTMLElement).closest("[data-theme-toggle]")) return;
   const next = currentTheme() === "dark" ? "light" : "dark";
