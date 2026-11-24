@@ -7,9 +7,6 @@ export interface SkillTopic {
   items: string[];
 }
 
-// Shown as the muted line under the Skills title.
-export const languages = ["Python", "R", "SAS", "SQL"];
-
 export const skills: SkillTopic[] = [
   {
     id: "ai-systems",
@@ -55,5 +52,10 @@ export const skills: SkillTopic[] = [
     id: "regulated-data",
     name: "Regulated data",
     items: ["HIPAA", "CDISC (SDTM, ADaM)", "Pinnacle 21", "FDA submissions"],
+  },
+  {
+    id: "languages",
+    name: "Languages",
+    items: ["Python", "R", "SAS", "SQL"],
   },
 ];
