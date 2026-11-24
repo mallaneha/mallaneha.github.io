@@ -19,7 +19,7 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
    or the icon when there's no logo.
 3. Projects: projects with `featured: true`, three in one line (stacked on phones), no icon tile, an open-link arrow on each. Each row opens a drawer.
 4. Skills: three topics (`src/data/skills.ts`) in one line like Projects (stacked on phones): topic name and its
-   tools as the muted line. Static rows, no tile, no drawer.
+   tools as the muted line, under a muted "Languages: …" line (the Section blurb). Static rows, no tile, no drawer.
 5. Writing: latest 3 published posts, then a quiet "All writing · N posts →" link styled like a row (no fill until hover).
 6. Connect: one column: Email (copies, toast), LinkedIn, GitHub, and Resume when `site.resume` is set.
    LinkedIn and GitHub also appear as icon links next to the name in the header.

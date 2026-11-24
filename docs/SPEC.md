@@ -29,9 +29,10 @@ Final spec as of 2026-11-22. Everything decided so far, ready to build.
 
 After Projects, three columns like Projects (stacked on phones): the topic name, then its tools as the muted line. Static, no interaction. (A first version with hover tabs right after the header was dropped the same day.) Data: `src/data/skills.ts` (resume facts only).
 
-- **AI systems** (Build): LangGraph, LangChain, Milvus, FastMCP, LangSmith tracing & evals, self-reflection, GKE, Docker, Terraform
+- **Languages** (muted line under the title): Python, R, SAS, SQL, C, C++
+- **AI systems** (Build): LangGraph, LangChain, LangFlow, Milvus, FastMCP, LangSmith tracing & evals, self-reflection, PyTorch, Scikit-learn, Streamlit, GCP (GKE, Dataproc), Docker, Terraform
 - **AI security & privacy** (Protect): Presidio, OpenMed, Private AI, reversible pseudonymization, HIPAA, RAG poisoning defenses, NLI checks, OWASP LLM Top 10, red & blue teaming, Wiz
-- **Regulated data** (Comply): CDISC (SDTM, ADaM), Pinnacle 21, FDA submissions, SAS, R, PySpark, Kafka, PostgreSQL
+- **Regulated data** (Comply): CDISC (SDTM, ADaM), Pinnacle 21, FDA submissions, Tidyverse, PySpark, Kafka, PostgreSQL, Pandas, NumPy, Matplotlib, Seaborn
 
 ### Building
 
