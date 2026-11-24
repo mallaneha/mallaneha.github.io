@@ -82,33 +82,35 @@ const educationDrawers = await Promise.all(
         <p class="tagline">
           <mark>{site.tagline}</mark>
         </p>
+      </div>
+      <div class="aside">
+        <span class="social">
+          <a
+            href={site.links.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            title="GitHub"
+          >
+            <Icon name="github" />
+          </a>
+          <a
+            href={site.links.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            title="LinkedIn"
+          >
+            <Icon name="linkedin" />
+          </a>
+          {resumeHref && (
+            <a href={resumeHref} aria-label="Resume (PDF)" title="Resume (PDF)">
+              <Icon name="file" />
+            </a>
+          )}
+        </span>
         <p class="location">{site.location}</p>
       </div>
-      <span class="social">
-        <a
-          href={site.links.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub"
-          title="GitHub"
-        >
-          <Icon name="github" />
-        </a>
-        <a
-          href={site.links.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="LinkedIn"
-          title="LinkedIn"
-        >
-          <Icon name="linkedin" />
-        </a>
-        {resumeHref && (
-          <a href={resumeHref} aria-label="Resume (PDF)" title="Resume (PDF)">
-            <Icon name="file" />
-          </a>
-        )}
-      </span>
     </div>
     {site.intro.map((line) => (
       <p>
@@ -279,6 +281,13 @@ const educationDrawers = await Promise.all(
     margin: 0;
     color: var(--color-muted);
   }
+  /* The icons with the location under them, both flush right. */
+  .aside {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    align-items: flex-end;
+  }
   .top {
     --cat: 2.5rem; /* the cat's height */
     --glyph: 1rem; /* the social icons' size */
@@ -325,6 +334,10 @@ const educationDrawers = await Promise.all(
       );
       margin-top: calc(var(--glyph-top) - var(--pad) / 2);
       margin-right: calc(var(--pad) / -2);
+    }
+    /* The 44px icon targets run past the name's line; pull the location up level with the tagline. */
+    .location {
+      margin-top: calc((var(--text-xl) * var(--leading-tight) - 2.75rem) / 2);
     }
   }
   .availability {
