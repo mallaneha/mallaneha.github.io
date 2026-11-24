@@ -101,7 +101,7 @@ test("writing list keeps the LLMs by hand parts together and in order", async ({
       .map((n) => n.match(/LLMs by hand, part (\d)/)?.[1])
       .filter(Boolean)
       .map(Number);
-    // The home page shows only 3 posts (featured first), so the series may not be on it.
+    // The home page shows only 4 posts (featured first), so the series may not be on it.
     if (path === "/" && parts.length === 0) continue;
     expect(parts.length, `${path} lists series parts`).toBeGreaterThan(0);
     expect(parts, `${path} order`).toEqual([...parts].sort());

@@ -30,11 +30,11 @@ const [projects, experience, education, writing] = await Promise.all([
 ]);
 const published = new Set(writing.map((w) => w.id));
 const featured = projects.filter((p) => p.data.featured);
-// Home page Writing section: featured posts first (newest first), topped up with the newest others to 3.
+// Home page Writing section: featured posts first (newest first), topped up with the newest others to 4.
 const latest = [
   ...writing.filter((w) => w.data.featured),
   ...writing.filter((w) => !w.data.featured),
-].slice(0, 3);
+].slice(0, 4);
 
 const featuredDrawers = await Promise.all(
   featured.map(async (p) => ({
