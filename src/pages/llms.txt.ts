@@ -1,7 +1,7 @@
 // /llms.txt: a plain-text summary of the site for AI tools (https://llmstxt.org).
 import type { APIRoute } from "astro";
 import { site } from "../data/site";
-import { skills, languages } from "../data/skills";
+import { skills } from "../data/skills";
 import {
   getWriting,
   getProjects,
@@ -37,7 +37,6 @@ export const GET: APIRoute = async () => {
     ...(site.availability ? ["", `Availability: ${site.availability}.`] : []),
     "",
     "## Skills",
-    `- Languages: ${languages.join(", ")}`,
     ...skills.map((s) => `- ${s.name}: ${s.items.join(", ")}`),
     "",
     "## Projects",

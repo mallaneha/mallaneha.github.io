@@ -420,7 +420,8 @@ test("skills: text tabs after Projects; click and arrow keys switch, height stay
 
   const tabs = section.locator("[role='tab']");
   const panels = section.locator("[role='tabpanel']");
-  await expect(tabs).toHaveCount(3);
+  await expect(tabs).toHaveCount(4);
+  await expect(tabs.nth(3)).toHaveText("Languages");
   await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
   await expect(panels.nth(0)).toBeVisible();
   await expect(panels.nth(0)).toContainText("LangGraph");
@@ -442,10 +443,12 @@ test("skills: text tabs after Projects; click and arrow keys switch, height stay
   expect((await area.boundingBox())!.height).toBe(before);
 
   await page.keyboard.press("ArrowRight");
-  await expect(tabs.nth(0)).toBeFocused();
+  await expect(tabs.nth(3)).toBeFocused();
+  await expect(panels.nth(3)).toContainText("Python");
+  await page.keyboard.press("ArrowRight");
   await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
   await page.keyboard.press("End");
-  await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+  await expect(tabs.nth(3)).toHaveAttribute("aria-selected", "true");
 
   await tabs.nth(1).click();
   await page.mouse.move(0, 0);

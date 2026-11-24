@@ -18,8 +18,8 @@ We copy the interaction patterns, not ch.sh's content, branding or code.
    file in `public/logos/`) in its own colors on a light tile,
    or the icon when there's no logo.
 3. Projects: projects with `featured: true`, three in one line (stacked on phones), no icon tile, an open-link arrow on each. Each row opens a drawer.
-4. Skills (`src/components/Skills.astro`, `src/scripts/skills.ts`): a muted "Languages: …" line (the Section blurb),
-   then the three topics as text tabs (active: text color and a 1px underline that grows in from the left; others muted,
+4. Skills (`src/components/Skills.astro`, `src/scripts/skills.ts`): four text tabs (the three topics,
+   then Languages) (active: text color and a 1px underline that grows in from the left; others muted,
    wrapping on phones), and the active topic's tools as a muted comma list. Click/tap or ←/→, Home, End; no hover
    switching. First topic by default and without JS. The old list fades out in 100ms, the new one in over
    `--duration-state` after 50ms; panels share one grid cell so the page below never moves. Reduced motion: instant.
