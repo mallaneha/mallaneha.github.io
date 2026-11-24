@@ -25,6 +25,7 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 ## Where things live
 
 - Short site copy (name, tagline, header paragraphs, contact links, location, resume, motto): `src/data/site.ts`
+- Skills section topics and chips: `src/data/skills.ts` (rendered by `src/components/Skills.astro`)
 - Writing (posts and short notes): `src/content/writing/<slug>.md` → `/writing/<slug>/`.
   Example: `src/content/writing/cutting-hallucinations-research-agent.md`
 - Projects: `src/content/projects/<slug>.md`. `featured: true` → Featured row + drawer; `status: building` → Building row.
@@ -37,7 +38,7 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 - Client scripts: `src/scripts/drawer.ts` (bottom-sheet drawers) and `src/scripts/effects.ts` (click spark, sound,
   vibration, mute toggle, theme toggle, copy-email toast). `effects.ts` also lazy-loads `src/scripts/explainers.ts`
   (widgets for the "LLMs by hand" posts) and `src/scripts/rag-explainers.ts` (widgets for the RAG posts), only on pages
-  that use one. Shared widget helpers: `src/scripts/explainer-kit.ts`. `effects.ts` also lazy-loads `src/scripts/margin-grid.ts` (the noise
+  that use one, and `src/scripts/skills.ts` (the home page's Skills tabs). Shared widget helpers: `src/scripts/explainer-kit.ts`. `effects.ts` also lazy-loads `src/scripts/margin-grid.ts` (the noise
   texture in the side margins) on screens 1024px and wider (turned off for now), and `src/scripts/snow.ts` (falling-snow
   dots behind every page; settings such as wind strength and direction in `src/data/snow.ts`). Icons: `src/data/icons.ts` (generic glyphs, plus the LinkedIn and GitHub marks for the Connect rows).
 - `/llms.txt` is generated from the same content by `src/pages/llms.txt.ts`.

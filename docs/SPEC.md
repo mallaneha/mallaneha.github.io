@@ -17,9 +17,21 @@ Final spec as of 2026-11-22. Everything decided so far, ready to build.
 ### Header
 
 - **Name (H1):** Neha Malla
-- **Tagline (italic):** _Safe AI for high-stakes data._
+- **Tagline (italic):** _AI engineering for regulated data._ (was "Safe AI for high-stakes data." until 2026-11-23)
 - **Intro:**
-  > I build applied AI systems where data is sensitive and mistakes are costly. M.S. in AI Engineering (Information Security) at Carnegie Mellon. Previously at Autonomize AI on HIPAA-grade PII redaction and RAG, and 3.5 years shipping FDA clinical data submissions. Looking for full-time roles in healthcare, banking and insurance from January 2027.
+  > M.S. student in AI Engineering at Carnegie Mellon, focused on information security. Previously at Autonomize AI, and 3.5 years at Numeric Mind shipping FDA clinical data submissions.
+  >
+  > I'm most interested in AI work where safety and compliance come first: healthcare, banking and insurance. I build AI systems that hold up to compliance and governance requirements, like HIPAA-grade PII redaction and RAG pipelines that resist poisoned documents.
+  >
+  > I'm looking for jobs and can start full-time in January 2027.
+
+### Skills (added 2026-11-23)
+
+Right after the header. Three topics, read left to right as build, protect, comply. Hover, tap or focus a topic to see its competencies. Data: `src/data/skills.ts` (resume facts only).
+
+- **AI systems** (Build): LangGraph, LangChain, Milvus, FastMCP, LangSmith tracing & evals, self-reflection, GKE, Docker, Terraform
+- **AI security & privacy** (Protect): Presidio, OpenMed, Private AI, reversible pseudonymization, HIPAA, RAG poisoning defenses, NLI checks, OWASP LLM Top 10, red & blue teaming, Wiz
+- **Regulated data** (Comply): CDISC (SDTM, ADaM), Pinnacle 21, FDA submissions, SAS, R, PySpark, Kafka, PostgreSQL
 
 ### Building
 
