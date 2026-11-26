@@ -23,3 +23,6 @@ CLAUDE.local.md
 test-results/
 playwright-report/
 .playwright-mcp/
+
+# private source files (resume has a phone number); never commit
+docs/reference/
