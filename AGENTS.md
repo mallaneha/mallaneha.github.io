@@ -3,7 +3,7 @@
 One-page personal site (intro, featured work, experience, writing, connect) plus a small blog.
 Full product spec: `docs/SPEC.md`. Design reference: ch.sh (layout, rows, drawers, click effects); see `docs/DESIGN.md`.
 Stack: Astro 7, TypeScript, Markdown content collections, plain CSS with design tokens, small vanilla TS scripts (no framework).
-Hosted on GitHub Pages at https://mallaneha.github.io; `.github/workflows/deploy.yml` deploys on push to `main`.
+Hosted on GitHub Pages at https://nehamalla.com (custom domain; `CNAME` at the repo root); `.github/workflows/deploy.yml` deploys on push to `main`.
 
 **Every change happens in its own git worktree, then merges into local `main`.** Never edit the main checkout:
 parallel agents share it. Steps are under "Parallel work" below.
@@ -20,7 +20,7 @@ Node version is pinned in `.nvmrc` (Astro needs ≥ 22.23.4). Run `nvm use` firs
 - `node scripts/check-links.mjs dist --external`: also check external URLs (slow, needs network)
 - `npm run test:visual`: Playwright smoke, interaction and explainer-widget tests (own server on port 4329) of every page
   at 375/768/1280/1920 px, light and dark. Fails on sideways scroll, JS errors or ≠ 1 `<h1>`. Screenshots: `test-results/shots/`
-- `npm run test:visual:live`: the same against https://mallaneha.github.io (published pages only)
+- `npm run test:visual:live`: the same against https://nehamalla.com (published pages only)
 
 ## Where things live
 

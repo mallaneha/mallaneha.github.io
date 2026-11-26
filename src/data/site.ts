@@ -2,7 +2,7 @@
 export const site = {
   name: "Neha Malla",
   tagline: "AI engineering for regulated data.",
-  url: "https://mallaneha.github.io",
+  url: "https://nehamalla.com",
   location: "Pittsburgh, PA",
   // IANA zone for the local time shown in the footer.
   timeZone: "America/New_York",
