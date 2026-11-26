@@ -3,7 +3,7 @@ import { defineConfig } from "astro/config";
 
 // GitHub Pages user site: served from the domain root, so no `base`.
 export default defineConfig({
-  site: "https://mallaneha.github.io",
+  site: "https://nehamalla.com",
   trailingSlash: "ignore",
   build: { format: "directory" },
   // Prefetch same-origin pages when a link is hovered or focused, so the next page is

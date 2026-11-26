@@ -1,7 +1,7 @@
 # mallaneha.github.io
 
 Personal website of Neha Malla: a one-page intro (experience, education, projects, writing, contact) and a small blog
-on evaluating and observing AI systems. Live at **https://mallaneha.github.io**.
+on evaluating and observing AI systems. Live at **https://nehamalla.com**.
 
 ![Home page, light theme](docs/screenshots/home-light.png)
 
